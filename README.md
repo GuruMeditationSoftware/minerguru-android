@@ -2,7 +2,7 @@
 
 Monitor and control your Bitaxe and NerdQAxe miners from your phone: live charts, network scan, pool management, alerts and home-screen widgets. Free, no account.
 
-Website: https://gurumeditationsoftware.github.io
+Website: https://minerguru.github.io
 
 ## Download
 
