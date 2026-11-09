@@ -1,5 +1,6 @@
 package app.minerguru.ui.settings
 
+import app.minerguru.R
 import app.minerguru.model.MinedCoin
 import app.minerguru.model.CoinAddress
 import app.minerguru.model.ChangeLog
@@ -83,7 +84,7 @@ import app.minerguru.model.AppInfo
 import app.minerguru.service.UpdateStatus
 import app.minerguru.model.AppLanguage
 import app.minerguru.model.BackgroundMode
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.Privacy
 import app.minerguru.service.AlertCenter
 import app.minerguru.service.MinerStore
@@ -100,13 +101,13 @@ import app.minerguru.ui.support.LicenseDialog
 private val intervals = listOf(2, 5, 10, 15, 30)
 
 private fun intervalLabel(sec: Int) = when (sec) {
-    2 -> L("2 s (Echtzeit)", "2 s (real time)")
-    5 -> L("5 s (empfohlen)", "5 s (recommended)")
+    2 -> tr(R.string.interval_2_s_real_time)
+    5 -> tr(R.string.interval_5_s_recommended)
     else -> "$sec s"
 }
 
 private fun languageLabel(lang: AppLanguage) = when (lang) {
-    AppLanguage.SYSTEM -> L("Systemsprache", "System language")
+    AppLanguage.SYSTEM -> tr(R.string.system_language)
     AppLanguage.GERMAN -> "Deutsch"
     AppLanguage.ENGLISH -> "English"
 }
@@ -128,7 +129,7 @@ fun SettingsScreen(store: MinerStore) {
     }
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) store.updateAlertsEnabled(true)
-        else store.showBanner(L("Ohne Erlaubnis für Mitteilungen kann MinerGuru nicht benachrichtigen.", "Without notification permission MinerGuru cannot notify you."), true)
+        else store.showBanner(tr(R.string.without_notification_permission_minerguru_cannot), true)
     }
 
     // Asked again on return from the system settings.
@@ -138,32 +139,31 @@ fun SettingsScreen(store: MinerStore) {
         onPauseOrDispose { }
     }
 
-    ScreenScaffold(L("Einstellungen", "Settings")) { inner ->
+    ScreenScaffold(tr(R.string.settings)) { inner ->
         PageContent(inner, maxWidth = 640.dp) { pad ->
             Column(
                 Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(pad),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                SettingsGroup(L("Darstellung", "Appearance"), listOf(
-                    { shape -> SettingsRow(shape, Icons.Rounded.Language, L("Sprache", "Language"), languageLabel(store.language)) { dialog = "language" } },
+                SettingsGroup(tr(R.string.appearance), listOf(
+                    { shape -> SettingsRow(shape, Icons.Rounded.Language, tr(R.string.language), languageLabel(store.language)) { dialog = "language" } },
                     { shape ->
                         SwitchRow(
-                            shape, Icons.Rounded.VisibilityOff, L("Privatmodus", "Privacy mode"),
-                            L("IP-, Wallet- und MAC-Adressen, WLAN-Name und Subnetz für Screenshots verschleiern. Worker-Namen bleiben lesbar.",
-                                "Scramble IP, wallet and MAC addresses, Wi-Fi name and subnet for screenshots. Worker names stay readable."),
+                            shape, Icons.Rounded.VisibilityOff, tr(R.string.privacy_mode),
+                            tr(R.string.scramble_ip_wallet_and_mac),
                             Privacy.active
                         ) { store.togglePrivacy() }
                     }
                 ))
 
-                SettingsGroup(L("Aktualisierung & Überwachung", "Refresh & monitoring"), listOf(
+                SettingsGroup(tr(R.string.refresh_monitoring), listOf(
                     { shape ->
-                        SettingsRow(shape, Icons.Rounded.Timer, L("Abfrage-Intervall", "Polling interval"), intervalLabel(store.pollingIntervalSeconds)) {
+                        SettingsRow(shape, Icons.Rounded.Timer, tr(R.string.polling_interval), intervalLabel(store.pollingIntervalSeconds)) {
                             dialog = "interval"
                         }
                     },
                     { shape ->
-                        val tempLabel = L("Temperaturwarnung (ASIC)", "Temperature warning (ASIC)")
+                        val tempLabel = tr(R.string.temperature_warning_asic)
                         Segment(shape) {
                             ListItem(
                                 leadingContent = { Icon(Icons.Rounded.Thermostat, null) },
@@ -182,8 +182,7 @@ fun SettingsScreen(store: MinerStore) {
                                             Text("${store.tempWarningThresholdC.toInt()} °C", style = MaterialTheme.typography.labelLarge)
                                         }
                                         Text(
-                                            L("Diese Abfrage läuft nur, solange die App geöffnet ist. Für Alarme bei geschlossener App: Überwachung im Hintergrund.",
-                                                "This polling only runs while the app is open. For alerts while it is closed: background monitoring."),
+                                            tr(R.string.this_polling_only_runs_while),
                                             style = MaterialTheme.typography.bodySmall
                                         )
                                     }
@@ -194,7 +193,7 @@ fun SettingsScreen(store: MinerStore) {
                     }
                 ))
 
-                SettingsGroup(L("Soll-Adressen", "Expected addresses"), listOf(
+                SettingsGroup(tr(R.string.expected_addresses), listOf(
                     { shape ->
                         Segment(shape) {
                             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -208,14 +207,13 @@ fun SettingsScreen(store: MinerStore) {
                                         label = { Text(coin.fullName) },
                                         isError = text.isNotEmpty() && CoinAddress.scriptPubKey(text) == null,
                                         supportingText = if (text.isNotEmpty() && CoinAddress.scriptPubKey(text) == null) {
-                                            { Text(L("Das ist keine gültige Adresse.", "This is not a valid address.")) }
+                                            { Text(tr(R.string.this_is_not_a_valid_address)) }
                                         } else null,
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
                                 Text(
-                                    L("MinerGuru warnt, wenn ein Miner an eine andere Adresse zahlt, und schreibt nie von selbst eine Adresse auf einen Miner.",
-                                        "MinerGuru warns when a miner pays to another address and never writes an address to a miner on its own."),
+                                    tr(R.string.minerguru_warns_when_a_miner),
                                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
@@ -223,32 +221,32 @@ fun SettingsScreen(store: MinerStore) {
                     }
                 ))
 
-                SettingsGroup(L("Eingriffe", "Interventions"), listOf(
+                SettingsGroup(tr(R.string.interventions), listOf(
                     { shape ->
-                        SwitchRow(shape, Icons.Rounded.Lock, L("Nur lesen", "Read-only"),
-                            L("Nichts an Minern ändern", "Change nothing on miners"), store.isReadOnly) { store.updateReadOnly(it) }
+                        SwitchRow(shape, Icons.Rounded.Lock, tr(R.string.read_only),
+                            tr(R.string.change_nothing_on_miners), store.isReadOnly) { store.updateReadOnly(it) }
                     },
                     { shape ->
-                        SwitchRow(shape, Icons.Rounded.RestartAlt, L("Ohne Shares neu starten", "Restart without shares"),
-                            L("Höchstens einmal pro Stunde je Miner, nie bei Überhitzung", "At most once an hour per miner, never when overheating"),
+                        SwitchRow(shape, Icons.Rounded.RestartAlt, tr(R.string.restart_without_shares),
+                            tr(R.string.at_most_once_an_hour),
                             store.restartsOnFlatline) { store.updateRestartsOnFlatline(it) }
                     },
                     { shape ->
-                        SwitchRow(shape, Icons.Rounded.RestartAlt, L("Zum Primär-Pool zurückholen", "Bring back to primary pool"),
-                            L("Höchstens einmal pro Stunde je Miner, nie bei Überhitzung", "At most once an hour per miner, never when overheating"),
+                        SwitchRow(shape, Icons.Rounded.RestartAlt, tr(R.string.bring_back_to_primary_pool),
+                            tr(R.string.at_most_once_an_hour),
                             store.restartsToPrimary) { store.updateRestartsToPrimary(it) }
                     },
                     { shape ->
-                        SettingsRow(shape, Icons.Rounded.History, L("Änderungsprotokoll", "Change log"),
-                            L("Jede Änderung an Minern", "Every change on miners")) { dialog = "changes" }
+                        SettingsRow(shape, Icons.Rounded.History, tr(R.string.change_log),
+                            tr(R.string.every_change_on_miners)) { dialog = "changes" }
                     }
                 ))
 
-                SettingsGroup(L("Benachrichtigungen", "Notifications"), buildList<@Composable (Shape) -> Unit> {
+                SettingsGroup(tr(R.string.notifications), buildList<@Composable (Shape) -> Unit> {
                     add { shape ->
                         SwitchRow(
-                            shape, Icons.Rounded.NotificationsActive, L("Bei Problemen benachrichtigen", "Notify me about problems"),
-                            L("Nur Alarme, keine Werbung.", "Alerts only, no advertising."),
+                            shape, Icons.Rounded.NotificationsActive, tr(R.string.notify_me_about_problems),
+                            tr(R.string.alerts_only_no_advertising),
                             store.alertsEnabled
                         ) { enabled ->
                             if (enabled && !AlertCenter.canPostNotifications(context)) notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -257,9 +255,8 @@ fun SettingsScreen(store: MinerStore) {
                     }
                     if (store.alertsEnabled && !notificationsReachUser) {
                         add { shape ->
-                            SettingsRow(shape, Icons.Rounded.NotificationsOff, L("Mitteilungen sind im System aus", "Notifications are off in the system"),
-                                L("MinerGuru kann dir so nichts anzeigen. Tippen, um sie in den Android-Einstellungen einzuschalten.",
-                                    "MinerGuru cannot show you anything like this. Tap to turn them on in the Android settings.")) {
+                            SettingsRow(shape, Icons.Rounded.NotificationsOff, tr(R.string.notifications_are_off_in_the),
+                                tr(R.string.minerguru_cannot_show_you_anything)) {
                                 val systemSettings = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                                 context.startActivity(systemSettings)
                             }
@@ -268,60 +265,57 @@ fun SettingsScreen(store: MinerStore) {
                     if (store.alertsEnabled) {
                         AlertKind.entries.forEach { kind ->
                             add { shape ->
-                                SwitchRow(shape, Icons.Rounded.WifiOff, kind.title, L("Einzelne Miner im Menü der Detailseite stummschalten", "Mute single miners in the menu of their detail page"),
+                                SwitchRow(shape, Icons.Rounded.WifiOff, kind.title, tr(R.string.mute_single_miners_in_the),
                                     kind !in store.disabledAlertKinds) { store.updateAlertKind(kind, it) }
                             }
                         }
                         add { shape ->
-                            SettingsRow(shape, Icons.Rounded.BatteryChargingFull, L("Überwachung im Hintergrund", "Background monitoring"), store.backgroundMode.title) {
+                            SettingsRow(shape, Icons.Rounded.BatteryChargingFull, tr(R.string.monitoring_in_background), store.backgroundMode.title) {
                                 dialog = "background"
                             }
                         }
                         add { shape ->
                             val active = store.emailSettings.isEnabled && store.emailSettings.isComplete
-                            SettingsRow(shape, Icons.Rounded.Email, L("E-Mail-Warnungen", "Email alerts"), if (active) L("Aktiv", "Active") else L("Aus", "Off")) {
+                            SettingsRow(shape, Icons.Rounded.Email, tr(R.string.email_alerts), if (active) tr(R.string.active) else tr(R.string.off)) {
                                 dialog = "email"
                             }
                         }
                     }
                 })
 
-                SettingsGroup(L("Blockansicht", "Block view"), listOf(
+                SettingsGroup(tr(R.string.block_view), listOf(
                     { shape ->
                         SwitchRow(
-                            shape, Icons.Rounded.ViewInAr, L("Block-Vorlage selbst beim Pool abfragen", "Fetch the block template from the pool"),
-                            L("Für Miner, die ihren Block nicht selbst melden (NerdOS, AxeOS vor 2.13)", "For miners that do not report their block (NerdOS, AxeOS before 2.13)"),
+                            shape, Icons.Rounded.ViewInAr, tr(R.string.fetch_the_block_template_from),
+                            tr(R.string.for_miners_that_do_not),
                             store.stratumProbeEnabled
                         ) { store.updateStratumProbe(it) }
                     },
                     { shape -> Segment(shape) { ProbeDescription() } }
                 ))
 
-                SettingsGroup(L("Netzwerk-Scan", "Network scan"), listOf(
+                SettingsGroup(tr(R.string.network_scan), listOf(
                     { shape ->
                         SettingsRow(
-                            shape, Icons.Rounded.TravelExplore, L("Standard-Subnetz (/24)", "Default subnet (/24)"),
+                            shape, Icons.Rounded.TravelExplore, tr(R.string.default_subnet_24),
                             "${Privacy.ip(store.subnetPrefix)}.1 – .254"
                         ) { dialog = "subnet" }
                     },
                     { shape ->
                         SwitchRow(
-                            shape, Icons.Rounded.Radar, L("Beim Start automatisch scannen", "Scan automatically at launch"),
-                            L("Wenn noch keine Miner konfiguriert sind", "When no miners are configured yet"),
+                            shape, Icons.Rounded.Radar, tr(R.string.scan_automatically_at_launch),
+                            tr(R.string.when_no_miners_are_configured),
                             store.autoScanOnEmptyLaunch
                         ) { store.updateAutoScan(it) }
                     }
                 ))
 
-                SettingsGroup(L("Updates", "Updates"), listOf(
+                SettingsGroup(tr(R.string.updates), listOf(
                     { shape ->
                         SwitchRow(
                             shape, Icons.Rounded.SystemUpdate,
-                            L("Täglich nach neuen Versionen suchen", "Check for new versions daily"),
-                            L(
-                                "MinerGuru fragt dazu GitHub nach der neuesten Version. GitHub sieht dabei deine IP-Adresse und die App-Version. Installiert wird nichts automatisch.",
-                                "MinerGuru asks GitHub for the latest version. GitHub sees your IP address and the app version. Nothing is installed automatically."
-                            ),
+                            tr(R.string.check_for_new_versions_daily),
+                            tr(R.string.minerguru_asks_github_for_the),
                             store.updates.isEnabled
                         ) { store.updates.updateEnabled(it) }
                     },
@@ -330,13 +324,13 @@ fun SettingsScreen(store: MinerStore) {
                         val available = updates.availableVersion
                         SettingsRow(
                             shape, Icons.Rounded.Refresh,
-                            if (available != null) L("Zum Download", "Go to download") else L("Jetzt suchen", "Check now"),
+                            if (available != null) tr(R.string.go_to_download) else tr(R.string.check_now),
                             when {
-                                updates.status == UpdateStatus.CHECKING -> L("Suche läuft …", "Checking …")
-                                updates.status == UpdateStatus.FAILED -> L("GitHub ist gerade nicht erreichbar.", "GitHub cannot be reached right now.")
-                                available != null -> L("MinerGuru $available ist verfügbar", "MinerGuru $available is available")
-                                updates.status == UpdateStatus.UP_TO_DATE -> L("MinerGuru ist aktuell.", "MinerGuru is up to date.")
-                                else -> L("Noch nicht gesucht", "Not checked yet")
+                                updates.status == UpdateStatus.CHECKING -> tr(R.string.checking)
+                                updates.status == UpdateStatus.FAILED -> tr(R.string.github_cannot_be_reached_right)
+                                available != null -> tr(R.string.minerguru_is_available, available)
+                                updates.status == UpdateStatus.UP_TO_DATE -> tr(R.string.minerguru_is_up_to_date)
+                                else -> tr(R.string.not_checked_yet)
                             }
                         ) {
                             if (available != null) {
@@ -348,7 +342,7 @@ fun SettingsScreen(store: MinerStore) {
                     }
                 ))
 
-                SettingsGroup(L("Über", "About"), listOf(
+                SettingsGroup(tr(R.string.about), listOf(
                     { shape ->
                         Segment(shape) {
                             ListItem(
@@ -357,8 +351,7 @@ fun SettingsScreen(store: MinerStore) {
                                 supportingContent = {
                                     Column {
                                         Text(AppInfo.MADE_BY)
-                                        Text(L("Überwachung und Steuerung von Bitaxe (AxeOS) und NerdOS-Minern im lokalen Netzwerk.",
-                                            "Monitoring and control of Bitaxe (AxeOS) and NerdOS miners in the local network."))
+                                        Text(tr(R.string.monitoring_and_control_of_bitaxe))
                                     }
                                 },
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
@@ -366,19 +359,18 @@ fun SettingsScreen(store: MinerStore) {
                         }
                     },
                     { shape ->
-                        SettingsRow(shape, Icons.Rounded.BugReport, L("Diagnose-Log exportieren", "Export diagnostic log"),
-                            L("Nur auf diesem Gerät. Enthält lokale IP-Adressen, aber keine Passwörter, Wallet-Adressen oder Codes. Wird nie automatisch gesendet.",
-                                "Only on this device. Contains local IP addresses, but no passwords, wallet addresses or codes. Never sent automatically.")) {
+                        SettingsRow(shape, Icons.Rounded.BugReport, tr(R.string.export_diagnostic_log),
+                            tr(R.string.only_on_this_device_contains)) {
                             exportLog.launch("minerguru-log.txt")
                         }
                     },
                     { shape ->
-                        SettingsRow(shape, Icons.Rounded.Feedback, L("Feedback geben", "Send feedback"), L("Auf GitHub", "On GitHub")) {
+                        SettingsRow(shape, Icons.Rounded.Feedback, tr(R.string.send_feedback), tr(R.string.on_github)) {
                             runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(AppInfo.FEEDBACK_URL))) }
                         }
                     },
                     { shape ->
-                        SettingsRow(shape, Icons.Rounded.Description, L("Lizenz", "License"), L("Lizenz und Hinweise zu Drittanbietern", "License and third-party notices")) {
+                        SettingsRow(shape, Icons.Rounded.Description, tr(R.string.license), tr(R.string.license_and_third_party_notices)) {
                             dialog = "license"
                         }
                     }
@@ -391,7 +383,7 @@ fun SettingsScreen(store: MinerStore) {
         "changes" -> ChangeLogDialog(onExport = { exportChanges.launch("minerguru-changes.txt") }, onDismiss = { dialog = null })
         "license" -> LicenseDialog(onDismiss = { dialog = null })
         "language" -> ChoiceDialog(
-            L("Sprache", "Language"), AppLanguage.entries, store.language, ::languageLabel,
+            tr(R.string.language), AppLanguage.entries, store.language, ::languageLabel,
             onDismiss = { dialog = null },
             extra = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 {
@@ -401,14 +393,14 @@ fun SettingsScreen(store: MinerStore) {
                             Intent(Settings.ACTION_APP_LOCALE_SETTINGS, Uri.fromParts("package", context.packageName, null))
                                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         )
-                    }) { Text(L("Systemeinstellungen", "System settings")) }
+                    }) { Text(tr(R.string.system_settings)) }
                 }
             } else null
         ) { dialog = null; store.updateLanguage(it) }
-        "interval" -> ChoiceDialog(L("Abfrage-Intervall", "Polling interval"), intervals, store.pollingIntervalSeconds, ::intervalLabel,
+        "interval" -> ChoiceDialog(tr(R.string.polling_interval), intervals, store.pollingIntervalSeconds, ::intervalLabel,
             onDismiss = { dialog = null }) { dialog = null; store.updatePollingInterval(it) }
         "email" -> EmailAlertsDialog(store) { dialog = null }
-        "background" -> ChoiceDialog(L("Überwachung im Hintergrund", "Background monitoring"), BackgroundMode.entries, store.backgroundMode, { it.title },
+        "background" -> ChoiceDialog(tr(R.string.monitoring_in_background), BackgroundMode.entries, store.backgroundMode, { it.title },
             onDismiss = { dialog = null }) { dialog = null; store.updateBackgroundMode(it) }
         "subnet" -> SubnetDialog(store.subnetPrefix, onDismiss = { dialog = null }) { dialog = null; store.updateSubnetPrefix(it) }
     }
@@ -422,9 +414,9 @@ private fun ChangeLogDialog(onExport: () -> Unit, onDismiss: () -> Unit) {
     val format = remember { java.text.DateFormat.getDateTimeInstance(java.text.DateFormat.SHORT, java.text.DateFormat.SHORT) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(L("Änderungsprotokoll", "Change log")) },
+        title = { Text(tr(R.string.change_log)) },
         text = {
-            if (entries.isEmpty()) Text(L("Noch keine Änderungen.", "No changes yet."))
+            if (entries.isEmpty()) Text(tr(R.string.no_changes_yet))
             else Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 entries.forEach { entry ->
                     Column {
@@ -439,9 +431,9 @@ private fun ChangeLogDialog(onExport: () -> Unit, onDismiss: () -> Unit) {
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(L("Schließen", "Close")) } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.close)) } },
         dismissButton = if (entries.isEmpty()) null else {
-            { TextButton(onClick = onExport) { Text(L("Exportieren", "Export")) } }
+            { TextButton(onClick = onExport) { Text(tr(R.string.export)) } }
         }
     )
 }
@@ -459,17 +451,11 @@ private fun SettingsGroup(title: String, rows: List<@Composable (Shape) -> Unit>
 private fun ProbeDescription() {
     Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            L(
-                "MinerGuru verbindet sich dazu von diesem Gerät aus kurz mit dem Pool des Miners, meldet sich mit dessen Adresse und dem Worker-Namen „minerguru“ an, liest den ersten Auftrag und trennt wieder. So siehst du Blockhöhe, Belohnung, Gebühren und Empfänger und ob deine Adresse dabei ist.",
-                "MinerGuru briefly connects from this device to the miner's pool, logs in with its address and the worker name \"minerguru\", reads the first job and disconnects. You then see block height, reward, fees and recipients, and whether your address is among them."
-            ),
+            tr(R.string.minerguru_briefly_connects_from_this),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            L(
-                "Es werden keine Shares eingereicht; bei 17 getesteten Solo-Pools erschien kein zusätzlicher Worker. Abgefragt wird nur bei offener Detailseite, höchstens alle 5 Minuten je Pool. Der Pool sieht die IP-Adresse deines Anschlusses, wie beim Miner auch.",
-                "No shares are submitted; none of 17 tested solo pools showed an extra worker. The pool is only asked while the detail page is open, at most every 5 minutes per pool. The pool sees the IP address of your connection, as it does for the miner."
-            ),
+            tr(R.string.no_shares_are_submitted_none),
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -532,7 +518,7 @@ private fun <T> ChoiceDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } },
         dismissButton = extra
     )
 }
@@ -543,18 +529,18 @@ private fun SubnetDialog(current: String, onDismiss: () -> Unit, onSave: (String
     val valid = Regex("""^\d{1,3}\.\d{1,3}\.\d{1,3}$""").matches(value.trim())
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(L("Standard-Subnetz", "Default subnet")) },
+        title = { Text(tr(R.string.default_subnet)) },
         text = {
             AppTextField(
                 value = value, onValueChange = { value = it.trim() }, singleLine = true,
-                label = { Text(L("Subnetz-Präfix (/24)", "Subnet prefix (/24)")) },
-                supportingText = { Text(L("z. B. 192.168.1 → scannt .1 bis .254", "e.g. 192.168.1 → scans .1 to .254")) },
+                label = { Text(tr(R.string.subnet_prefix_24)) },
+                supportingText = { Text(tr(R.string.e_g_192_168_1)) },
                 isError = value.isNotEmpty() && !valid,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 modifier = Modifier.fillMaxWidth().sensitive()
             )
         },
-        confirmButton = { TextButton(onClick = { onSave(value.trim()) }, enabled = valid) { Text(L("Speichern", "Save")) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } }
+        confirmButton = { TextButton(onClick = { onSave(value.trim()) }, enabled = valid) { Text(tr(R.string.save)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } }
     )
 }

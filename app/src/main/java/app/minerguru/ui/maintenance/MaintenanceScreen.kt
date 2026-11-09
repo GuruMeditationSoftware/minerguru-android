@@ -43,7 +43,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.model.MaintenanceKind
 import app.minerguru.model.MaintenanceStatus
 import app.minerguru.model.MaintenanceTask
@@ -80,32 +81,31 @@ fun MaintenanceScreen(store: MinerStore, onBack: () -> Unit) {
     val soon = tasks.count { it.status() == MaintenanceStatus.DUE_SOON }
 
     ScreenScaffold(
-        L("Wartung", "Maintenance"),
-        navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, L("Zurück", "Back")) } },
+        tr(R.string.maintenance),
+        navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr(R.string.back)) } },
         floatingActionButton = {
-            FloatingActionButton(onClick = { choosing = true }) { Icon(Icons.Rounded.Add, L("Aufgabe hinzufügen", "Add task")) }
+            FloatingActionButton(onClick = { choosing = true }) { Icon(Icons.Rounded.Add, tr(R.string.add_task)) }
         }
     ) { inner ->
         PageContent(inner) { pad ->
             LazyColumn(Modifier.fillMaxSize(), contentPadding = pad, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Figure(L("Überfällig", "Overdue"), overdue, if (overdue > 0) MG.bad() else null, Modifier.weight(1f))
-                        Figure(L("In 7 Tagen", "In 7 days"), soon, if (soon > 0) MG.warning() else null, Modifier.weight(1f))
-                        Figure(L("Erledigt", "Done"), store.maintenanceRecords.size, null, Modifier.weight(1f))
+                        Figure(tr(R.string.overdue), overdue, if (overdue > 0) MG.bad() else null, Modifier.weight(1f))
+                        Figure(tr(R.string.in_7_days), soon, if (soon > 0) MG.warning() else null, Modifier.weight(1f))
+                        Figure(tr(R.string.completed), store.maintenanceRecords.size, null, Modifier.weight(1f))
                     }
                 }
                 if (tasks.isEmpty()) {
                     item {
-                        EmptyHint(L("Noch keine Aufgaben. Mit dem Plus legst du zum Beispiel „Lüfter reinigen“ alle 90 Tage an. MinerGuru erinnert dich, wenn eine Aufgabe fällig ist.",
-                            "No tasks yet. Use the plus to add, for example, “Clean the fan” every 90 days. MinerGuru reminds you when a task is due."))
+                        EmptyHint(tr(R.string.no_tasks_yet_use_the))
                     }
                 }
                 items(tasks, key = { it.id }) { task ->
                     TaskCard(task, store.miners, onDone = { finishing = task }, onEdit = { editing = task }, onDelete = { store.removeMaintenanceTask(task.id) })
                 }
                 if (store.maintenanceRecords.isNotEmpty()) {
-                    item { Text(L("Erledigt", "Done"), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp)) }
+                    item { Text(tr(R.string.completed), style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp)) }
                     items(store.maintenanceRecords.take(50), key = { it.id }) { record ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Rounded.CheckCircle, null, tint = MG.good())
@@ -115,7 +115,7 @@ fun MaintenanceScreen(store: MinerStore, onBack: () -> Unit) {
                                 Text(listOf(dateText(record.doneAt), record.notes).filter { it.isNotEmpty() }.joinToString(" · "),
                                     style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
-                            IconButton(onClick = { store.removeMaintenanceRecord(record.id) }) { Icon(Icons.Rounded.Delete, L("Eintrag löschen", "Delete entry")) }
+                            IconButton(onClick = { store.removeMaintenanceRecord(record.id) }) { Icon(Icons.Rounded.Delete, tr(R.string.delete_entry)) }
                         }
                     }
                 }
@@ -126,7 +126,7 @@ fun MaintenanceScreen(store: MinerStore, onBack: () -> Unit) {
     if (choosing) {
         AlertDialog(
             onDismissRequest = { choosing = false },
-            title = { Text(L("Aufgabe hinzufügen", "Add task")) },
+            title = { Text(tr(R.string.add_task)) },
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     MaintenanceKind.entries.forEach { kind ->
@@ -137,7 +137,7 @@ fun MaintenanceScreen(store: MinerStore, onBack: () -> Unit) {
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { choosing = false }) { Text(L("Abbrechen", "Cancel")) } }
+            confirmButton = { TextButton(onClick = { choosing = false }) { Text(tr(R.string.cancel)) } }
         )
     }
     editing?.let { task ->
@@ -151,14 +151,14 @@ fun MaintenanceScreen(store: MinerStore, onBack: () -> Unit) {
         AlertDialog(
             onDismissRequest = { finishing = null },
             title = { Text(task.title) },
-            text = { AppTextField(notes, { notes = it }, label = { Text(L("Was wurde gemacht?", "What was done?")) }, modifier = Modifier.fillMaxWidth()) },
+            text = { AppTextField(notes, { notes = it }, label = { Text(tr(R.string.what_was_done)) }, modifier = Modifier.fillMaxWidth()) },
             confirmButton = {
                 TextButton(onClick = {
                     store.markMaintenanceDone(task, System.currentTimeMillis(), notes)
                     finishing = null
-                }) { Text(L("Erledigt", "Done")) }
+                }) { Text(tr(R.string.completed)) }
             },
-            dismissButton = { TextButton(onClick = { finishing = null }) { Text(L("Abbrechen", "Cancel")) } }
+            dismissButton = { TextButton(onClick = { finishing = null }) { Text(tr(R.string.cancel)) } }
         )
     }
 }
@@ -177,9 +177,9 @@ private fun Figure(title: String, count: Int, tint: Color?, modifier: Modifier) 
 private fun TaskCard(task: MaintenanceTask, miners: List<MinerDevice>, onDone: () -> Unit, onEdit: () -> Unit, onDelete: () -> Unit) {
     val days = task.daysUntilDue()
     val due = when {
-        days < 0 -> L("seit ${-days} Tagen fällig", "overdue by ${-days} days")
-        days == 0 -> L("heute fällig", "due today")
-        days <= MaintenanceTask.DUE_SOON_DAYS -> L("in $days Tagen", "in $days days")
+        days < 0 -> tr(R.string.overdue_by_days, -days)
+        days == 0 -> tr(R.string.due_today)
+        days <= MaintenanceTask.DUE_SOON_DAYS -> tr(R.string.in_days, days)
         else -> dateText(task.nextDue)
     }
     val color = when (task.status()) {
@@ -187,8 +187,8 @@ private fun TaskCard(task: MaintenanceTask, miners: List<MinerDevice>, onDone: (
         MaintenanceStatus.DUE_SOON -> MG.warning()
         MaintenanceStatus.PLANNED -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val scope = if (task.minerIds.isEmpty()) L("Alle Miner", "All miners") else miners.filter { it.id in task.minerIds }.joinToString { it.displayName }.ifEmpty { L("Miner entfernt", "Miner removed") }
-    val repeat = if (task.intervalDays > 0) L("alle ${task.intervalDays} Tage", "every ${task.intervalDays} days") else L("einmalig", "once")
+    val scope = if (task.minerIds.isEmpty()) tr(R.string.all_miners) else miners.filter { it.id in task.minerIds }.joinToString { it.displayName }.ifEmpty { tr(R.string.miner_removed) }
+    val repeat = if (task.intervalDays > 0) tr(R.string.every_days, task.intervalDays) else tr(R.string.once)
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(task.title, style = MaterialTheme.typography.titleSmall)
@@ -196,10 +196,10 @@ private fun TaskCard(task: MaintenanceTask, miners: List<MinerDevice>, onDone: (
             Text(listOf(scope, repeat, task.notes).filter { it.isNotEmpty() }.joinToString(" · "), style = MGType.mono(11.sp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onDone) { Text(L("Erledigt", "Done")) }
+                TextButton(onClick = onDone) { Text(tr(R.string.completed)) }
                 Spacer(Modifier.weight(1f))
-                IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, L("Bearbeiten", "Edit")) }
-                IconButton(onClick = onDelete) { Icon(Icons.Rounded.Delete, L("Aufgabe löschen", "Delete task")) }
+                IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, tr(R.string.edit)) }
+                IconButton(onClick = onDelete) { Icon(Icons.Rounded.Delete, tr(R.string.delete_task)) }
             }
         }
     }
@@ -214,26 +214,26 @@ private fun TaskEditor(task: MaintenanceTask, isNew: Boolean, miners: List<Miner
     val valid = draft.kind != MaintenanceKind.CUSTOM || draft.customTitle.isNotBlank()
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isNew) L("Wartungsaufgabe hinzufügen", "Add maintenance task") else L("Wartungsaufgabe bearbeiten", "Edit maintenance task")) },
+        title = { Text(if (isNew) tr(R.string.add_maintenance_task) else tr(R.string.edit_maintenance_task)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (draft.kind.hint.isNotEmpty()) {
                     Text(draft.kind.hint, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 AppTextField(draft.customTitle, { draft = draft.copy(customTitle = it) }, Modifier.fillMaxWidth(),
-                    label = { Text(L("Titel", "Title")) }, placeholder = { Text(draft.kind.title) })
-                TextButton(onClick = { pickingDate = true }) { Text(L("Fällig am ", "Due on ") + dateText(draft.nextDue)) }
+                    label = { Text(tr(R.string.title)) }, placeholder = { Text(draft.kind.title) })
+                TextButton(onClick = { pickingDate = true }) { Text(tr(R.string.due_on) + dateText(draft.nextDue)) }
                 AppTextField(interval, { interval = it.filter(Char::isDigit).take(4) }, Modifier.fillMaxWidth(),
-                    label = { Text(L("Wiederholen, Tage (0 = einmalig)", "Repeat, days (0 = once)")) },
+                    label = { Text(tr(R.string.repeat_days_0_once)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                 MinerScopeChecks(draft.minerIds, miners) { draft = draft.copy(minerIds = it) }
-                AppTextField(draft.notes, { draft = draft.copy(notes = it) }, Modifier.fillMaxWidth(), label = { Text(L("Notiz", "Note")) })
+                AppTextField(draft.notes, { draft = draft.copy(notes = it) }, Modifier.fillMaxWidth(), label = { Text(tr(R.string.note)) })
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(draft.copy(intervalDays = interval.toIntOrNull() ?: 0)) }, enabled = valid) { Text(L("Sichern", "Save")) }
+            TextButton(onClick = { onSave(draft.copy(intervalDays = interval.toIntOrNull() ?: 0)) }, enabled = valid) { Text(tr(R.string.save_entry)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } }
     )
     if (pickingDate) {
         val zone = ZoneId.systemDefault()
@@ -251,7 +251,7 @@ private fun TaskEditor(task: MaintenanceTask, isNew: Boolean, miners: List<Miner
                     pickingDate = false
                 }) { Text("OK") }
             },
-            dismissButton = { TextButton(onClick = { pickingDate = false }) { Text(L("Abbrechen", "Cancel")) } }
+            dismissButton = { TextButton(onClick = { pickingDate = false }) { Text(tr(R.string.cancel)) } }
         ) { DatePicker(state) }
     }
 }

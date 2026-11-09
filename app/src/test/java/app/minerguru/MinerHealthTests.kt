@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.Test
 
 class MinerHealthTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     private val start = 1_800_000_000_000L
     private val minute = 60_000L

@@ -16,7 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 
 /** The files wrap at 80 columns, a phone is narrower. Only full lines continue, so headings and lists stay as they are. */
 private val WRAPPED_LINE = Regex("""(?m)^(.{60,})\n *(?=\S)""")
@@ -32,17 +33,16 @@ fun LicenseDialog(onDismiss: () -> Unit) {
     }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(L("Lizenz", "License")) },
+        title = { Text(tr(R.string.license)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text(
-                    L("Open Source unter der MIT-Lizenz und kostenlos nutzbar. Nutzung und Änderungen an der Hardware auf eigenes Risiko.",
-                        "Open source under the MIT license and free to use. Use and changes to your hardware are at your own risk."),
+                    tr(R.string.open_source_under_the_mit),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 SelectionContainer { Text(text, fontFamily = FontFamily.Monospace, fontSize = 11.sp, lineHeight = 15.sp) }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(L("Schließen", "Close")) } }
+        confirmButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.close)) } }
     )
 }

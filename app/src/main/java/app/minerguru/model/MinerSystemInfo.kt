@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -189,10 +190,10 @@ data class MinerSystemInfo(
             ?: minerReportedPoolLatencyMs?.takeIf { isUsingFallbackStratum && it > 0 }
 
     val primaryPoolEndpoint: String
-        get() = if (stratumURL.isEmpty()) L("Nicht konfiguriert", "Not configured") else "${StratumHost.clean(stratumURL, true)}:$stratumPort"
+        get() = if (stratumURL.isEmpty()) tr(R.string.not_configured) else "${StratumHost.clean(stratumURL, true)}:$stratumPort"
 
     val fallbackPoolEndpoint: String
-        get() = if (fallbackStratumURL.isEmpty()) L("Nicht konfiguriert", "Not configured")
+        get() = if (fallbackStratumURL.isEmpty()) tr(R.string.not_configured)
         else "${StratumHost.clean(fallbackStratumURL, true)}:$fallbackStratumPort"
 
     val activePoolEndpoint: String
@@ -357,7 +358,7 @@ data class MinerSystemInfo(
         }
 
     val fanModeLabel: String
-        get() = if (autoFanModeRaw == 2) "PID Auto" else if (autoFanSpeed) L("Auto-Modus", "Auto mode") else L("Manuell", "Manual")
+        get() = if (autoFanModeRaw == 2) "PID Auto" else if (autoFanSpeed) tr(R.string.auto_mode) else tr(R.string.manual)
 
     private val hasSecondFan: Boolean get() = (fan2RPM ?: 0) > 0
 
@@ -370,8 +371,8 @@ data class MinerSystemInfo(
         get() = if (hasSecondFan && fan2RPM != null) "$fanRPM & $fan2RPM RPM • $fanModeLabel" else "$fanRPM RPM • $fanModeLabel"
 
     fun coolingText(warningThresholdC: Double): String =
-        if (vrTemp != null) L("Spannungsregler (VR)", "Voltage regulator (VR)") + ": ${MinerFormatting.format1(vrTemp)} °C"
-        else if (temp >= warningThresholdC) L("Kühlstatus: Erhöht", "Cooling: elevated") else L("Kühlstatus: Optimal", "Cooling: optimal")
+        if (vrTemp != null) tr(R.string.voltage_regulator_vr) + ": ${MinerFormatting.format1(vrTemp)} °C"
+        else if (temp >= warningThresholdC) tr(R.string.cooling_elevated) else tr(R.string.cooling_optimal)
 
     val powerDetailText: String
         get() = "${MinerFormatting.format2(voltageVolts)} V • ${MinerFormatting.format2(currentAmps)} A"
@@ -380,7 +381,7 @@ data class MinerSystemInfo(
         get() = "~${MinerFormatting.format2(power * 24.0 / 1000.0)} kWh / 24h"
 
     val coreVoltageText: String
-        get() = L("Ziel", "Target") + ": $coreVoltageTargetMV mV • " + L("Ist", "Actual") + ": $coreVoltageActualMV mV"
+        get() = tr(R.string.target) + ": $coreVoltageTargetMV mV • " + tr(R.string.actual) + ": $coreVoltageActualMV mV"
 
     val sharesText: String
         get() = "Shares: $sharesAccepted ok / $sharesRejected rej (${MinerFormatting.format2(shareRejectionRatePercent)}%)"

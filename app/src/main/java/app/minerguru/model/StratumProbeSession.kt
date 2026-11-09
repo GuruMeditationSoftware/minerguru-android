@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -28,11 +29,11 @@ sealed class StratumProbeError(val reason: String = "") : Exception(reason) {
 
     val text: String
         get() = when (this) {
-            InvalidEndpoint -> L("Pool-Adresse ist unvollständig.", "The pool address is incomplete.")
-            is ConnectionFailed -> L("Keine Verbindung zum Pool: $reason", "No connection to the pool: $reason")
-            is Rejected -> L("Der Pool lehnt den User ab: $reason", "The pool refuses the user: $reason")
-            Timeout -> L("Der Pool hat keinen Auftrag geschickt.", "The pool sent no job.")
-            Closed -> L("Der Pool hat die Verbindung getrennt.", "The pool closed the connection.")
+            InvalidEndpoint -> tr(R.string.the_pool_address_is_incomplete)
+            is ConnectionFailed -> tr(R.string.no_connection_to_the_pool, reason)
+            is Rejected -> tr(R.string.the_pool_refuses_the_user, reason)
+            Timeout -> tr(R.string.the_pool_sent_no_job)
+            Closed -> tr(R.string.the_pool_closed_the_connection)
         }
 
     override fun equals(other: Any?): Boolean = other is StratumProbeError && other::class == this::class && other.reason == reason
@@ -84,7 +85,7 @@ class StratumProbeSession(val user: String, val userAgent: String, val password:
             2 -> {
                 val accepted = message.bool("result") ?: false
                 if (!accepted) {
-                    val reason = errorText(message.opt("error")) ?: L("ohne Begründung", "no reason given")
+                    val reason = errorText(message.opt("error")) ?: tr(R.string.no_reason_given)
                     authorizeError = reason
                     return Event.Failed(StratumProbeError.Rejected(reason))
                 }

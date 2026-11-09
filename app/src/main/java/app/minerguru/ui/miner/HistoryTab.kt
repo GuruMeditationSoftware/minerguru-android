@@ -2,7 +2,8 @@ package app.minerguru.ui.miner
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,12 +52,12 @@ fun HistoryTab(
     val info = miner.latestInfo ?: return
     val h = miner.history
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(contentPadding), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        SectionTitle(L("Live-Telemetrie & Verlauf", "Live telemetry & history"), Icons.Rounded.ShowChart, "${h.size} " + L("Messpunkte", "samples") + " • ${pollingSeconds}s")
+        SectionTitle(tr(R.string.live_telemetry_history), Icons.Rounded.ShowChart, "${h.size} " + tr(R.string.samples) + " • ${pollingSeconds}s")
 
         ChartCard("Hashrate (GH/s)", MinerFormatting.formatHashrate(info.hashRate), Icons.Rounded.Bolt, MG.orange()) {
             LineChart(listOf(ChartSeries(h.map { it.hashRateGHs }, MG.orange(), fill = true)))
         }
-        ChartCard(L("ASIC & VR Temperatur (°C)", "ASIC & VR temperature (°C)"), "ASIC: ${MinerFormatting.format1(info.temp)} °C", Icons.Rounded.Thermostat, MG.green()) {
+        ChartCard(tr(R.string.asic_vr_temperature_c), "ASIC: ${MinerFormatting.format1(info.temp)} °C", Icons.Rounded.Thermostat, MG.green()) {
             LineChart(
                 listOf(
                     ChartSeries(h.map { it.asicTempC }, MG.green()),
@@ -66,11 +67,11 @@ fun HistoryTab(
             )
         }
         val latencyValues = h.map { s -> s.poolLatencyMs?.takeIf { it > 0 } }
-        ChartCard(L("Pool-Latenz (ms)", "Pool latency (ms)"), MinerFormatting.formatLatency(miner.activePoolLatencyMs), Icons.Rounded.Public, MG.mint()) {
-            if (latencyValues.none { it != null }) EmptyHint(L("Noch keine Latenzdaten", "No latency data yet"))
+        ChartCard(tr(R.string.pool_latency_ms), MinerFormatting.formatLatency(miner.activePoolLatencyMs), Icons.Rounded.Public, MG.mint()) {
+            if (latencyValues.none { it != null }) EmptyHint(tr(R.string.no_latency_data_yet))
             else LineChart(listOf(ChartSeries(latencyValues, MG.mint(), fill = true)), includeZero = true)
         }
-        ChartCard(L("Leistungsaufnahme (Watt)", "Power draw (watts)"), "${MinerFormatting.format1(info.power)} W • ${MinerFormatting.format1(info.efficiencyJPerTH)} J/TH", Icons.Rounded.Bolt, MG.yellow()) {
+        ChartCard(tr(R.string.power_draw_watts), "${MinerFormatting.format1(info.power)} W • ${MinerFormatting.format1(info.efficiencyJPerTH)} J/TH", Icons.Rounded.Bolt, MG.yellow()) {
             LineChart(listOf(ChartSeries(h.map { it.powerWatts }, MG.yellow(), fill = true)))
         }
         ShareDifficultyCard(tracker, log)
@@ -108,12 +109,12 @@ private fun ShareDifficultyCard(tracker: ShareDifficultyTracker, log: MinerLogSt
     val colors = samples.map { s -> if (!hasPools) single else if (s.pool == ShareSample.Pool.SECONDARY) p2 else p1 }
 
     ChartCard(
-        L("Difficulty pro Share", "Difficulty per share"),
-        samples.maxOfOrNull { it.difficulty }?.let { L("Bester", "Best") + ": ${MinerFormatting.formatDifficulty(it)}" } ?: "",
+        tr(R.string.difficulty_per_share),
+        samples.maxOfOrNull { it.difficulty }?.let { tr(R.string.best) + ": ${MinerFormatting.formatDifficulty(it)}" } ?: "",
         Icons.Rounded.ScatterPlot, MG.indigo()
     ) {
         if (samples.isEmpty()) {
-            EmptyHint(if (isSampling) L("Sammle Shares…", "Collecting shares…") else L("Noch keine Shares – die erste Stichprobe dauert etwa 10 Sekunden.", "No shares yet – the first sample takes about 10 seconds."))
+            EmptyHint(if (isSampling) tr(R.string.collecting_shares) else tr(R.string.no_shares_yet_the_first))
         } else {
             LogScatterChart(
                 xs = samples.map { it.date }, ys = samples.map { it.difficulty }, seriesKeys = keys, colors = colors,
@@ -126,14 +127,14 @@ private fun ShareDifficultyCard(tracker: ShareDifficultyTracker, log: MinerLogSt
             Box(Modifier.size(6.dp).clip(CircleShape).background(if (live) MG.green() else MaterialTheme.colorScheme.outline))
             Text(
                 " " + when {
-                    live -> L("Live aus dem Live-Log", "Live from the live log")
-                    isSampling -> L("Stichprobe läuft…", "Sampling…")
-                    lastSample != null -> L("Stichprobe alle 60 s • zuletzt", "Sample every 60 s • last") + " ${DateFormat.getTimeInstance(DateFormat.MEDIUM).format(Date(lastSample!!))}"
-                    else -> L("Stichprobe alle 60 s", "Sample every 60 s")
+                    live -> tr(R.string.live_from_the_live_log)
+                    isSampling -> tr(R.string.sampling)
+                    lastSample != null -> tr(R.string.sample_every_60_s_last) + " ${DateFormat.getTimeInstance(DateFormat.MEDIUM).format(Date(lastSample!!))}"
+                    else -> tr(R.string.sample_every_60_s)
                 },
                 style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f)
             )
-            Text("${samples.size} " + L("Ergebnisse", "results") + " • ${samples.count { it.isSubmitted }} " + L("über Pool-Diff.", "above pool diff."), style = MaterialTheme.typography.labelSmall,
+            Text("${samples.size} " + tr(R.string.results) + " • ${samples.count { it.isSubmitted }} " + tr(R.string.above_pool_diff), style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (hasPools) Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -61,8 +61,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.minerguru.R
 import app.minerguru.model.ConnectionState
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.Privacy
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.MinerFormatting
@@ -81,10 +82,10 @@ fun MinersScreen(
 ) {
     val gate = LocalNetworkGate.current
     ScreenScaffold(
-        L("Miner", "Miners"),
+        tr(R.string.miners),
         actions = {
             PrivacyToggle(store)
-            IconButton(onClick = { gate.run { onAdd(true) } }) { Icon(Icons.Rounded.Radar, L("Netzwerk scannen", "Scan network")) }
+            IconButton(onClick = { gate.run { onAdd(true) } }) { Icon(Icons.Rounded.Radar, tr(R.string.scan_network)) }
             RefreshAllMenu(store)
         },
         floatingActionButton = {
@@ -92,7 +93,7 @@ fun MinersScreen(
                 ExtendedFloatingActionButton(
                     onClick = { onAdd(false) },
                     icon = { Icon(Icons.Rounded.Add, null) },
-                    text = { Text(L("Miner", "Miner")) }
+                    text = { Text(tr(R.string.miner)) }
                 )
             }
         }
@@ -104,9 +105,9 @@ fun MinersScreen(
             ) {
                 if (!store.localNetworkGranted) NetworkAccessCard()
                 Icon(Icons.Rounded.Memory, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(L("Noch keine Miner", "No miners yet"), style = MaterialTheme.typography.titleMedium)
-                Text(L("Füge deinen ersten Bitaxe- oder NerdOS-Miner hinzu.", "Add your first Bitaxe or NerdOS miner."), color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Button(onClick = { onAdd(false) }) { Icon(Icons.Rounded.Add, null); Spacer(Modifier.width(8.dp)); Text(L("Miner hinzufügen", "Add miner")) }
+                Text(tr(R.string.no_miners_yet), style = MaterialTheme.typography.titleMedium)
+                Text(tr(R.string.add_your_first_bitaxe_or), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Button(onClick = { onAdd(false) }) { Icon(Icons.Rounded.Add, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.add_miner)) }
             }
             return@ScreenScaffold
         }
@@ -142,7 +143,7 @@ fun MinerDetailPlaceholder() {
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
     ) {
         Icon(Icons.Rounded.Tune, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(L("Wähle einen Miner aus, um Details und Steuerung zu sehen.", "Pick a miner to see its details and controls."),
+        Text(tr(R.string.pick_a_miner_to_see),
             color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
 }
@@ -182,15 +183,15 @@ fun MinerSummaryCard(
                     )
                 }
                 Box {
-                    IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, L("Aktionen", "Actions")) }
+                    IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, tr(R.string.actions)) }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                        DropdownMenuItem(text = { Text(L("Details & Steuerung", "Details & control")) }, leadingIcon = { Icon(Icons.Rounded.Tune, null) },
+                        DropdownMenuItem(text = { Text(tr(R.string.details_control)) }, leadingIcon = { Icon(Icons.Rounded.Tune, null) },
                             onClick = { menu = false; onOpen() })
-                        DropdownMenuItem(text = { Text(L("AxeOS / NerdOS im Browser", "AxeOS / NerdOS in browser")) }, leadingIcon = { Icon(Icons.Rounded.OpenInBrowser, null) },
+                        DropdownMenuItem(text = { Text(tr(R.string.axeos_nerdos_in_browser)) }, leadingIcon = { Icon(Icons.Rounded.OpenInBrowser, null) },
                             onClick = { menu = false; openUrl(context, miner.webInterfaceUrl) })
-                        DropdownMenuItem(text = { Text(L("Miner neu starten", "Restart miner")) }, leadingIcon = { Icon(Icons.Rounded.RestartAlt, null) },
+                        DropdownMenuItem(text = { Text(tr(R.string.restart_miner)) }, leadingIcon = { Icon(Icons.Rounded.RestartAlt, null) },
                             onClick = { menu = false; confirmRestart = true })
-                        DropdownMenuItem(text = { Text(L("Aus MinerGuru entfernen", "Remove from MinerGuru")) }, leadingIcon = { Icon(Icons.Rounded.Delete, null) },
+                        DropdownMenuItem(text = { Text(tr(R.string.remove_from_minerguru)) }, leadingIcon = { Icon(Icons.Rounded.Delete, null) },
                             onClick = { menu = false; confirmRemove = true })
                     }
                 }
@@ -211,7 +212,7 @@ fun MinerSummaryCard(
                             Text(" $unit", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(bottom = 4.dp))
                         }
-                        Text(L("Best seit Neustart ", "Best since restart ") + info.sessionBestDiffText + L(" · Allzeit ", " · all-time ") + info.bestDiffFormatted,
+                        Text(tr(R.string.best_since_restart) + info.sessionBestDiffText + tr(R.string.all_time_separator) + info.bestDiffFormatted,
                             style = MGType.mono(10.sp), color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     Sparkline(miner.history.takeLast(30).map { it.hashRateGHs }, accent, Modifier.width(100.dp).height(40.dp)) { MinerFormatting.formatHashrate(it) }
@@ -227,7 +228,7 @@ fun MinerSummaryCard(
                     SensorPill(Icons.Rounded.Thermostat, "ASIC", "${MinerFormatting.format1(info.temp)} °C",
                         if (isHighTemp) MG.bad() else if (info.temp > 62) MG.warning() else neutral, Modifier.weight(1f))
                     SensorPill(Icons.Rounded.Bolt, "${MinerFormatting.format1(info.efficiencyJPerTH)} J/TH", "${MinerFormatting.format1(info.power)} W", neutral, Modifier.weight(1f))
-                    SensorPill(Icons.Rounded.Air, if (info.fanRPM > 0) "${info.fanRPM} RPM" else L("Lüfter", "Fan"), "${info.fanPercentText} %", neutral, Modifier.weight(1f))
+                    SensorPill(Icons.Rounded.Air, if (info.fanRPM > 0) "${info.fanRPM} RPM" else tr(R.string.fan), "${info.fanPercentText} %", neutral, Modifier.weight(1f))
                 }
 
                 Row(
@@ -247,14 +248,14 @@ fun MinerSummaryCard(
                     is ConnectionState.Offline -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Icon(Icons.Rounded.WifiOff, null, tint = MG.bad())
                         Column {
-                            Text(L("Nicht erreichbar", "Unreachable"), fontWeight = FontWeight.Medium)
+                            Text(tr(R.string.unreachable), fontWeight = FontWeight.Medium)
                             Text(st.reason, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     else -> Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp)
-                        Text(L("Verbinde mit", "Connecting to") + " ${Privacy.ip(miner.ipAddress)}…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(tr(R.string.connecting_to) + " ${Privacy.ip(miner.ipAddress)}…", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -263,20 +264,20 @@ fun MinerSummaryCard(
 
     if (confirmRestart) AlertDialog(
         onDismissRequest = { confirmRestart = false },
-        title = { Text(L("Miner neu starten?", "Restart miner?")) },
-        text = { Text(L("Soll ${miner.displayName} (${Privacy.ip(miner.ipAddress)}) jetzt neu gestartet werden?", "Restart ${miner.displayName} (${Privacy.ip(miner.ipAddress)}) now?")) },
-        confirmButton = { TextButton(onClick = { confirmRestart = false; onRestart() }) { Text(L("Neu starten", "Restart")) } },
-        dismissButton = { TextButton(onClick = { confirmRestart = false }) { Text(L("Abbrechen", "Cancel")) } }
+        title = { Text(tr(R.string.restart_miner_question)) },
+        text = { Text(tr(R.string.restart_miner_now_question, miner.displayName, Privacy.ip(miner.ipAddress))) },
+        confirmButton = { TextButton(onClick = { confirmRestart = false; onRestart() }) { Text(tr(R.string.restart)) } },
+        dismissButton = { TextButton(onClick = { confirmRestart = false }) { Text(tr(R.string.cancel)) } }
     )
     if (confirmRemove) AlertDialog(
         onDismissRequest = { confirmRemove = false },
-        title = { Text(L("Miner entfernen?", "Remove miner?")) },
-        text = { Text(L("${miner.displayName} wird aus MinerGuru entfernt, sein Verlauf wird gelöscht. Der Miner selbst bleibt unverändert.", "${miner.displayName} is removed from MinerGuru and its history is deleted. The miner itself stays unchanged.")) },
+        title = { Text(tr(R.string.remove_miner)) },
+        text = { Text(tr(R.string.is_removed_from_minerguru_and, miner.displayName)) },
         confirmButton = {
             TextButton(onClick = { confirmRemove = false; onRemove() },
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(L("Entfernen", "Remove")) }
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(tr(R.string.remove)) }
         },
-        dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text(L("Abbrechen", "Cancel")) } }
+        dismissButton = { TextButton(onClick = { confirmRemove = false }) { Text(tr(R.string.cancel)) } }
     )
 }
 

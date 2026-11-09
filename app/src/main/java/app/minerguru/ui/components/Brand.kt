@@ -39,8 +39,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.MaterialTheme
+import app.minerguru.R
 import app.minerguru.model.ConnectionState
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.MinerFirmware
 import app.minerguru.model.MinerSystemInfo
@@ -111,9 +112,9 @@ private fun DrawScope.drawStatusBlock(state: ConnectionState, isHighTemp: Boolea
 
 fun connectionDescription(state: ConnectionState, isHighTemp: Boolean): String = when {
     state is ConnectionState.Offline -> "Offline"
-    state is ConnectionState.Online && isHighTemp -> L("Online, Temperatur hoch", "Online, temperature high")
+    state is ConnectionState.Online && isHighTemp -> tr(R.string.online_temperature_high)
     state is ConnectionState.Online -> "Online"
-    else -> L("Verbindung wird geprüft", "Checking connection")
+    else -> tr(R.string.checking_connection)
 }
 
 // endregion

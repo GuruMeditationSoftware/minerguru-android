@@ -29,7 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.PoolConfig
 import app.minerguru.model.PoolScheduleRule
@@ -54,10 +55,9 @@ fun PoolSchedulesCard(store: MinerStore) {
     val rules = store.poolSchedules.sortedBy { it.minute }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(L("Geplanter Pool-Wechsel", "Scheduled pool switching"), style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.scheduled_pool_switching), style = MaterialTheme.typography.titleSmall)
             if (rules.isEmpty()) {
-                Text(L("Stell Miner automatisch um, zum Beispiel nachts und am Wochenende auf einen Solo-Pool und morgens zurück. Jeder Wechsel ist ein eigener Eintrag; der Miner startet dabei kurz neu.",
-                    "Move miners automatically, for example to a solo pool on nights and weekends and back in the morning. Each switch is its own entry; the miner restarts briefly."),
+                Text(tr(R.string.move_miners_automatically_for_example),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             rules.forEachIndexed { index, rule ->
@@ -65,16 +65,15 @@ fun PoolSchedulesCard(store: MinerStore) {
                 RuleRow(store, rule, onEdit = { editing = rule })
             }
             if (rules.isNotEmpty() && !PowerCenter.isSwitching(context)) {
-                Text(L("Das Handy schaltet nur mit sofortiger Überwachung und eingeschalteten Zeitplänen auf der Seite Strom.",
-                    "The phone only switches with instant monitoring and with schedules turned on on the Power page."),
+                Text(tr(R.string.the_phone_only_switches_with),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             app.minerguru.ui.support.OtpWaitingNotice(store)
-            store.poolScheduleError?.let { StatusMessage(L("Letzter Wechsel fehlgeschlagen: $it", "Last switch failed: $it"), true) }
+            store.poolScheduleError?.let { StatusMessage(tr(R.string.last_pool_switch_failed, it), true) }
             FilledTonalButton(
                 onClick = { store.poolLibrary.firstOrNull()?.let { editing = PoolScheduleRule(poolId = it.id) } },
                 enabled = store.poolLibrary.isNotEmpty() && store.miners.isNotEmpty()
-            ) { Text(L("Wechsel planen", "Schedule a switch")) }
+            ) { Text(tr(R.string.schedule_a_switch)) }
         }
     }
     editing?.let { rule ->
@@ -87,18 +86,18 @@ fun PoolSchedulesCard(store: MinerStore) {
 
 @Composable
 private fun RuleRow(store: MinerStore, rule: PoolScheduleRule, onEdit: () -> Unit) {
-    val pool = store.poolLibrary.firstOrNull { it.id == rule.poolId }?.name ?: L("Pool gelöscht", "Pool deleted")
+    val pool = store.poolLibrary.firstOrNull { it.id == rule.poolId }?.name ?: tr(R.string.pool_deleted)
     Row(verticalAlignment = Alignment.CenterVertically) {
         Switch(rule.isEnabled, { on -> store.updatePoolSchedules(store.poolSchedules.map { if (it.id == rule.id) it.copy(isEnabled = on) else it }) })
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Text("${Weekdays.summary(rule.weekdays)} ${WeeklyWindow.clock(rule.minute)} → $pool", style = MaterialTheme.typography.bodyMedium)
-            val miners = if (rule.minerIds.isEmpty()) L("Alle Miner", "All miners") else store.miners.filter { it.id in rule.minerIds }.joinToString { it.displayName }.ifEmpty { L("Miner entfernt", "Miner removed") }
+            val miners = if (rule.minerIds.isEmpty()) tr(R.string.all_miners) else store.miners.filter { it.id in rule.minerIds }.joinToString { it.displayName }.ifEmpty { tr(R.string.miner_removed) }
             Text(miners, style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
         }
-        IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, L("Bearbeiten", "Edit")) }
+        IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, tr(R.string.edit)) }
         IconButton(onClick = { store.updatePoolSchedules(store.poolSchedules.filterNot { it.id == rule.id }) }) {
-            Icon(Icons.Rounded.Delete, L("Wechsel löschen", "Delete switch"))
+            Icon(Icons.Rounded.Delete, tr(R.string.delete_switch))
         }
     }
 }
@@ -108,25 +107,24 @@ private fun RuleEditor(rule: PoolScheduleRule, isNew: Boolean, pools: List<PoolC
     var draft by remember { mutableStateOf(rule) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isNew) L("Pool-Wechsel planen", "Schedule a pool switch") else L("Pool-Wechsel bearbeiten", "Edit pool switch")) },
+        title = { Text(if (isNew) tr(R.string.schedule_a_pool_switch) else tr(R.string.edit_pool_switch)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()).fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Pool", style = MaterialTheme.typography.labelLarge)
                 pools.forEach { pool ->
                     AppFilterChip(selected = pool.id == draft.poolId, onClick = { draft = draft.copy(poolId = pool.id) }, label = { Text(pool.name) })
                 }
-                Text(L("Tage", "Days"), style = MaterialTheme.typography.labelLarge)
+                Text(tr(R.string.days), style = MaterialTheme.typography.labelLarge)
                 WeekdayPicker(draft.weekdays) { draft = draft.copy(weekdays = it) }
-                TimeField(L("Uhrzeit", "Time"), draft.minute) { draft = draft.copy(minute = it) }
+                TimeField(tr(R.string.time), draft.minute) { draft = draft.copy(minute = it) }
                 MinerScopeChecks(draft.minerIds, miners) { draft = draft.copy(minerIds = it) }
-                Text(L("Der Miner bekommt den Pool als Hauptpool und startet neu. War er zur Uhrzeit offline, holt MinerGuru den Wechsel in den nächsten 30 Minuten nach.",
-                    "The miner gets the pool as its primary pool and restarts. If it was offline at that time, MinerGuru catches up within the next 30 minutes."),
+                Text(tr(R.string.the_miner_gets_the_pool),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSave(if (isNew) draft.copy(createdAt = System.currentTimeMillis()) else draft) }, enabled = draft.weekdays.isNotEmpty()) { Text(L("Sichern", "Save")) }
+            TextButton(onClick = { onSave(if (isNew) draft.copy(createdAt = System.currentTimeMillis()) else draft) }, enabled = draft.weekdays.isNotEmpty()) { Text(tr(R.string.save_entry)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } }
     )
 }

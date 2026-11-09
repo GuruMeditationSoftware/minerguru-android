@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
+import app.minerguru.R
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,7 +80,7 @@ fun DashboardScreen(
         "MinerGuru", large = true,
         actions = {
             PrivacyToggle(store)
-            IconButton(onClick = { gate.run { onOpenScanner(true) } }) { Icon(Icons.Rounded.Radar, L("Netzwerk scannen", "Scan network")) }
+            IconButton(onClick = { gate.run { onOpenScanner(true) } }) { Icon(Icons.Rounded.Radar, tr(R.string.scan_network)) }
             RefreshAllMenu(store)
         }
     ) { inner ->
@@ -100,15 +101,15 @@ fun DashboardScreen(
                     val due = store.maintenanceTasks.count { it.daysUntilDue() <= 0 }
                     SectionCard(Modifier.weight(1f), onClick = onOpenMaintenance) {
                         Column {
-                            Text(L("Wartung", "Maintenance"), style = MaterialTheme.typography.titleSmall)
-                            Text(if (due > 0) L("$due fällig", "$due due") else L("Nichts fällig", "Nothing due"),
+                            Text(tr(R.string.maintenance), style = MaterialTheme.typography.titleSmall)
+                            Text(if (due > 0) tr(R.string.due, due) else tr(R.string.nothing_due),
                                 style = MaterialTheme.typography.bodySmall, color = if (due > 0) MG.warning() else MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                     SectionCard(Modifier.weight(1f), onClick = onOpenReports) {
                         Column {
-                            Text(L("Berichte", "Reports"), style = MaterialTheme.typography.titleSmall)
-                            Text(L("PDF und CSV", "PDF and CSV"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(tr(R.string.reports), style = MaterialTheme.typography.titleSmall)
+                            Text(tr(R.string.pdf_and_csv), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
                 }
@@ -124,10 +125,10 @@ fun RefreshAllMenu(store: MinerStore) {
     var open by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     Box {
-        IconButton(onClick = { open = true }) { Icon(Icons.Rounded.MoreVert, L("Mehr", "More")) }
+        IconButton(onClick = { open = true }) { Icon(Icons.Rounded.MoreVert, tr(R.string.more)) }
         DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             DropdownMenuItem(
-                text = { Text(L("Alle aktualisieren", "Refresh all")) },
+                text = { Text(tr(R.string.refresh_all)) },
                 leadingIcon = { Icon(Icons.Rounded.Refresh, null) },
                 enabled = store.miners.isNotEmpty(),
                 onClick = { open = false; scope.launch { store.refreshAllMiners() } }
@@ -148,31 +149,28 @@ private fun Onboarding(store: MinerStore, onOpenScanner: (Boolean) -> Unit) {
                 ),
                 width = 120.dp
             )
-            Text(L("Willkommen bei MinerGuru", "Welcome to MinerGuru"), style = MaterialTheme.typography.headlineSmall)
+            Text(tr(R.string.welcome_to_minerguru), style = MaterialTheme.typography.headlineSmall)
             Text(
-                L(
-                    "Dein Dashboard für Bitaxe- und NerdOS-Miner. Scanne dein WLAN automatisch oder füge einen Miner direkt per IP-Adresse hinzu.",
-                    "Your dashboard for Bitaxe and NerdOS miners. Scan your Wi-Fi automatically or add a miner directly by IP address."
-                ),
+                tr(R.string.your_dashboard_for_bitaxe_and),
                 style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (store.isScanning) {
                 CircularProgressIndicator()
                 Text(
-                    L("Prüfe IPs in", "Checking IPs in") + " ${Privacy.ip(store.subnetPrefix)}.1–254… (${store.scanCompleted}/${store.scanTotal})",
+                    tr(R.string.checking_ips_in) + " ${Privacy.ip(store.subnetPrefix)}.1–254… (${store.scanCompleted}/${store.scanTotal})",
                     style = MaterialTheme.typography.bodySmall
                 )
                 if (store.discoveredMiners.isNotEmpty()) {
-                    Text(Lp(store.discoveredMiners.size, "Miner", "Miner", "miner", "miners") + L(" gefunden", " found"), color = MG.text(MG.green()),
+                    Text(trp(R.plurals.miners_count, store.discoveredMiners.size) + tr(R.string.found), color = MG.text(MG.green()),
                         modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
                 }
-                FilledTonalButton(onClick = { store.stopScan() }) { Text(L("Stopp", "Stop")) }
+                FilledTonalButton(onClick = { store.stopScan() }) { Text(tr(R.string.stop)) }
             } else {
                 Button(onClick = { gate.run { store.startScan(); onOpenScanner(true) } }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Rounded.Radar, null); Spacer(Modifier.width(8.dp)); Text(L("Netzwerk jetzt scannen", "Scan network now"))
+                    Icon(Icons.Rounded.Radar, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.scan_network_now))
                 }
                 FilledTonalButton(onClick = { onOpenScanner(false) }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Rounded.AddCircle, null); Spacer(Modifier.width(8.dp)); Text(L("Miner per IP hinzufügen", "Add miner by IP"))
+                    Icon(Icons.Rounded.AddCircle, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.add_miner_by_ip))
                 }
             }
         }
@@ -189,20 +187,20 @@ private fun FleetSection(store: MinerStore, onOpenMiners: () -> Unit) {
     val total = store.miners.size
     val accent = MG.accent()
     val meta = buildList {
-        add(L("$online von $total online", "$online of $total online"))
+        add(tr(R.string.of_online, online, total))
         if (total > online) add("${total - online} offline")
-        store.lastGlobalRefresh?.let { add(L("aktualisiert ", "updated ") + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(Date(it))) }
+        store.lastGlobalRefresh?.let { add(tr(R.string.updated) + DateFormat.getTimeInstance(DateFormat.MEDIUM).format(Date(it))) }
     }.joinToString(" · ")
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(L("Flotte", "Fleet"), style = MaterialTheme.typography.titleMedium)
+        Text(tr(R.string.fleet), style = MaterialTheme.typography.titleMedium)
         Text(meta, style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite })
         SectionCard(onClick = onOpenMiners) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(L("Gesamt-Hashrate", "Total hashrate"), style = MaterialTheme.typography.labelMedium,
+                        Text(tr(R.string.total_hashrate), style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                         val (value, unit) = MinerFormatting.splitHashrate(store.totalHashrateGHs)
                         Row(verticalAlignment = Alignment.Bottom) {
@@ -239,13 +237,13 @@ private fun FleetFigures(store: MinerStore) {
     val latency = store.averagePoolLatencyMs
     val best = store.bestSessionMiner
     val figures = listOf(
-        Figure(L("Leistung", "Power"), MinerFormatting.format1(store.totalPowerWatts), "W",
-            "${MinerFormatting.format2(store.totalPowerWatts * 24 / 1000)} kWh/" + L("Tag", "day")),
-        Figure(L("Effizienz", "Efficiency"), if (store.fleetEfficiencyJPerTH > 0) MinerFormatting.format1(store.fleetEfficiencyJPerTH) else "—", "J/TH", null),
-        Figure("Shares", DisplayFormat.integer(acc), null, L("$rej abgelehnt", "$rej rejected") + " · ${MinerFormatting.format2(rejRate)} %"),
-        Figure(L("Best Diff seit Neustart", "Best diff since restart"), MinerFormatting.formatSessionBest(best?.second), null,
-            L("Allzeit ", "All-time ") + store.highestBestDiffFormatted),
-        Figure(L("Ø Pool-Latenz", "Avg. pool latency"), latency?.let { MinerFormatting.format0(it) } ?: "—", if (latency != null) "ms" else null,
+        Figure(tr(R.string.power), MinerFormatting.format1(store.totalPowerWatts), "W",
+            "${MinerFormatting.format2(store.totalPowerWatts * 24 / 1000)} kWh/" + tr(R.string.day_in_text)),
+        Figure(tr(R.string.efficiency), if (store.fleetEfficiencyJPerTH > 0) MinerFormatting.format1(store.fleetEfficiencyJPerTH) else "—", "J/TH", null),
+        Figure("Shares", DisplayFormat.integer(acc), null, tr(R.string.rejected, rej) + " · ${MinerFormatting.format2(rejRate)} %"),
+        Figure(tr(R.string.best_diff_since_restart), MinerFormatting.formatSessionBest(best?.second), null,
+            tr(R.string.all_time) + store.highestBestDiffFormatted),
+        Figure(tr(R.string.avg_pool_latency), latency?.let { MinerFormatting.format0(it) } ?: "—", if (latency != null) "ms" else null,
             LatencyQuality.evaluate(latency).label)
     )
     CardGrid(figures, minCellWidth = 128.dp, spacing = 16.dp, minColumns = 2, maxColumns = 5) { FigureCell(it) }
@@ -280,10 +278,9 @@ private fun SoloChanceSection(store: MinerStore) {
     if (summaries.isEmpty()) return
 
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(L("Solo-Mining-Chancen", "Solo mining chances"), style = MaterialTheme.typography.titleMedium)
+        Text(tr(R.string.solo_mining_chances), style = MaterialTheme.typography.titleMedium)
         Text(
-            L("Wahrscheinlichkeit auf einen Block-Fund mit deiner aktuellen Flotten-Hashrate",
-                "Probability of finding a block with your current fleet hashrate"),
+            tr(R.string.probability_of_finding_a_block),
             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
@@ -291,7 +288,7 @@ private fun SoloChanceSection(store: MinerStore) {
         ExposedDropdownMenuBox(expanded = tfMenu, onExpandedChange = { tfMenu = it }) {
             AppTextField(
                 value = store.soloChanceTimeframe.label, onValueChange = {}, readOnly = true, singleLine = true,
-                label = { Text(L("Zeitraum", "Timeframe")) },
+                label = { Text(tr(R.string.timeframe)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = tfMenu) },
                 modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).widthIn(min = 220.dp)
             )
@@ -319,7 +316,7 @@ private fun CoinSoloChanceCard(summary: FleetCoinMiningSummary, timeframe: SoloC
             }
 
             Text(
-                L("Solo-Chance", "Solo chance") + " · ${timeframe.label}",
+                tr(R.string.solo_chance) + " · ${timeframe.label}",
                 style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -327,11 +324,11 @@ private fun CoinSoloChanceCard(summary: FleetCoinMiningSummary, timeframe: SoloC
                 Text("(${summary.formattedProbabilityPercent(timeframe)})", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(bottom = 2.dp))
             }
             Text(
-                L("Ø 1 Block alle", "Avg. 1 block every") + " ${summary.expectedTimePerBlockFormatted}",
+                tr(R.string.avg_1_block_every) + " ${summary.expectedTimePerBlockFormatted}",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                L("Block-Reward", "Block reward") + ": ${summary.blockRewardText}",
+                tr(R.string.block_reward) + ": ${summary.blockRewardText}",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
@@ -339,7 +336,7 @@ private fun CoinSoloChanceCard(summary: FleetCoinMiningSummary, timeframe: SoloC
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(summary.contributingMinersText, style = MaterialTheme.typography.labelSmall, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-                Text(L("Netz-Diff", "Net diff") + ": ${MinerFormatting.formatDifficulty(summary.networkDifficulty)}",
+                Text(tr(R.string.net_diff) + ": ${MinerFormatting.formatDifficulty(summary.networkDifficulty)}",
                     style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

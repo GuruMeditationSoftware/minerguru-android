@@ -62,8 +62,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.minerguru.R
 import app.minerguru.model.ConnectionState
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.Privacy
 import app.minerguru.model.LatencyQuality
 import app.minerguru.model.MinedCoin
@@ -235,8 +236,8 @@ fun PoolModeBadge(info: MinerSystemInfo, compact: Boolean = true) {
             else "Dual-Pool (${info.dualPoolPrimaryPercent}% / ${info.dualPoolSecondaryPercent}%)",
             MG.purple(), icon = Icons.Rounded.AltRoute
         )
-        info.isUsingFallbackStratum -> Chip(if (compact) "Fallback" else L("Fallback-Pool aktiv", "Fallback pool active"), MG.orange(), dot = true)
-        else -> Chip(if (compact) L("Primär", "Primary") else L("Primärer Pool aktiv", "Primary pool active"), MG.green(), dot = true)
+        info.isUsingFallbackStratum -> Chip(if (compact) "Fallback" else tr(R.string.fallback_pool_active), MG.orange(), dot = true)
+        else -> Chip(if (compact) tr(R.string.primary) else tr(R.string.primary_pool_active), MG.green(), dot = true)
     }
 }
 
@@ -421,7 +422,7 @@ fun LogScatterChart(
     axisFormat: (Double) -> String
 ) {
     val chartDescription = if (ys.isEmpty()) "" else
-        L("Share-Difficulty: ${ys.size} Werte, höchster ${axisFormat(ys.max())}", "Share difficulty: ${ys.size} values, highest ${axisFormat(ys.max())}")
+        tr(R.string.share_difficulty_values_highest, ys.size, axisFormat(ys.max()))
     val gridColor = MaterialTheme.colorScheme.outlineVariant
     val textColor = MaterialTheme.colorScheme.onSurfaceVariant
     val measurer = androidx.compose.ui.text.rememberTextMeasurer()
@@ -465,15 +466,14 @@ fun LogScatterChart(
 /** Short text version of a chart for screen readers: latest value, range and trend. */
 fun chartSummary(values: List<Double?>, format: (Double) -> String): String {
     val v = values.filterNotNull()
-    if (v.isEmpty()) return L("Keine Daten", "No data")
+    if (v.isEmpty()) return tr(R.string.no_data)
     val trend = when {
         v.size < 2 -> ""
-        v.last() > v.first() * 1.02 -> L(", steigend", ", rising")
-        v.last() < v.first() * 0.98 -> L(", fallend", ", falling")
-        else -> L(", stabil", ", steady")
+        v.last() > v.first() * 1.02 -> tr(R.string.rising)
+        v.last() < v.first() * 0.98 -> tr(R.string.falling)
+        else -> tr(R.string.steady)
     }
-    return L("Aktuell ${format(v.last())}, Bereich ${format(v.min())} bis ${format(v.max())}$trend",
-        "Now ${format(v.last())}, range ${format(v.min())} to ${format(v.max())}$trend")
+    return tr(R.string.now_range_to, format(v.last()), format(v.min()), format(v.max()), trend)
 }
 
 private fun Modifier.chartSemantics(description: String): Modifier =
@@ -490,7 +490,7 @@ fun PrivacyToggle(store: app.minerguru.service.MinerStore) {
     androidx.compose.material3.IconButton(onClick = { store.togglePrivacy() }) {
         Icon(
             if (Privacy.active) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
-            if (Privacy.active) L("Sensible Daten einblenden", "Show sensitive data") else L("Sensible Daten ausblenden", "Hide sensitive data")
+            if (Privacy.active) tr(R.string.show_sensitive_data) else tr(R.string.hide_sensitive_data)
         )
     }
 }
@@ -501,7 +501,7 @@ fun PasswordField(value: String, onValueChange: (String) -> Unit, modifier: Modi
     var visible by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
     AppTextField(
         value, onValueChange, modifier = modifier, singleLine = true,
-        label = { Text(L("Passwort", "Password")) },
+        label = { Text(tr(R.string.password)) },
         visualTransformation = if (visible) androidx.compose.ui.text.input.VisualTransformation.None
         else androidx.compose.ui.text.input.PasswordVisualTransformation(),
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password),
@@ -509,7 +509,7 @@ fun PasswordField(value: String, onValueChange: (String) -> Unit, modifier: Modi
             androidx.compose.material3.IconButton(onClick = { visible = !visible }) {
                 Icon(
                     if (visible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
-                    if (visible) L("Passwort verbergen", "Hide password") else L("Passwort anzeigen", "Show password")
+                    if (visible) tr(R.string.hide_password) else tr(R.string.show_password)
                 )
             }
         }

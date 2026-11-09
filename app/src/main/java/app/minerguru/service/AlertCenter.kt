@@ -16,7 +16,7 @@ import app.minerguru.model.ChangeLog
 import app.minerguru.model.ChangeSource
 import app.minerguru.model.DiagnosticLog
 import app.minerguru.model.BackgroundMode
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinedCoin
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.WatchSettings
@@ -168,13 +168,13 @@ object AlertCenter {
     fun ensureChannels(context: Context) {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_ALERTS, L("Miner-Alarme", "Miner alerts"), NotificationManager.IMPORTANCE_HIGH).apply {
-                description = L("Offline und andere Probleme der Miner", "Miners going offline and other problems")
+            NotificationChannel(CHANNEL_ALERTS, tr(R.string.miner_alerts), NotificationManager.IMPORTANCE_HIGH).apply {
+                description = tr(R.string.miners_going_offline_and_other)
             }
         )
         manager.createNotificationChannel(
-            NotificationChannel(CHANNEL_MONITOR, L("Hintergrund-Überwachung", "Background monitoring"), NotificationManager.IMPORTANCE_MIN).apply {
-                description = L("Dauerhafte Mitteilung, solange die Überwachung läuft", "Permanent notification while monitoring runs")
+            NotificationChannel(CHANNEL_MONITOR, tr(R.string.background_monitoring), NotificationManager.IMPORTANCE_MIN).apply {
+                description = tr(R.string.permanent_notification_while_monitoring_runs)
                 setShowBadge(false)
             }
         )

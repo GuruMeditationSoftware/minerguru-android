@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import app.minerguru.R
 import app.minerguru.model.*
 import app.minerguru.service.PowerCenter
 import app.minerguru.ui.components.AppFilterChip
@@ -47,9 +48,9 @@ internal fun WeekdayPicker(days: Set<Int>, onChange: (Set<Int>) -> Unit) {
             }
         }
         Row {
-            TextButton(onClick = { onChange(Weekdays.all) }) { Text(L("Täglich", "Daily")) }
-            TextButton(onClick = { onChange(Weekdays.workdays) }) { Text(L("Mo–Fr", "Mon–Fri")) }
-            TextButton(onClick = { onChange(Weekdays.weekend) }) { Text(L("Wochenende", "Weekend")) }
+            TextButton(onClick = { onChange(Weekdays.all) }) { Text(tr(R.string.daily)) }
+            TextButton(onClick = { onChange(Weekdays.workdays) }) { Text(tr(R.string.mon_fri)) }
+            TextButton(onClick = { onChange(Weekdays.weekend) }) { Text(tr(R.string.weekend)) }
         }
     }
 }
@@ -72,12 +73,12 @@ internal fun TimeField(label: String, minute: Int, modifier: Modifier = Modifier
 private fun TimeWindowFields(window: WeeklyWindow, onChange: (WeeklyWindow) -> Unit) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TimeField(L("Von", "From"), window.startMinute) { onChange(window.copy(startMinute = it)) }
-            TimeField(L("bis", "to"), window.endMinute) { onChange(window.copy(endMinute = it)) }
+            TimeField(tr(R.string.from), window.startMinute) { onChange(window.copy(startMinute = it)) }
+            TimeField(tr(R.string.to_in_text), window.endMinute) { onChange(window.copy(endMinute = it)) }
         }
         val note = when {
-            window.isWholeDay -> L("Gleiche Zeit zweimal: gilt den ganzen Tag.", "Same time twice: applies all day.")
-            window.wrapsMidnight -> L("Läuft über Mitternacht in den nächsten Tag.", "Runs past midnight into the next day.")
+            window.isWholeDay -> tr(R.string.same_time_twice_applies_all)
+            window.wrapsMidnight -> tr(R.string.runs_past_midnight_into_the)
             else -> null
         }
         note?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -94,22 +95,22 @@ internal fun ZoneEditorDialog(zone: TariffZone, isNew: Boolean, currencyCode: St
     val valid = draft.name.isNotBlank() && draft.window.weekdays.isNotEmpty() && draft.pricePerKWh >= 0
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isNew) L("Neue Tarifzone", "New tariff zone") else L("Tarifzone bearbeiten", "Edit tariff zone")) },
+        title = { Text(if (isNew) tr(R.string.new_tariff_zone) else tr(R.string.edit_tariff_zone)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                AppTextField(draft.name, { draft = draft.copy(name = it) }, label = { Text(L("Name", "Name")) },
-                    placeholder = { Text(L("z. B. Nacht", "e.g. Night")) }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                PriceField(draft.pricePerKWh, L("Preis pro kWh ($currencyCode)", "Price per kWh ($currencyCode)"), Modifier.fillMaxWidth()) {
+                AppTextField(draft.name, { draft = draft.copy(name = it) }, label = { Text(tr(R.string.name)) },
+                    placeholder = { Text(tr(R.string.e_g_night)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                PriceField(draft.pricePerKWh, tr(R.string.price_per_kwh_in, currencyCode), Modifier.fillMaxWidth()) {
                     draft = draft.copy(pricePerKWh = it)
                 }
-                Text(L("Tage", "Days"), style = MaterialTheme.typography.labelLarge)
+                Text(tr(R.string.days), style = MaterialTheme.typography.labelLarge)
                 WeekdayPicker(draft.window.weekdays) { draft = draft.copy(window = draft.window.copy(weekdays = it)) }
-                Text(L("Uhrzeit", "Time"), style = MaterialTheme.typography.labelLarge)
+                Text(tr(R.string.time), style = MaterialTheme.typography.labelLarge)
                 TimeWindowFields(draft.window) { draft = draft.copy(window = it) }
             }
         },
-        confirmButton = { TextButton(onClick = { onSave(draft.copy(name = draft.name.trim())) }, enabled = valid) { Text(L("Sichern", "Save")) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } }
+        confirmButton = { TextButton(onClick = { onSave(draft.copy(name = draft.name.trim())) }, enabled = valid) { Text(tr(R.string.save_entry)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } }
     )
 }
 
@@ -130,11 +131,11 @@ internal fun RuleEditorDialog(
     val actions = listOf(PowerAction.NIGHT_MODE, PowerAction.PAUSE, PowerAction.NORMAL)
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isNew) L("Neuer Zeitplan", "New schedule") else L("Zeitplan bearbeiten", "Edit schedule")) },
+        title = { Text(if (isNew) tr(R.string.new_schedule) else tr(R.string.edit_schedule)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(L("Wann", "When"), style = MaterialTheme.typography.labelLarge)
-                val kinds = if (zones.isEmpty()) listOf(L("Uhrzeit", "Time")) else listOf(L("Tarifzone", "Tariff zone"), L("Uhrzeit", "Time"))
+                Text(tr(R.string.when_label), style = MaterialTheme.typography.labelLarge)
+                val kinds = if (zones.isEmpty()) listOf(tr(R.string.time)) else listOf(tr(R.string.tariff_zone), tr(R.string.time))
                 val isZone = draft.trigger is ScheduleTrigger.Zone
                 ConnectedToggleGroup(kinds, if (zones.isEmpty() || !isZone) kinds.lastIndex else 0, onSelect = { i ->
                     draft = draft.copy(trigger = if (i == 0 && zones.isNotEmpty()) ScheduleTrigger.Zone(zones.first().id)
@@ -148,7 +149,7 @@ internal fun RuleEditorDialog(
                                 AppFilterChip(selected = zone.id == t.zoneId, onClick = { draft = draft.copy(trigger = ScheduleTrigger.Zone(zone.id)) },
                                     label = { Text("${zone.name} · ${Weekdays.summary(zone.window.weekdays)} ${zone.window.timeRangeText}") })
                             }
-                            Text(L("Ändert sich die Zone, zieht der Zeitplan mit.", "If the zone changes, the schedule follows it."),
+                            Text(tr(R.string.if_the_zone_changes_the),
                                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                     }
@@ -158,23 +159,22 @@ internal fun RuleEditorDialog(
                     }
                 }
 
-                Text(L("Aktion", "Action"), style = MaterialTheme.typography.labelLarge)
+                Text(tr(R.string.action), style = MaterialTheme.typography.labelLarge)
                 ConnectedToggleGroup(actions.map { it.title }, actions.indexOf(draft.action), onSelect = { draft = draft.copy(action = actions[it]) },
                     modifier = Modifier.fillMaxWidth(), compact = true)
                 if (draft.action == PowerAction.NORMAL) {
-                    Text(L("„Normal“ hält Miner bei ihren eigenen Einstellungen, auch wenn ein Zeitplan weiter unten etwas anderes will.",
-                        "“Normal” keeps miners on their own settings, even if a schedule further down wants something else."),
+                    Text(tr(R.string.normal_keeps_miners_on_their),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
 
-                Text(L("Miner", "Miners"), style = MaterialTheme.typography.labelLarge)
-                CheckRow(L("Alle Miner", "All miners"), draft.minerIds.isEmpty()) { all ->
+                Text(tr(R.string.miners), style = MaterialTheme.typography.labelLarge)
+                CheckRow(tr(R.string.all_miners), draft.minerIds.isEmpty()) { all ->
                     draft = draft.copy(minerIds = if (all) emptySet() else miners.map { it.id }.toSet())
                 }
                 if (draft.minerIds.isNotEmpty()) {
                     miners.forEach { miner ->
                         val note = if (draft.action == PowerAction.PAUSE && miner.latestInfo != null && !PowerCenter.canPause(miner))
-                            L(" (kann nicht pausieren, Nachtmodus)", " (cannot pause, night mode)") else ""
+                            tr(R.string.cannot_pause_night_mode) else ""
                         CheckRow(miner.displayName + note, miner.id in draft.minerIds) { on ->
                             val ids = if (on) draft.minerIds + miner.id else draft.minerIds - miner.id
                             if (ids.isNotEmpty()) draft = draft.copy(minerIds = ids)
@@ -183,16 +183,16 @@ internal fun RuleEditorDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { onSave(draft) }, enabled = valid) { Text(L("Sichern", "Save")) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } }
+        confirmButton = { TextButton(onClick = { onSave(draft) }, enabled = valid) { Text(tr(R.string.save_entry)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } }
     )
 }
 
 /** "All miners" or a selection; an empty set means all. */
 @Composable
 internal fun MinerScopeChecks(ids: Set<String>, miners: List<MinerDevice>, onChange: (Set<String>) -> Unit) {
-    Text(L("Miner", "Miners"), style = MaterialTheme.typography.labelLarge)
-    CheckRow(L("Alle Miner", "All miners"), ids.isEmpty()) { all -> onChange(if (all) emptySet() else miners.map { it.id }.toSet()) }
+    Text(tr(R.string.miners), style = MaterialTheme.typography.labelLarge)
+    CheckRow(tr(R.string.all_miners), ids.isEmpty()) { all -> onChange(if (all) emptySet() else miners.map { it.id }.toSet()) }
     if (ids.isNotEmpty()) {
         miners.forEach { miner ->
             CheckRow(miner.displayName, miner.id in ids) { on ->

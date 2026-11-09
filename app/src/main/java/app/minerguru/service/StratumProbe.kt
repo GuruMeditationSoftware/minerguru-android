@@ -6,8 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import app.minerguru.BuildConfig
+import app.minerguru.R
 import app.minerguru.model.BlockTemplateSummary
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinedCoin
 import app.minerguru.model.MinerSystemInfo
 import app.minerguru.model.StratumHost
@@ -179,7 +180,7 @@ class BlockProbeStore(
             val state = try {
                 val job = fetch(target)
                 BlockTemplateSummary.from(job, target.coin, target.user)?.let { State.Loaded(it) }
-                    ?: State.Failed(L("Der Auftrag des Pools ließ sich nicht lesen.", "The pool's job could not be read."))
+                    ?: State.Failed(tr(R.string.the_pool_s_job_could))
             } catch (e: StratumProbeError) {
                 State.Failed(e.text)
             } catch (e: kotlinx.coroutines.CancellationException) {

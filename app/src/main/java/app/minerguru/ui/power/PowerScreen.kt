@@ -58,6 +58,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.minerguru.R
 import app.minerguru.model.*
 import app.minerguru.service.MinerStore
 import app.minerguru.service.PowerCenter
@@ -82,14 +83,14 @@ fun PowerScreen(store: MinerStore, onOpenSettings: () -> Unit) {
     val rules = store.powerRules
     val instant = PowerCenter.hasInstantMonitoring(context)
 
-    ScreenScaffold(L("Strom", "Power"), actions = { PrivacyToggle(store) }) { inner ->
+    ScreenScaffold(tr(R.string.power_page), actions = { PrivacyToggle(store) }) { inner ->
         PageContent(inner, onRefresh = { store.refreshAllMiners() }) { pad ->
             LazyColumn(contentPadding = pad, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 item { Figures(store, tariff, now) }
                 item {
                     TariffCard(store, tariff, rules, now,
                         onAddZone = {
-                            editingZone = TariffZone(name = L("Nacht", "Night"), pricePerKWh = tariff.basePricePerKWh,
+                            editingZone = TariffZone(name = tr(R.string.night), pricePerKWh = tariff.basePricePerKWh,
                                 window = WeeklyWindow(Weekdays.all, 22 * 60, 6 * 60))
                         },
                         onEditZone = { editingZone = it })
@@ -103,10 +104,9 @@ fun PowerScreen(store: MinerStore, onOpenSettings: () -> Unit) {
                         },
                         onEditRule = { editingRule = it })
                 }
-                item { GroupHeader(L("Kosten je Miner", "Cost per miner")) }
+                item { GroupHeader(tr(R.string.cost_per_miner)) }
                 if (store.miners.isEmpty()) {
-                    item { EmptyHint(L("Noch keine Miner. Füge Miner hinzu, um ihren Verbrauch und ihre Kosten zu sehen.",
-                        "No miners yet. Add miners to see their consumption and costs.")) }
+                    item { EmptyHint(tr(R.string.no_miners_yet_add_miners)) }
                 } else {
                     items(store.miners, key = { it.id }) { MinerCostRow(store, it, tariff, rules, now) }
                 }
@@ -146,17 +146,17 @@ private fun Figures(store: MinerStore, tariff: PowerTariff, now: Long) {
     val month = store.onlineMiners.sumOf { PowerCenter.projectedCost(context, it, 24.0 * 30, now, tariff, store.powerRules) }
     val th = store.totalHashrateGHs / 1000
     val figures = listOf(
-        Figure(L("Preis jetzt", "Price now"), tariff.formatPrice(tariff.priceAt(now), 3),
-            zone?.let { "${it.name} · ${it.window.timeRangeText}" } ?: if (tariff.hasZones) L("Standardpreis", "Standard price") else L("Festpreis", "Fixed price"),
+        Figure(tr(R.string.price_now), tariff.formatPrice(tariff.priceAt(now), 3),
+            zone?.let { "${it.name} · ${it.window.timeRangeText}" } ?: if (tariff.hasZones) tr(R.string.standard_price) else tr(R.string.fixed_price),
             Icons.Rounded.Euro),
-        Figure(L("Leistung", "Power"), "${MinerFormatting.format0(watts)} W",
-            Lp(store.onlineMiners.size, "Miner online", "Miner online", "miner online", "miners online"), Icons.Rounded.Bolt),
-        Figure(L("Kosten pro Stunde", "Cost per hour"), tariff.formatPrice(watts / 1000 * tariff.priceAt(now), 3),
-            L("bei aktueller Leistung", "at the current draw"), Icons.Rounded.Schedule),
-        Figure(L("Heute", "Today"), tariff.formatPrice(today), L("0–24 Uhr, hochgerechnet", "midnight to midnight, projected"), Icons.Rounded.Today),
-        Figure(L("30 Tage", "30 days"), tariff.formatPrice(month),
-            if (th > 0.01) L("${tariff.formatPrice(month / th)} pro TH/s", "${tariff.formatPrice(month / th)} per TH/s")
-            else L("mit Preisen und Pausen", "with prices and pauses"), Icons.Rounded.CalendarMonth)
+        Figure(tr(R.string.power), "${MinerFormatting.format0(watts)} W",
+            trp(R.plurals.miners_online, store.onlineMiners.size), Icons.Rounded.Bolt),
+        Figure(tr(R.string.cost_per_hour), tariff.formatPrice(watts / 1000 * tariff.priceAt(now), 3),
+            tr(R.string.at_the_current_draw), Icons.Rounded.Schedule),
+        Figure(tr(R.string.today), tariff.formatPrice(today), tr(R.string.midnight_to_midnight_projected), Icons.Rounded.Today),
+        Figure(tr(R.string.days_30), tariff.formatPrice(month),
+            if (th > 0.01) tr(R.string.per_th_s, tariff.formatPrice(month / th))
+            else tr(R.string.with_prices_and_pauses), Icons.Rounded.CalendarMonth)
     )
     CardGrid(figures) { MetricCard(it.title, it.value, null, it.subtitle, it.icon, MG.accent()) }
 }
@@ -173,7 +173,7 @@ private fun TariffCard(
     var templates by remember { mutableStateOf(false) }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(L("Tarif", "Tariff"), Icons.Rounded.Bolt)
+            SectionTitle(tr(R.string.tariff), Icons.Rounded.Bolt)
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 var currency by rememberSaveable(tariff.currencyCode) { mutableStateOf(tariff.currencyCode) }
@@ -183,11 +183,11 @@ private fun TariffCard(
                         currency = v.uppercase().filter(Char::isLetter).take(3)
                         if (currency.length == 3) store.updatePowerTariff(tariff.copy(currencyCode = currency))
                     },
-                    label = { Text(L("Währung", "Currency")) }, singleLine = true, modifier = Modifier.width(110.dp)
+                    label = { Text(tr(R.string.currency)) }, singleLine = true, modifier = Modifier.width(110.dp)
                 )
                 PriceField(
                     tariff.basePricePerKWh,
-                    if (tariff.hasZones) L("Standardpreis pro kWh", "Standard price per kWh") else L("Preis pro kWh", "Price per kWh"),
+                    if (tariff.hasZones) tr(R.string.standard_price_per_kwh) else tr(R.string.price_per_kwh),
                     Modifier.weight(1f)
                 ) { store.updatePowerTariff(tariff.copy(basePricePerKWh = it)) }
             }
@@ -209,30 +209,29 @@ private fun TariffCard(
                 }
             } else {
                 Text(
-                    L("Ein Festpreis gilt rund um die Uhr. Mit Zonen bekommen Nacht, Wochenende oder Spitzenzeiten eigene Preise, und Zeitpläne können sich danach richten.",
-                        "A fixed price applies around the clock. With zones, nights, weekends or peak hours get prices of their own, and schedules can follow them."),
+                    tr(R.string.a_fixed_price_applies_around),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilledTonalButton(onClick = onAddZone) {
-                    Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(L("Zone", "Zone"))
+                    Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(tr(R.string.zone))
                 }
                 Box {
-                    TextButton(onClick = { templates = true }) { Text(L("Vorlage", "Template")) }
+                    TextButton(onClick = { templates = true }) { Text(tr(R.string.template)) }
                     DropdownMenu(templates, onDismissRequest = { templates = false }) {
                         val cheaper = Math.round(tariff.basePricePerKWh * 0.8 * 1000) / 1000.0
-                        DropdownMenuItem(text = { Text(L("Nacht und Tag (HT/NT)", "Night and day (off-peak/peak)")) }, onClick = {
+                        DropdownMenuItem(text = { Text(tr(R.string.night_and_day_off_peak)) }, onClick = {
                             templates = false
                             store.updatePowerTariff(tariff.copy(zones = tariff.zones +
-                                TariffZone(name = L("Nacht", "Night"), pricePerKWh = cheaper, window = WeeklyWindow(Weekdays.all, 22 * 60, 6 * 60)) +
-                                TariffZone(name = L("Tag", "Day"), pricePerKWh = tariff.basePricePerKWh, window = WeeklyWindow(Weekdays.workdays, 6 * 60, 22 * 60))))
+                                TariffZone(name = tr(R.string.night), pricePerKWh = cheaper, window = WeeklyWindow(Weekdays.all, 22 * 60, 6 * 60)) +
+                                TariffZone(name = tr(R.string.day), pricePerKWh = tariff.basePricePerKWh, window = WeeklyWindow(Weekdays.workdays, 6 * 60, 22 * 60))))
                         })
-                        DropdownMenuItem(text = { Text(L("Wochenende günstiger", "Cheaper weekends")) }, onClick = {
+                        DropdownMenuItem(text = { Text(tr(R.string.cheaper_weekends)) }, onClick = {
                             templates = false
                             store.updatePowerTariff(tariff.copy(zones = tariff.zones +
-                                TariffZone(name = L("Wochenende", "Weekend"), pricePerKWh = cheaper, window = WeeklyWindow(Weekdays.weekend, 0, 0))))
+                                TariffZone(name = tr(R.string.weekend), pricePerKWh = cheaper, window = WeeklyWindow(Weekdays.weekend, 0, 0))))
                         })
                     }
                 }
@@ -241,12 +240,10 @@ private fun TariffCard(
             WeekBar(tariff, now)
 
             tariff.overlappingZones.forEach { (a, b) ->
-                Hint(L("„${a.name}“ und „${b.name}“ überschneiden sich. Dort gilt „${a.name}“, weil sie weiter oben steht.",
-                    "“${a.name}” and “${b.name}” overlap. There “${a.name}” applies because it is higher up."), MG.warning())
+                Hint(tr(R.string.and_overlap_there_applies_because, a.name, b.name), MG.warning())
             }
             if (tariff.hasGaps) {
-                Hint(L("Zeiten ohne Zone kosten den Standardpreis (grau im Wochenbalken).",
-                    "Times without a zone cost the standard price (grey in the week bar)."), MaterialTheme.colorScheme.onSurfaceVariant)
+                Hint(tr(R.string.times_without_a_zone_cost), MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
@@ -268,19 +265,19 @@ private fun ZoneRow(
                 Text(zone.name, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (isNow) {
                     Spacer(Modifier.width(6.dp))
-                    Text(L("jetzt", "now"), style = MaterialTheme.typography.labelSmall, color = MG.text(MG.accent()))
+                    Text(tr(R.string.now), style = MaterialTheme.typography.labelSmall, color = MG.text(MG.accent()))
                 }
             }
             Text("${Weekdays.summary(zone.window.weekdays)} · ${zone.window.timeRangeText} · ${tariff.formatPrice(zone.pricePerKWh, 3)}/kWh",
                 style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (ruleCount > 0) {
-                Text(Lp(ruleCount, "Zeitplan", "Zeitpläne", "schedule", "schedules"),
+                Text(trp(R.plurals.schedules_count, ruleCount),
                     style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
-        if (index > 0) IconButton(onClick = onUp) { Icon(Icons.Rounded.KeyboardArrowUp, L("Nach oben", "Move up")) }
-        IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, L("Bearbeiten", "Edit")) }
-        IconButton(onClick = onDelete) { Icon(Icons.Rounded.Delete, L("Zone löschen", "Delete zone")) }
+        if (index > 0) IconButton(onClick = onUp) { Icon(Icons.Rounded.KeyboardArrowUp, tr(R.string.move_up)) }
+        IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, tr(R.string.edit)) }
+        IconButton(onClick = onDelete) { Icon(Icons.Rounded.Delete, tr(R.string.delete_zone)) }
     }
 }
 
@@ -298,7 +295,7 @@ private fun WeekBar(tariff: PowerTariff, now: Long) {
     val marker = MaterialTheme.colorScheme.onSurface
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.semantics { contentDescription = L("Wochenübersicht des Tarifs", "Weekly overview of the tariff") }
+        modifier = Modifier.semantics { contentDescription = tr(R.string.weekly_overview_of_the_tariff) }
     ) {
         (1..7).forEach { day ->
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -335,11 +332,10 @@ private fun SchedulesCard(
 ) {
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(L("Zeitpläne", "Schedules"), Icons.Rounded.Schedule)
+            SectionTitle(tr(R.string.schedules), Icons.Rounded.Schedule)
             if (rules.isEmpty()) {
                 Text(
-                    L("Noch keine Zeitpläne. Ein Zeitplan schaltet Miner während einer Tarifzone oder zu festen Uhrzeiten in den Nachtmodus oder pausiert sie; danach kehren sie zu ihren eigenen Einstellungen zurück.",
-                        "No schedules yet. A schedule puts miners into night mode or pauses them during a tariff zone or at set times; afterwards they return to their own settings."),
+                    tr(R.string.no_schedules_yet_a_schedule),
                     style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
@@ -351,41 +347,38 @@ private fun SchedulesCard(
                 }
             }
             FilledTonalButton(onClick = onAddRule, enabled = store.miners.isNotEmpty()) {
-                Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(L("Zeitplan", "Schedule"))
+                Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(tr(R.string.schedule))
             }
 
             HorizontalDivider(color = MG.hairline())
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(L("Dieses Gerät führt die Zeitpläne aus", "This device runs the schedules"), style = MaterialTheme.typography.bodyLarge)
+                    Text(tr(R.string.this_device_runs_the_schedules), style = MaterialTheme.typography.bodyLarge)
                     Text(
-                        if (instant) L("Nur ein Gerät sollte schalten, sonst arbeiten Mac und Handy gegeneinander.",
-                            "Only one device should switch, otherwise the Mac and the phone work against each other.")
-                        else L("Braucht die Überwachung „Sofort“ in den Einstellungen; ohne sie zeigt das Handy nur Kosten.",
-                            "Needs “Instant” monitoring in Settings; without it the phone only shows costs."),
+                        if (instant) tr(R.string.only_one_device_should_switch)
+                        else tr(R.string.needs_instant_monitoring_in_settings),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 Spacer(Modifier.width(12.dp))
                 Switch(checked = store.powerRunsSchedules && instant, enabled = instant, onCheckedChange = store::updatePowerRunsSchedules)
             }
-            if (!instant) TextButton(onClick = onOpenSettings) { Text(L("Zu den Einstellungen", "Open Settings")) }
+            if (!instant) TextButton(onClick = onOpenSettings) { Text(tr(R.string.go_to_settings)) }
 
             Column {
-                Text(L("Lüfter im Nachtmodus: ${store.powerNightFan} %", "Fan in night mode: ${store.powerNightFan} %"),
+                Text(tr(R.string.fan_in_night_mode, store.powerNightFan),
                     style = MaterialTheme.typography.bodyLarge)
                 var fan by remember(store.powerNightFan) { mutableStateOf(store.powerNightFan.toFloat()) }
                 Slider(value = fan, onValueChange = { fan = it }, valueRange = 20f..100f, steps = 15,
                     onValueChangeFinished = { store.updatePowerNightFan(Math.round(fan / 5) * 5) })
                 Text(
-                    L("Der Nachtmodus senkt den Takt auf Eco und hält den Lüfter fest. Pause gibt es ab AxeOS 2.15; ältere AxeOS und NerdOS gehen stattdessen in den Nachtmodus.",
-                        "Night mode lowers the clock to Eco and fixes the fan speed. Pause needs AxeOS 2.15; older AxeOS and NerdOS go into night mode instead."),
+                    tr(R.string.night_mode_lowers_the_clock),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             app.minerguru.ui.support.OtpWaitingNotice(store)
-            store.powerError?.let { Hint(L("Letzte Schaltung fehlgeschlagen: $it", "Last switch failed: $it"), MG.bad()) }
+            store.powerError?.let { Hint(tr(R.string.last_switch_failed, it), MG.bad()) }
         }
     }
 }
@@ -402,7 +395,7 @@ private fun RuleRow(store: MinerStore, rule: ScheduleRule, index: Int, tariff: P
                     maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                 if (rule.isActive(now, tariff)) {
                     Spacer(Modifier.width(6.dp))
-                    Text(L("aktiv", "active"), style = MaterialTheme.typography.labelSmall, color = MG.text(MG.accent()))
+                    Text(tr(R.string.active_in_text), style = MaterialTheme.typography.labelSmall, color = MG.text(MG.accent()))
                 }
             }
             Text(minersText(rule, store.miners), style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -410,23 +403,23 @@ private fun RuleRow(store: MinerStore, rule: ScheduleRule, index: Int, tariff: P
         }
         if (index > 0) IconButton(onClick = {
             val list = rules.toMutableList(); java.util.Collections.swap(list, index, index - 1); store.updatePowerRules(list)
-        }) { Icon(Icons.Rounded.KeyboardArrowUp, L("Nach oben", "Move up")) }
-        IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, L("Bearbeiten", "Edit")) }
+        }) { Icon(Icons.Rounded.KeyboardArrowUp, tr(R.string.move_up)) }
+        IconButton(onClick = onEdit) { Icon(Icons.Rounded.Edit, tr(R.string.edit)) }
         IconButton(onClick = { store.updatePowerRules(rules.filterNot { it.id == rule.id }) }) {
-            Icon(Icons.Rounded.Delete, L("Zeitplan löschen", "Delete schedule"))
+            Icon(Icons.Rounded.Delete, tr(R.string.delete_schedule))
         }
     }
 }
 
 internal fun triggerText(trigger: ScheduleTrigger, tariff: PowerTariff): String = when (trigger) {
     is ScheduleTrigger.Zone -> tariff.zones.firstOrNull { it.id == trigger.zoneId }
-        ?.let { L("während „${it.name}“", "during “${it.name}”") } ?: L("Zone gelöscht", "zone deleted")
+        ?.let { tr(R.string.during, it.name) } ?: tr(R.string.zone_deleted)
     is ScheduleTrigger.Window -> "${Weekdays.summary(trigger.window.weekdays)} ${trigger.window.timeRangeText}"
 }
 
 private fun minersText(rule: ScheduleRule, miners: List<MinerDevice>): String =
-    if (rule.minerIds.isEmpty()) L("Alle Miner", "All miners")
-    else miners.filter { it.id in rule.minerIds }.joinToString(", ") { it.displayName }.ifEmpty { L("Miner entfernt", "Miner removed") }
+    if (rule.minerIds.isEmpty()) tr(R.string.all_miners)
+    else miners.filter { it.id in rule.minerIds }.joinToString(", ") { it.displayName }.ifEmpty { tr(R.string.miner_removed) }
 
 // endregion
 
@@ -450,20 +443,20 @@ private fun MinerCostRow(store: MinerStore, miner: MinerDevice, tariff: PowerTar
                     style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (!online) {
-                Text(L("Offline", "Offline"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(tr(R.string.offline), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {
                 val watts = info!!.power
                 val midnight = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
                 val month = PowerCenter.projectedCost(context, miner, 24.0 * 30, now, tariff, rules)
                 val th = info.hashRate / 1000
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    LabeledValue(L("Leistung", "Power"), "${MinerFormatting.format1(watts)} W", mono = true)
-                    LabeledValue(L("pro Stunde", "per hour"), tariff.formatPrice(watts / 1000 * tariff.priceAt(now), 3), mono = true)
-                    LabeledValue(L("heute", "today"), tariff.formatPrice(PowerCenter.projectedCost(context, miner, 24.0, midnight, tariff, rules)), mono = true)
-                    LabeledValue(L("30 Tage", "30 days"), tariff.formatPrice(month), mono = true)
+                    LabeledValue(tr(R.string.power), "${MinerFormatting.format1(watts)} W", mono = true)
+                    LabeledValue(tr(R.string.per_hour_in_text), tariff.formatPrice(watts / 1000 * tariff.priceAt(now), 3), mono = true)
+                    LabeledValue(tr(R.string.today_in_text), tariff.formatPrice(PowerCenter.projectedCost(context, miner, 24.0, midnight, tariff, rules)), mono = true)
+                    LabeledValue(tr(R.string.days_30), tariff.formatPrice(month), mono = true)
                 }
                 if (th > 0.01) {
-                    Text(L("${tariff.formatPrice(month / th)} pro TH/s in 30 Tagen", "${tariff.formatPrice(month / th)} per TH/s in 30 days"),
+                    Text(tr(R.string.per_th_s_in_30, tariff.formatPrice(month / th)),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }

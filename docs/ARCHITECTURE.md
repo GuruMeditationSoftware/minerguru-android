@@ -109,4 +109,5 @@ Raise `versionName` and `versionCode` in `app/build.gradle.kts`, then run `scrip
 - `<View>` is not allowed in `RemoteViews`; placeholders are `FrameLayout`s.
 - `setWidgetPreview` is throttled per hour. After that the widget picker shows the XML layout, which is why its sample texts exist as resources in both languages.
 - "Force stop" clears the widgets' PendingIntents until the next redraw.
-- Write new strings directly as `L("deutsch", "english")`. `Lang.english` is Compose state; switching the language redraws everything at once.
+- Texts live in `res/values/strings.xml` (English) and `res/values-de/strings.xml` (German). Code reads them with `tr(R.string.key)`, `tr(R.string.key, value)` and `trp(R.plurals.key, n)`, not `stringResource`: the app language can differ from the device's, and services, workers and widgets need texts outside Compose. `Lang.english` is Compose state; switching the language redraws everything at once. `MinerGuruApp` connects the resources at process start.
+- Placeholders are `%1$s`, `%2$s`; a literal `%` in a text with placeholders is `%%`. Keys must not be Java or Kotlin keywords (`continue_label`, `when_label`). Unit tests read the XML files through `XmlTexts` (`useGermanTexts()`), so they need no Robolectric.

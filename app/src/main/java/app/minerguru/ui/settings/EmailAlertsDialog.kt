@@ -24,7 +24,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.service.EmailAlerts
 import app.minerguru.service.MinerStore
 import app.minerguru.service.SmtpSecurity
@@ -47,40 +48,38 @@ fun EmailAlertsDialog(store: MinerStore, onDismiss: () -> Unit) {
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(L("E-Mail-Warnungen", "Email alerts")) },
+        title = { Text(tr(R.string.email_alerts)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(L("MinerGuru schickt jede Warnung zusätzlich an diese Adressen, über deinen eigenen Mailserver. Das Passwort bleibt verschlüsselt auf diesem Gerät.",
-                    "MinerGuru also sends every alert to these addresses through your own mail server. The password stays encrypted on this device."),
+                Text(tr(R.string.minerguru_also_sends_every_alert),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(L("Warnungen per E-Mail senden", "Send alerts by email"), Modifier.weight(1f))
+                    Text(tr(R.string.send_alerts_by_email), Modifier.weight(1f))
                     Switch(draft.isEnabled, { draft = draft.copy(isEnabled = it) })
                 }
                 AppTextField(draft.host, { draft = draft.copy(host = it.trim()) }, Modifier.fillMaxWidth(), label = { Text("Server") }, placeholder = { Text("smtp.example.com") })
                 val modes = SmtpSecurity.entries
-                ConnectedToggleGroup(modes.map { if (it == SmtpSecurity.NONE) L("Keine", "None") else it.title }, modes.indexOf(draft.security), { i ->
+                ConnectedToggleGroup(modes.map { if (it == SmtpSecurity.NONE) tr(R.string.none) else it.title }, modes.indexOf(draft.security), { i ->
                     draft = draft.copy(security = modes[i], port = modes[i].defaultPort)
                 }, Modifier.fillMaxWidth(), compact = true)
                 if (draft.security == SmtpSecurity.NONE) {
-                    Text(L("Ohne Verschlüsselung gehen Passwort und Inhalt lesbar durchs Netz. Nur für einen Mailserver im eigenen Netz.",
-                        "Without encryption, password and content cross the network in the clear. Only for a mail server on your own network."),
+                    Text(tr(R.string.without_encryption_password_and_content),
                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                 }
                 AppTextField(draft.port.toString(), { v -> draft = draft.copy(port = v.filter(Char::isDigit).take(5).toIntOrNull() ?: 0) }, Modifier.fillMaxWidth(),
                     label = { Text("Port") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
-                AppTextField(draft.username, { draft = draft.copy(username = it.trim()) }, Modifier.fillMaxWidth(), label = { Text(L("Benutzername", "Username")) })
-                AppTextField(password, { password = it }, Modifier.fillMaxWidth(), label = { Text(L("Passwort", "Password")) },
-                    placeholder = { if (EmailAlerts.hasPassword(context)) Text(L("gespeichert", "saved")) },
+                AppTextField(draft.username, { draft = draft.copy(username = it.trim()) }, Modifier.fillMaxWidth(), label = { Text(tr(R.string.username)) })
+                AppTextField(password, { password = it }, Modifier.fillMaxWidth(), label = { Text(tr(R.string.password)) },
+                    placeholder = { if (EmailAlerts.hasPassword(context)) Text(tr(R.string.saved)) },
                     visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password))
-                AppTextField(draft.sender, { draft = draft.copy(sender = it.trim()) }, Modifier.fillMaxWidth(), label = { Text(L("Absender", "Sender")) },
+                AppTextField(draft.sender, { draft = draft.copy(sender = it.trim()) }, Modifier.fillMaxWidth(), label = { Text(tr(R.string.sender)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
-                AppTextField(draft.recipients, { draft = draft.copy(recipients = it) }, Modifier.fillMaxWidth(), label = { Text(L("Empfänger, mit Komma getrennt", "Recipients, separated by commas")) },
+                AppTextField(draft.recipients, { draft = draft.copy(recipients = it) }, Modifier.fillMaxWidth(), label = { Text(tr(R.string.recipients_separated_by_commas)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
                 result?.let { (text, isError) -> StatusMessage(text, isError) }
             }
         },
-        confirmButton = { TextButton(onClick = { save(); onDismiss() }) { Text(L("Sichern", "Save")) } },
+        confirmButton = { TextButton(onClick = { save(); onDismiss() }) { Text(tr(R.string.save_entry)) } },
         dismissButton = {
             TextButton(enabled = draft.isComplete && !testing, onClick = {
                 save()
@@ -89,13 +88,13 @@ fun EmailAlertsDialog(store: MinerStore, onDismiss: () -> Unit) {
                 scope.launch {
                     result = try {
                         EmailAlerts.sendTest(context, draft)
-                        L("Test-Mail versendet.", "Test mail sent.") to false
+                        tr(R.string.test_mail_sent) to false
                     } catch (e: Exception) {
-                        (e.message ?: L("Mailserver nicht erreichbar.", "Mail server not reachable.")) to true
+                        (e.message ?: tr(R.string.mail_server_not_reachable)) to true
                     }
                     testing = false
                 }
-            }) { Text(L("Test-Mail", "Test mail")) }
+            }) { Text(tr(R.string.test_mail)) }
         }
     )
 }

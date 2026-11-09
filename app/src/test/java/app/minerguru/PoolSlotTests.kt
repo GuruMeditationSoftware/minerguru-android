@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.Test
 
 class PoolSlotTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     private fun slotsForm() = MinerSettingsForm.from(Fixtures.device(Fixtures.axeSlotsInfo()))
     private val ocean = PoolConfig.create("OCEAN", "mine.ocean.xyz", 3334, "bc1qocean.rig")

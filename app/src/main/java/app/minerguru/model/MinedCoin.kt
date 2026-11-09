@@ -1,5 +1,7 @@
 package app.minerguru.model
 
+import app.minerguru.R
+
 /** SHA-256 coin detected for a stratum pool slot from pool host, wallet format and network difficulty. */
 enum class MinedCoin(
     val symbol: String,
@@ -76,8 +78,7 @@ enum class MinedCoin(
 
         /** Warning text for [mismatch], or `null`. */
         fun mismatchWarning(poolHost: String, stratumUser: String): String? = mismatch(poolHost, stratumUser)?.let { (pool, address) ->
-            L("Die Adresse gehört zu ${address.symbol}, der Pool schürft ${pool.symbol}. Auszahlungen könnten verloren gehen.",
-                "This address belongs to ${address.symbol}, the pool mines ${pool.symbol}. Payouts could be lost.")
+            tr(R.string.this_address_belongs_to_the, address.symbol, pool.symbol)
         }
 
         fun detect(poolHost: String, stratumUser: String, networkDifficulty: Double? = null): MinedCoin {

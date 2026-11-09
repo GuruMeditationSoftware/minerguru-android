@@ -59,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import app.minerguru.R
 import app.minerguru.model.*
 import app.minerguru.service.MinerStore
 import app.minerguru.service.PoolLatencyService
@@ -99,23 +100,22 @@ fun ControlTab(
             ),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            val sections = listOf(L("Takt & Lüfter", "Clock & fan"), "Pool", "System")
+            val sections = listOf(tr(R.string.clock_fan), "Pool", "System")
             ConnectedToggleGroup(sections, section, { section = it }, Modifier.fillMaxWidth())
     
             if (section == 0) {
-                Text(L("Übertakten geschieht immer auf eigenes Risiko. Zu hoher Takt oder zu hohe Spannung können den Miner beschädigen, die Garantie erlischt.",
-                    "Overclocking is always at your own risk. Too high a frequency or voltage can damage the miner and voids the warranty."),
+                Text(tr(R.string.overclocking_is_always_at_your),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
     
             when (section) {
                 0 -> PerformanceSection(miner, form, onForm, isSaving) {
-                    run(L("Einstellungen übertragen. Takt und Spannung gelten erst nach einem Neustart des Miners.", "Settings sent. Clock and voltage only apply after the miner restarts.")) {
+                    run(tr(R.string.settings_sent_clock_and_voltage)) {
                         store.updateMinerSettings(miner.id, form.performancePayload(miner.latestInfo?.autoFanModeRaw))
                     }
                 }
                 1 -> PoolSection(store, miner, form, onForm, isSaving) {
-                    run(L("Pool-Konfiguration gespeichert, Miner wurde neu gestartet.", "Pool configuration saved, miner was restarted.")) {
+                    run(tr(R.string.pool_configuration_saved_miner_was)) {
                         store.applyPoolSettings(form, miner.id)
                         onReloadForm()
                     }
@@ -123,9 +123,9 @@ fun ControlTab(
                 else -> SystemSection(store, miner, form, onForm, isSaving,
                     onSaveAlias = {
                         store.updateCustomName(miner.id, form.customAlias)
-                        status.error = null; status.success = L("Anzeigename gespeichert.", "Display name saved.")
+                        status.error = null; status.success = tr(R.string.display_name_saved)
                     },
-                    onSaveHostname = { run(L("Hostname übertragen.", "Hostname sent.")) { store.updateMinerSettings(miner.id, form.hostnamePayload) } })
+                    onSaveHostname = { run(tr(R.string.hostname_sent)) { store.updateMinerSettings(miner.id, form.hostnamePayload) } })
             }
     }
         // Below the scroll area: the buttons sit at the end of a long form, a message above them would stay out of sight.
@@ -146,7 +146,7 @@ private fun PerformanceSection(miner: MinerDevice, form: MinerSettingsForm, onFo
     val presets = miner.recommendedPresets
     if (presets.isNotEmpty()) SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(L("Schnell-Profile für", "Quick profiles for") + " ${miner.hardwareTitle}", style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.quick_profiles_for) + " ${miner.hardwareTitle}", style = MaterialTheme.typography.titleSmall)
             Column(verticalArrangement = Arrangement.spacedBy(SegmentGap)) { presets.forEachIndexed { index, preset ->
                 val current = form.isCurrent(preset)
                 // Grouped segments; the active profile gets the secondary container.
@@ -172,48 +172,48 @@ private fun PerformanceSection(miner: MinerDevice, form: MinerSettingsForm, onFo
     }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(L("Manuelle Feinabstimmung", "Manual fine-tuning"), style = MaterialTheme.typography.titleSmall)
-            Stepper(L("Frequenz", "Frequency"), form.frequencyMHz, "MHz", miner.frequencyRange, 5) { onForm(form.copy(frequencyMHz = it)) }
+            Text(tr(R.string.manual_fine_tuning), style = MaterialTheme.typography.titleSmall)
+            Stepper(tr(R.string.frequency), form.frequencyMHz, "MHz", miner.frequencyRange, 5) { onForm(form.copy(frequencyMHz = it)) }
             Stepper("Core Voltage", form.coreVoltageMV, "mV", miner.coreVoltageRange, 5) { onForm(form.copy(coreVoltageMV = it)) }
             Text(
-                L("Bereich laut Firmware: ", "Firmware range: ") +
+                tr(R.string.firmware_range) +
                     "${miner.frequencyRange.first}–${miner.frequencyRange.last} MHz • ${miner.coreVoltageRange.first}–${miner.coreVoltageRange.last} mV. " +
-                    L("Zu hohe Werte können den ASIC überhitzen.", "Too high values can overheat the ASIC."),
+                    tr(R.string.too_high_values_can_overheat),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(L("Lüftersteuerung", "Fan control"), style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.fan_control), style = MaterialTheme.typography.titleSmall)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(L("Automatische Temperaturregelung (Auto-Fan)", "Automatic temperature control (auto fan)"), Modifier.weight(1f))
+                Text(tr(R.string.automatic_temperature_control_auto_fan), Modifier.weight(1f))
                 Switch(checked = form.autoFanSpeed, onCheckedChange = { onForm(form.copy(autoFanSpeed = it)) })
             }
             if (!form.autoFanSpeed) {
                 Row {
-                    Text(L("Manuelle Lüfterdrehzahl", "Manual fan speed"), Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(tr(R.string.manual_fan_speed), Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Text("${form.manualFanPercent.toInt()} %", fontWeight = FontWeight.Bold)
                 }
                 Slider(
                     // 5 % steps without a row of tick marks.
                     value = form.manualFanPercent, onValueChange = { onForm(form.copy(manualFanPercent = Math.round(it / 5f) * 5f)) },
                     valueRange = MinerSettingsForm.manualFanRange,
-                    modifier = Modifier.semantics { contentDescription = L("Manuelle Lüfterdrehzahl", "Manual fan speed") }
+                    modifier = Modifier.semantics { contentDescription = tr(R.string.manual_fan_speed) }
                 )
             }
         }
     }
-    SaveButton(L("Takt & Lüfter auf Miner anwenden", "Apply clock & fan to miner"), saving, onClick = onSave)
+    SaveButton(tr(R.string.apply_clock_fan_to_miner), saving, onClick = onSave)
 }
 
 @Composable
 private fun Stepper(label: String, value: Int, unit: String, range: IntRange, step: Int, onChange: (Int) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant)
-        FilledTonalIconButton(onClick = { onChange((value - step).coerceIn(range)) }) { Icon(Icons.Rounded.Remove, L("Weniger", "Less")) }
+        FilledTonalIconButton(onClick = { onChange((value - step).coerceIn(range)) }) { Icon(Icons.Rounded.Remove, tr(R.string.less)) }
         Text("$value $unit", Modifier.width(92.dp), fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
-        FilledTonalIconButton(onClick = { onChange((value + step).coerceIn(range)) }) { Icon(Icons.Rounded.Add, L("Mehr", "More")) }
+        FilledTonalIconButton(onClick = { onChange((value + step).coerceIn(range)) }) { Icon(Icons.Rounded.Add, tr(R.string.more)) }
     }
 }
 
@@ -242,11 +242,11 @@ private fun PoolSection(
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(L("Stratum-Server & Wallet", "Stratum server & wallet"), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                Text(tr(R.string.stratum_server_wallet), Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                 Box {
-                    FilledTonalButton(onClick = { presetMenu = true }) { Text(L("Vorlage…", "Template…")) }
+                    FilledTonalButton(onClick = { presetMenu = true }) { Text(tr(R.string.template_menu)) }
                     DropdownMenu(expanded = presetMenu, onDismissRequest = { presetMenu = false }) {
-                        listOf(true to L("Als Primär-Pool", "As primary pool"), false to L("Als Fallback / Pool 2", "As fallback / pool 2")).forEach { (primary, title) ->
+                        listOf(true to tr(R.string.as_primary_pool), false to tr(R.string.as_fallback_pool_2)).forEach { (primary, title) ->
                             Text(title, Modifier.padding(horizontal = 12.dp, vertical = 6.dp), style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary)
                             PoolPreset.commonPools.forEach { p ->
@@ -264,23 +264,22 @@ private fun PoolSection(
             }
             if (miner.supportsDualPool) {
                 HorizontalDivider()
-                Text(L("Pool-Betriebsmodus", "Pool mode"), style = MaterialTheme.typography.labelLarge)
+                Text(tr(R.string.pool_operating_mode), style = MaterialTheme.typography.labelLarge)
                 DualPoolControls(form, onForm)
             }
             if (slotsApi) {
                 HorizontalDivider()
-                Text(L("Pool-Slots (AxeOS: bis zu ${AxeOSPool.SLOT_COUNT})", "Pool slots (AxeOS: up to ${AxeOSPool.SLOT_COUNT})"),
+                Text(tr(R.string.pool_slots_axeos_up_to, AxeOSPool.SLOT_COUNT),
                     style = MaterialTheme.typography.labelLarge)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SlotRolePicker(L("Primär", "Primary"), form, store.poolLibrary, form.primarySlot, Modifier.weight(1f)) {
+                    SlotRolePicker(tr(R.string.primary), form, store.poolLibrary, form.primarySlot, Modifier.weight(1f)) {
                         onForm(form.copy(primarySlot = it))
                     }
                     SlotRolePicker("Fallback", form, store.poolLibrary, form.secondarySlot, Modifier.weight(1f)) {
                         onForm(form.copy(secondarySlot = it))
                     }
                 }
-                Text(L("Weitere Slots bleiben als Reserve auf dem Miner gespeichert – so wechselst du Pools ohne neu einzutippen.",
-                    "Further slots stay stored on the miner as reserve – switch pools without retyping."),
+                Text(tr(R.string.further_slots_stay_stored_on),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
@@ -288,11 +287,11 @@ private fun PoolSection(
 
     form.visibleSlots.forEach { index ->
         val title = when {
-            slotsApi && index == form.primarySlot -> "${form.slotTitle(index)} – " + L("Primärer Pool", "Primary pool")
-            slotsApi && index == form.secondarySlot -> "${form.slotTitle(index)} – " + L("Fallback-Pool", "Fallback pool")
+            slotsApi && index == form.primarySlot -> "${form.slotTitle(index)} – " + tr(R.string.primary_pool)
+            slotsApi && index == form.secondarySlot -> "${form.slotTitle(index)} – " + tr(R.string.fallback_pool)
             slotsApi -> "${form.slotTitle(index)} – Reserve"
-            index == 0 -> if (isDual) L("Pool 1 – Primär", "Pool 1 – primary") + " (${form.primaryPercent}%)" else L("Primärer Stratum-Pool", "Primary stratum pool")
-            else -> if (isDual) L("Pool 2 – Sekundär", "Pool 2 – secondary") + " (${form.secondaryPercent}%)" else L("Fallback Stratum-Pool", "Fallback stratum pool")
+            index == 0 -> if (isDual) tr(R.string.pool_1_primary) + " (${form.primaryPercent}%)" else tr(R.string.primary_stratum_pool)
+            else -> if (isDual) tr(R.string.pool_2_secondary) + " (${form.secondaryPercent}%)" else tr(R.string.fallback_stratum_pool)
         }
         val canClear = form.slots[index].hasContent && (if (slotsApi) index != form.primarySlot else index != 0)
         PoolEndpointEditor(
@@ -301,8 +300,8 @@ private fun PoolSection(
             library = store.poolLibrary,
             coin = slotCoin(miner, form, index),
             hostHint = if (index == form.primarySlot) "public-pool.io" else "eusolo.ckpool.org",
-            passwordHelp = if (slotsApi) L("„*****“ behält das auf dem Miner gespeicherte Passwort.", "“*****” keeps the password stored on the miner.")
-            else L("Leer lassen, um das gespeicherte Passwort zu behalten.", "Leave empty to keep the stored password."),
+            passwordHelp = if (slotsApi) tr(R.string.keeps_the_password_stored_on)
+            else tr(R.string.leave_empty_to_keep_the),
             latencyMs = when (index) { form.primarySlot -> testedPrimary; form.secondarySlot -> testedFallback; else -> null },
             onChange = { onForm(form.withSlot(index, it)) },
             onPick = { cfg -> onForm(if (cfg != null) form.assign(cfg, index) else form.clearSlot(index)) },
@@ -317,7 +316,7 @@ private fun PoolSection(
     form.poolValidationMessage?.let { StatusMessage(it, true) }
     form.poolCoinWarning?.let { StatusMessage(it, true) }
     if (form.poolValidationMessage == null && form.slotsToClear.isNotEmpty()) {
-        Text(L("Beim Speichern geleert: ", "Cleared on save: ") + form.slotsToClear.joinToString(", ") { form.slotTitle(it) },
+        Text(tr(R.string.cleared_on_save) + form.slotsToClear.joinToString(", ") { form.slotTitle(it) },
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 
@@ -334,11 +333,10 @@ private fun PoolSection(
         enabled = !testing, modifier = Modifier.fillMaxWidth()
     ) {
         if (testing) CircularProgressIndicator(Modifier.size(18.dp), strokeWidth = 2.dp) else Icon(Icons.Rounded.Timeline, null)
-        Spacer(Modifier.width(8.dp)); Text(L("Pool-Latenz testen", "Test pool latency"))
+        Spacer(Modifier.width(8.dp)); Text(tr(R.string.test_pool_latency))
     }
-    SaveButton(L("Speichern & neu starten", "Save & restart"), saving, form.poolValidationMessage == null, onSave)
-    Text(L("Der Miner startet nach einer Pool-Änderung neu, damit sie aktiv wird.",
-        "The miner restarts after a pool change so it takes effect."),
+    SaveButton(tr(R.string.save_restart), saving, form.poolValidationMessage == null, onSave)
+    Text(tr(R.string.the_miner_restarts_after_a),
         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 }
 
@@ -367,10 +365,10 @@ private fun PoolEndpointEditor(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 LibraryPoolPicker(library, endpoint, Modifier.weight(1f), allowEmpty = onClear != null, onSelect = onPick)
                 if (endpoint.hasContent && !inLibrary) {
-                    IconButton(onClick = onSaveToLibrary) { Icon(Icons.Rounded.SaveAlt, L("In die Bibliothek übernehmen", "Save to library")) }
+                    IconButton(onClick = onSaveToLibrary) { Icon(Icons.Rounded.SaveAlt, tr(R.string.save_to_library)) }
                 }
                 if (onClear != null) {
-                    IconButton(onClick = onClear) { Icon(Icons.Rounded.Delete, L("Slot leeren", "Clear slot")) }
+                    IconButton(onClick = onClear) { Icon(Icons.Rounded.Delete, tr(R.string.clear_slot)) }
                 }
             }
             AppTextField(
@@ -388,7 +386,7 @@ private fun PoolEndpointEditor(
             }
             Text(passwordHelp, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             AppTextField(
-                endpoint.user, { onChange(endpoint.copy(user = it)) }, label = { Text(L("Wallet-Adresse.Worker", "Wallet address.worker")) },
+                endpoint.user, { onChange(endpoint.copy(user = it)) }, label = { Text(tr(R.string.wallet_address_worker)) },
                 placeholder = { Text("bc1q…wallet.bitaxe") }, singleLine = true, modifier = Modifier.fillMaxWidth().sensitive()
             )
         }
@@ -405,41 +403,40 @@ private fun SystemSection(
 
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(L("Anzeigename in MinerGuru", "Display name in MinerGuru"), style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.display_name_in_minerguru), style = MaterialTheme.typography.titleSmall)
             AppTextField(
                 form.customAlias, { onForm(form.copy(customAlias = it)) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(L("leer = Hostname vom Miner", "empty = hostname of the miner")) }
+                placeholder = { Text(tr(R.string.empty_hostname_of_the_miner)) }
             )
-            Button(onClick = onSaveAlias) { Text(L("Speichern", "Save")) }
+            Button(onClick = onSaveAlias) { Text(tr(R.string.save)) }
         }
     }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(L("Miner-Hostname im Netzwerk", "Miner hostname in the network"), style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.miner_hostname_in_the_network), style = MaterialTheme.typography.titleSmall)
             AppTextField(form.deviceHostname, { onForm(form.copy(deviceHostname = it)) }, singleLine = true, modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("bitaxe") })
             FilledTonalButton(onClick = onSaveHostname, enabled = form.trimmedHostname.isNotEmpty() && !saving) {
-                Text(L("Hostname übertragen", "Send hostname"))
+                Text(tr(R.string.send_hostname))
             }
         }
     }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(L("Geräte-Aktionen", "Device actions"), style = MaterialTheme.typography.titleSmall)
+            Text(tr(R.string.device_actions), style = MaterialTheme.typography.titleSmall)
             FilledTonalButton(onClick = { confirmRestart = true }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Rounded.RestartAlt, null); Spacer(Modifier.width(8.dp)); Text(L("Miner neu starten (Reboot)", "Restart miner (reboot)"))
+                Icon(Icons.Rounded.RestartAlt, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.restart_miner_reboot))
             }
             FilledTonalButton(onClick = { openUrl(context, miner.webInterfaceUrl) }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Rounded.OpenInBrowser, null); Spacer(Modifier.width(8.dp)); Text(L("Weboberfläche im Browser öffnen", "Open web interface in browser"))
+                Icon(Icons.Rounded.OpenInBrowser, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.open_web_interface_in_browser))
             }
         }
     }
     if (confirmRestart) AlertDialog(
         onDismissRequest = { confirmRestart = false },
-        title = { Text(L("Miner wirklich neu starten?", "Really restart the miner?")) },
-        text = { Text(L("Der Miner unterbricht kurzzeitig das Mining und startet innerhalb weniger Sekunden neu.",
-            "The miner briefly stops mining and restarts within a few seconds.")) },
-        confirmButton = { TextButton(onClick = { confirmRestart = false; store.restartMiner(miner.id) }) { Text(L("Jetzt neu starten", "Restart now")) } },
-        dismissButton = { TextButton(onClick = { confirmRestart = false }) { Text(L("Abbrechen", "Cancel")) } }
+        title = { Text(tr(R.string.really_restart_the_miner)) },
+        text = { Text(tr(R.string.the_miner_briefly_stops_mining)) },
+        confirmButton = { TextButton(onClick = { confirmRestart = false; store.restartMiner(miner.id) }) { Text(tr(R.string.restart_now)) } },
+        dismissButton = { TextButton(onClick = { confirmRestart = false }) { Text(tr(R.string.cancel)) } }
     )
 }

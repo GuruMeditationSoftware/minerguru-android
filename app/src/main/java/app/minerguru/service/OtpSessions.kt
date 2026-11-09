@@ -1,7 +1,8 @@
 package app.minerguru.service
 
 import android.content.Context
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.OtpSession
 import kotlinx.coroutines.sync.Mutex
@@ -10,8 +11,8 @@ import kotlinx.coroutines.sync.withLock
 /** Thrown instead of writing: the user gave no code, or a schedule has no session. */
 class OtpException(message: String) : Exception(message) {
     companion object {
-        fun cancelled() = OtpException(L("Kein Einmalcode eingegeben, nichts geändert.", "No one-time code entered, nothing changed."))
-        fun codeNeeded() = OtpException(L("Dieser Miner braucht einen Einmalcode.", "This miner needs a one-time code."))
+        fun cancelled() = OtpException(tr(R.string.no_one_time_code_entered))
+        fun codeNeeded() = OtpException(tr(R.string.this_miner_needs_a_one))
     }
 }
 
@@ -56,7 +57,7 @@ class OtpSessions(
         while (true) {
             val code = (ask(miner.displayName, problem) ?: throw OtpException.cancelled()).trim()
             if (code.length != 6 || !code.all { it in '0'..'9' }) {
-                problem = L("Der Code hat 6 Ziffern.", "The code has 6 digits.")
+                problem = tr(R.string.the_code_has_6_digits)
                 continue
             }
             try {
@@ -66,8 +67,7 @@ class OtpSessions(
             } catch (e: MinerApiException) {
                 if (e.status == 405) return null
                 if (!e.isOtpWrongCode) throw e
-                problem = L("Der Code stimmt nicht. Warte auf den nächsten und versuche es noch einmal.",
-                    "That code is wrong. Wait for the next one and try again.")
+                problem = tr(R.string.that_code_is_wrong_wait)
             }
         }
     }

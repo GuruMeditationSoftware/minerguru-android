@@ -15,7 +15,7 @@ Welcome, above all for miner models and firmware versions MinerGuru does not kno
 - This repository is a snapshot of each release. Development happens elsewhere, so a pull request is not merged here: the maintainer carries the change over, it ships with the next release, and the pull request is closed with a note. Your contribution is credited in the release notes.
 - Keep a pull request to one topic and add or update a test for it.
 - Run the tests before you open it: `./gradlew testDebugUnitTest`.
-- New text in the app needs German and English.
+- New text in the app goes into `res/values/strings.xml` (English) and `res/values-de/strings.xml` (German); the code reads it with `tr(R.string.your_key)`.
 - By opening a pull request you agree that your contribution is licensed under the [MIT License](LICENSE.txt) of this project.
 
 ## Developer documentation

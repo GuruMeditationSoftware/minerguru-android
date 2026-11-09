@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.platform.LocalLayoutDirection
+import app.minerguru.R
 import app.minerguru.service.PoolEditor
 import app.minerguru.ui.fleet.RefreshAllMenu
 import androidx.compose.foundation.layout.Arrangement
@@ -76,12 +77,12 @@ import kotlinx.coroutines.launch
 fun PoolsScreen(store: MinerStore, onOpenMiner: (String) -> Unit) {
     var section by rememberSaveable { mutableStateOf(0) }
     val tabStates = rememberSaveableStateHolder()
-    ScreenScaffold(L("Pools", "Pools"), actions = { PrivacyToggle(store); RefreshAllMenu(store) }) { inner ->
+    ScreenScaffold(tr(R.string.pools), actions = { PrivacyToggle(store); RefreshAllMenu(store) }) { inner ->
         PageContent(inner, maxWidth = if (section == 0) 840.dp else 1280.dp, onRefresh = { store.refreshAllMiners() }) { pad ->
             val dir = LocalLayoutDirection.current
             Column(Modifier.fillMaxSize()) {
                 ConnectedToggleGroup(
-                    listOf(L("Verbindungen", "Connections"), L("Konfiguration", "Configuration")), section, { section = it },
+                    listOf(tr(R.string.connections), tr(R.string.configuration)), section, { section = it },
                     Modifier.fillMaxWidth().padding(start = pad.calculateStartPadding(dir), end = pad.calculateEndPadding(dir), top = 8.dp, bottom = 8.dp)
                 )
                 val listPadding = PaddingValues(start = pad.calculateStartPadding(dir), end = pad.calculateEndPadding(dir), bottom = pad.calculateBottomPadding())
@@ -98,12 +99,12 @@ fun PoolsScreen(store: MinerStore, onOpenMiner: (String) -> Unit) {
 @Composable
 private fun PoolConnections(store: MinerStore, onOpenMiner: (String) -> Unit, contentPadding: PaddingValues) {
     if (store.miners.isEmpty()) {
-        EmptyHint(L("Noch keine Miner – füge zuerst einen Miner hinzu.", "No miners yet – add a miner first."))
+        EmptyHint(tr(R.string.no_miners_yet_add_a))
         return
     }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = contentPadding, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
-            Text(L("Live-Vergleich aller Miner: aktiver Pool, Worker und Latenz", "Live comparison of all miners: active pool, worker and latency"),
+            Text(tr(R.string.live_comparison_of_all_miners),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         items(store.miners, key = { it.id }) { miner -> PoolRowCard(miner, store.tempWarningThresholdC, Modifier.animateItem()) { onOpenMiner(miner.id) } }
@@ -191,8 +192,8 @@ private fun PoolConfiguration(store: MinerStore, contentPadding: PaddingValues) 
                 onImport = {
                     val added = store.importPoolsFromMiners()
                     store.showBanner(
-                        if (added == 0) L("Keine neuen Pools gefunden.", "No new pools found.")
-                        else Lp(added, "Pool", "Pools", "pool", "pools") + L(" in die Bibliothek übernommen.", " added to the library."), false
+                        if (added == 0) tr(R.string.no_new_pools_found)
+                        else trp(R.plurals.pools_count, added) + tr(R.string.added_to_the_library), false
                     )
                 },
                 onNew = { store.poolEditor = PoolEditor(PoolConfig.create("", ""), true) },
@@ -207,16 +208,15 @@ private fun PoolConfiguration(store: MinerStore, contentPadding: PaddingValues) 
     val assignments: LazyListScope.() -> Unit = {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(L("Zuordnung zu Minern", "Assignment to miners"), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text(tr(R.string.assignment_to_miners), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 FilledTonalButton(
                     onClick = { store.applyPoolDrafts(dirty) },
                     enabled = dirty.isNotEmpty() && dirty.none { store.poolDrafts[it]?.poolValidationMessage != null }
-                ) { Text(L("Alle übernehmen", "Apply all") + " (${dirty.size})") }
+                ) { Text(tr(R.string.apply_all) + " (${dirty.size})") }
             }
         }
         if (configurable.isEmpty()) {
-            item { EmptyHint(L("Sobald ein Miner Telemetrie liefert, kannst du hier seine Pool-Slots belegen.",
-                "As soon as a miner reports telemetry, you can fill its pool slots here.")) }
+            item { EmptyHint(tr(R.string.as_soon_as_a_miner)) }
         }
         items(configurable, key = { it.id }) { miner ->
             MinerPoolAssignmentCard(
@@ -262,16 +262,15 @@ private fun PoolConfiguration(store: MinerStore, contentPadding: PaddingValues) 
     pendingDelete?.let { pool ->
         AlertDialog(
             onDismissRequest = { pendingDeleteId = null },
-            title = { Text(L("Pool-Konfiguration löschen?", "Delete pool configuration?")) },
+            title = { Text(tr(R.string.delete_pool_configuration)) },
             text = {
-                Text(L("„${pool.name}“ wird nur aus der Bibliothek entfernt. Die Miner behalten ihre aktuelle Konfiguration.",
-                    "“${pool.name}” is only removed from the library. The miners keep their current configuration."))
+                Text(tr(R.string.is_only_removed_from_the, pool.name))
             },
             confirmButton = {
                 TextButton(onClick = { store.removePool(pool.id); pendingDeleteId = null },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(L("Löschen", "Delete")) }
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(tr(R.string.delete)) }
             },
-            dismissButton = { TextButton(onClick = { pendingDeleteId = null }) { Text(L("Abbrechen", "Cancel")) } }
+            dismissButton = { TextButton(onClick = { pendingDeleteId = null }) { Text(tr(R.string.cancel)) } }
         )
     }
 }
@@ -291,18 +290,17 @@ private fun LibraryCard(
 ) {
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionTitle(L("Pool-Bibliothek", "Pool library"), Icons.Rounded.Storage, "${store.poolLibrary.size}")
+            SectionTitle(tr(R.string.pool_library), Icons.Rounded.Storage, "${store.poolLibrary.size}")
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilledTonalButton(onClick = onImport) {
-                    Icon(Icons.Rounded.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(L("Aus Minern auslesen", "Read from miners"))
+                    Icon(Icons.Rounded.Download, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(tr(R.string.read_from_miners))
                 }
                 FilledTonalButton(onClick = onNew) {
-                    Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(L("Neuer Pool", "New pool"))
+                    Icon(Icons.Rounded.Add, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(tr(R.string.new_pool))
                 }
             }
             if (store.poolLibrary.isEmpty()) {
-                Text(L("Noch keine Pools gespeichert. Lies die Pools deiner Miner aus oder lege einen neuen an.",
-                    "No pools saved yet. Read the pools from your miners or create a new one."),
+                Text(tr(R.string.no_pools_saved_yet_read),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             // Pools as a grouped list of rounded segments instead of rows with dividers.
@@ -340,16 +338,16 @@ private fun LibraryRow(
         }
         if (usage > 0) Text("$usage Miner", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Box {
-            IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, L("Aktionen", "Actions")) }
+            IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, tr(R.string.actions)) }
             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                DropdownMenuItem(text = { Text(L("Als Primär-Pool auf allen Minern", "As primary pool on all miners")) },
+                DropdownMenuItem(text = { Text(tr(R.string.as_primary_pool_on_all)) },
                     enabled = hasMiners, onClick = { menu = false; onAssign(pool, true) })
-                DropdownMenuItem(text = { Text(L("Als Fallback / Pool 2 auf allen Minern", "As fallback / pool 2 on all miners")) },
+                DropdownMenuItem(text = { Text(tr(R.string.as_fallback_pool_2_on)) },
                     enabled = hasMiners, onClick = { menu = false; onAssign(pool, false) })
                 HorizontalDivider()
-                DropdownMenuItem(text = { Text(L("Bearbeiten", "Edit")) }, onClick = { menu = false; onEdit(pool) })
-                DropdownMenuItem(text = { Text(L("Duplizieren", "Duplicate")) }, onClick = { menu = false; onDuplicate(pool) })
-                DropdownMenuItem(text = { Text(L("Löschen", "Delete")) }, onClick = { menu = false; onDelete(pool) })
+                DropdownMenuItem(text = { Text(tr(R.string.edit)) }, onClick = { menu = false; onEdit(pool) })
+                DropdownMenuItem(text = { Text(tr(R.string.duplicate)) }, onClick = { menu = false; onDuplicate(pool) })
+                DropdownMenuItem(text = { Text(tr(R.string.delete)) }, onClick = { menu = false; onDelete(pool) })
             }
         }
     }
@@ -383,9 +381,9 @@ private fun MinerPoolAssignmentCard(
                     Text(miner.displayName, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
                         Privacy.ip(miner.ipAddress) + " • " + when {
-                            form.poolApi == MinerSettingsForm.PoolApi.SLOTS -> "${AxeOSPool.SLOT_COUNT} " + L("Pool-Slots", "pool slots")
-                            miner.supportsDualPool -> L("Failover oder Dual-Pool", "Failover or dual pool")
-                            else -> L("Primär + Fallback", "Primary + fallback")
+                            form.poolApi == MinerSettingsForm.PoolApi.SLOTS -> "${AxeOSPool.SLOT_COUNT} " + tr(R.string.pool_slots)
+                            miner.supportsDualPool -> tr(R.string.failover_or_dual_pool)
+                            else -> tr(R.string.primary_fallback)
                         },
                         style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -399,7 +397,7 @@ private fun MinerPoolAssignmentCard(
 
             if (form.poolApi == MinerSettingsForm.PoolApi.SLOTS) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    SlotRolePicker(L("Primär", "Primary"), form, library, form.primarySlot, Modifier.weight(1f)) {
+                    SlotRolePicker(tr(R.string.primary), form, library, form.primarySlot, Modifier.weight(1f)) {
                         onForm(form.copy(primarySlot = it))
                     }
                     SlotRolePicker("Fallback", form, library, form.secondarySlot, Modifier.weight(1f)) {
@@ -412,12 +410,12 @@ private fun MinerPoolAssignmentCard(
             if (isDirty) form.poolCoinWarning?.let { StatusMessage(it, true) }
             errorMessage?.let { StatusMessage(it, true) }
             if (form.slotsToClear.isNotEmpty()) {
-                Text(L("Wird geleert: ", "Will be cleared: ") + form.slotsToClear.joinToString(", ") { form.slotTitle(it) },
+                Text(tr(R.string.will_be_cleared) + form.slotsToClear.joinToString(", ") { form.slotTitle(it) },
                     style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Spacer(Modifier.weight(1f))
-                TextButton(onClick = onReset, enabled = isDirty && !isApplying) { Text(L("Zurücksetzen", "Reset")) }
+                TextButton(onClick = onReset, enabled = isDirty && !isApplying) { Text(tr(R.string.reset)) }
                 Button(
                     onClick = onApply,
                     enabled = isDirty && !isApplying && form.poolValidationMessage == null && miner.connectionState.isOnline
@@ -428,7 +426,7 @@ private fun MinerPoolAssignmentCard(
                     } else {
                         Icon(Icons.Rounded.CheckCircle, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp))
                     }
-                    Text(L("Übernehmen & neu starten", "Apply & restart"))
+                    Text(tr(R.string.apply_restart))
                 }
             }
         }
@@ -445,13 +443,13 @@ fun DualPoolControls(form: MinerSettingsForm, onForm: (MinerSettingsForm) -> Uni
             Row {
                 Text("P1 ${form.primaryPercent}%", fontWeight = FontWeight.SemiBold)
                 Spacer(Modifier.weight(1f))
-                Text(L("Hashrate-Aufteilung", "Hashrate split"), style = MaterialTheme.typography.labelSmall,
+                Text(tr(R.string.hashrate_split), style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.weight(1f))
                 Text("P2 ${form.secondaryPercent}%", fontWeight = FontWeight.SemiBold)
             }
             Slider(value = form.poolBalance, onValueChange = { onForm(form.copy(poolBalance = it)) }, valueRange = 1f..99f,
-                modifier = Modifier.semantics { contentDescription = L("Hashrate-Aufteilung", "Hashrate split") })
+                modifier = Modifier.semantics { contentDescription = tr(R.string.hashrate_split) })
         }
     }
 }
@@ -464,7 +462,7 @@ private fun SlotRow(
     val endpoint = form.slots[index]
     val label = when (form.poolApi) {
         MinerSettingsForm.PoolApi.SLOTS -> form.slotTitle(index)
-        MinerSettingsForm.PoolApi.LEGACY -> if (index == 0) (if (isDual) "Pool 1" else L("Primär", "Primary")) else (if (isDual) "Pool 2" else "Fallback")
+        MinerSettingsForm.PoolApi.LEGACY -> if (index == 0) (if (isDual) "Pool 1" else tr(R.string.primary)) else (if (isDual) "Pool 2" else "Fallback")
     }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -472,7 +470,7 @@ private fun SlotRow(
             if (endpoint.hasContent) CoinBadge(slotCoin(miner, form, index))
             Spacer(Modifier.weight(1f))
             when {
-                form.poolApi == MinerSettingsForm.PoolApi.SLOTS && index == form.primarySlot -> RoleBadge(L("Primär", "Primary"), MG.green())
+                form.poolApi == MinerSettingsForm.PoolApi.SLOTS && index == form.primarySlot -> RoleBadge(tr(R.string.primary), MG.green())
                 form.poolApi == MinerSettingsForm.PoolApi.SLOTS && index == form.secondarySlot -> RoleBadge("Fallback", MG.orange())
                 form.poolApi == MinerSettingsForm.PoolApi.SLOTS && endpoint.hasContent -> RoleBadge("Reserve", MaterialTheme.colorScheme.onSurfaceVariant)
                 form.poolApi == MinerSettingsForm.PoolApi.LEGACY && isDual ->
@@ -485,7 +483,7 @@ private fun SlotRow(
             }
             if (endpoint.hasContent && library.none { it.matches(endpoint) }) {
                 IconButton(onClick = { onSaveToLibrary(endpoint) }) {
-                    Icon(Icons.Rounded.SaveAlt, L("In die Bibliothek übernehmen", "Save to library"))
+                    Icon(Icons.Rounded.SaveAlt, tr(R.string.save_to_library))
                 }
             }
         }

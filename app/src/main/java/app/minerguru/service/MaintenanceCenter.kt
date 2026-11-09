@@ -1,9 +1,10 @@
 package app.minerguru.service
 
 import android.content.Context
+import app.minerguru.R
 import app.minerguru.model.AlertEvent
 import app.minerguru.model.AlertKind
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.minerScopeWithout
 import app.minerguru.model.MaintenanceRecord
 import app.minerguru.model.MaintenanceTask
@@ -53,8 +54,8 @@ object MaintenanceCenter {
         val reminded = runCatching { JSONObject(prefs(context).getString(KEY_REMINDED, null) ?: "{}") }.getOrDefault(JSONObject())
         val events = tasks.filter { now - reminded.optLong(it.id, 0) >= REMIND_AGAIN_MS }.map { task ->
             reminded.put(task.id, now)
-            AlertEvent(AlertKind.MAINTENANCE, task.id, L("Wartung fällig: ${task.title}", "Maintenance due: ${task.title}"),
-                task.kind.hint.ifEmpty { L("Trag sie in MinerGuru als erledigt ein.", "Mark it as done in MinerGuru.") }, false, task.title)
+            AlertEvent(AlertKind.MAINTENANCE, task.id, tr(R.string.maintenance_due_for, task.title),
+                task.kind.hint.ifEmpty { tr(R.string.mark_it_as_done_in) }, false, task.title)
         }
         if (events.isNotEmpty()) prefs(context).edit().putString(KEY_REMINDED, reminded.toString()).apply()
         events

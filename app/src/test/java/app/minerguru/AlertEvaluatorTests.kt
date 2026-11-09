@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.Test
 
 class AlertEvaluatorTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     private val start = 1_800_000_000_000L
     private val off = ConnectionState.Offline("Timeout")
@@ -56,7 +56,7 @@ class AlertCombineTests {
     private fun event(name: String, recovery: Boolean = false, alone: Boolean = false) =
         AlertEvent(AlertKind.OFFLINE, name, name, "text", recovery, name, alone)
 
-    @org.junit.Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @org.junit.Before fun germanUi() = useGermanTexts()
 
     @Test fun alertsOfOnePollCombinePerDirection() {
         val single = event("A")

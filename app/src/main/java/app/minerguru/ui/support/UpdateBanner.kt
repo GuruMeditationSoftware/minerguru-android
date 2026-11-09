@@ -22,8 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import app.minerguru.R
 import app.minerguru.model.AppInfo
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.service.UpdateChecker
 
 /** Tells the user on the overview that a newer version exists, until they dismiss it or update. */
@@ -40,15 +41,15 @@ fun UpdateBanner(updates: UpdateChecker, modifier: Modifier = Modifier) {
             Icon(Icons.Rounded.SystemUpdate, null, tint = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.width(12.dp))
             Text(
-                L("MinerGuru $version ist verfügbar", "MinerGuru $version is available"),
+                tr(R.string.minerguru_is_available, version),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
             TextButton(onClick = {
                 runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(AppInfo.RELEASES_URL))) }
-            }) { Text(L("Zum Download", "Download")) }
+            }) { Text(tr(R.string.download)) }
             IconButton(onClick = updates::dismissBanner) {
-                Icon(Icons.Rounded.Close, L("Ausblenden", "Dismiss"))
+                Icon(Icons.Rounded.Close, tr(R.string.dismiss))
             }
         }
     }

@@ -1,5 +1,6 @@
 package app.minerguru.ui.support
 
+import app.minerguru.R
 import app.minerguru.model.Privacy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.service.MinerStore
 import app.minerguru.service.OtpException
 import kotlinx.coroutines.CancellationException
@@ -39,13 +40,10 @@ fun OtpCodeDialog(store: MinerStore) {
     var code by remember(request) { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = { request.answer.complete(null) },
-        title = { Text(L("Einmalcode für ${request.minerName}", "One-time code for ${request.minerName}")) },
+        title = { Text(tr(R.string.one_time_code_for, request.minerName)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(request.problem ?: L(
-                    "Dieser Miner schützt seine Einstellungen mit einem Einmalcode. Gib den 6-stelligen Code aus deiner Authenticator-App ein. Die Sitzung gilt bis zu 24 Stunden.",
-                    "This miner protects its settings with a one-time code. Enter the 6-digit code from your authenticator app. The session lasts up to 24 hours."
-                ))
+                Text(request.problem ?: tr(R.string.this_miner_protects_its_settings))
                 OutlinedTextField(
                     value = code,
                     onValueChange = { code = it.filter(Char::isDigit).take(6) },
@@ -57,10 +55,10 @@ fun OtpCodeDialog(store: MinerStore) {
             }
         },
         confirmButton = {
-            TextButton(onClick = { request.answer.complete(code) }) { Text(L("Bestätigen", "Confirm")) }
+            TextButton(onClick = { request.answer.complete(code) }) { Text(tr(R.string.confirm)) }
         },
         dismissButton = {
-            TextButton(onClick = { request.answer.complete(null) }) { Text(L("Abbrechen", "Cancel")) }
+            TextButton(onClick = { request.answer.complete(null) }) { Text(tr(R.string.cancel)) }
         }
     )
 }
@@ -71,22 +69,22 @@ fun WriteConfirmDialog(store: MinerStore) {
     val request = store.writeRequest ?: return
     AlertDialog(
         onDismissRequest = { request.answer.complete(false) },
-        title = { Text(L("An ${request.minerName} übertragen?", "Send to ${request.minerName}?")) },
+        title = { Text(tr(R.string.send_to, request.minerName)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                if (request.fields.isEmpty()) Text(L("Es ändert sich kein Wert.", "No value changes."))
+                if (request.fields.isEmpty()) Text(tr(R.string.no_value_changes))
                 request.fields.forEach { field ->
                     val line = field.summary
                     Text(if (Privacy.active) Privacy.freeText(line) else line)
                 }
-                if (request.restarts) Text(L("Danach startet der Miner neu.", "The miner restarts afterwards."))
+                if (request.restarts) Text(tr(R.string.the_miner_restarts_afterwards))
             }
         },
         confirmButton = {
-            TextButton(onClick = { request.answer.complete(true) }) { Text(L("Übertragen", "Send")) }
+            TextButton(onClick = { request.answer.complete(true) }) { Text(tr(R.string.send)) }
         },
         dismissButton = {
-            TextButton(onClick = { request.answer.complete(false) }) { Text(L("Abbrechen", "Cancel")) }
+            TextButton(onClick = { request.answer.complete(false) }) { Text(tr(R.string.cancel)) }
         }
     )
 }
@@ -100,8 +98,7 @@ fun OtpWaitingNotice(store: MinerStore) {
     var problem by remember { mutableStateOf<String?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            L("Zeitpläne laufen auf diesen Minern nur mit gültiger Sitzung (bis zu 24 Stunden).",
-                "Schedules only run on these miners with a valid session (up to 24 hours)."),
+            tr(R.string.schedules_only_run_on_these),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -123,7 +120,7 @@ fun OtpWaitingNotice(store: MinerStore) {
                             e.message
                         }
                     }
-                }) { Text(L("Code eingeben", "Enter code")) }
+                }) { Text(tr(R.string.enter_code)) }
             }
         }
         problem?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }

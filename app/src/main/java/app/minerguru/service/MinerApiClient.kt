@@ -1,8 +1,9 @@
 package app.minerguru.service
 
+import app.minerguru.R
 import app.minerguru.model.ChangeLog
 import app.minerguru.model.DiagnosticLog
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinerSystemInfo
 import app.minerguru.model.MinerSystemUpdatePayload
 import app.minerguru.model.OtpSession
@@ -34,10 +35,9 @@ class MinerApiException(message: String, val status: Int? = null, detail: String
         fun ofResponse(status: Int, detail: String): MinerApiException {
             val plain = MinerApiException("", status, detail)
             val message = when {
-                plain.isOtpBlocked -> L("Zu viele falsche Einmalcodes: Der Miner sperrt Änderungen für 5 Minuten.",
-                    "Too many wrong one-time codes: the miner blocks changes for 5 minutes.")
-                plain.isOtpRefused -> L("Der Miner verlangt einen gültigen Einmalcode.", "The miner demands a valid one-time code.")
-                else -> L("HTTP-Fehler", "HTTP error") + " $status" + if (detail.isEmpty()) "" else ": $detail"
+                plain.isOtpBlocked -> tr(R.string.too_many_wrong_one_time)
+                plain.isOtpRefused -> tr(R.string.the_miner_demands_a_valid)
+                else -> tr(R.string.http_error) + " $status" + if (detail.isEmpty()) "" else ": $detail"
             }
             return MinerApiException(message, status, detail)
         }
@@ -81,7 +81,7 @@ object MinerApiClient {
 
     private fun url(host: String, path: String): String {
         val normalized = normalizeHost(host)
-        if (normalized.isEmpty()) throw MinerApiException(L("Ungültige Adresse", "Invalid address") + ": $host")
+        if (normalized.isEmpty()) throw MinerApiException(tr(R.string.invalid_address) + ": $host")
         return "http://$normalized$path"
     }
 
@@ -91,7 +91,7 @@ object MinerApiClient {
             cont.invokeOnCancellation { call.cancel() }
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
-                    if (cont.isActive) cont.resumeWithException(MinerApiException(e.message ?: L("Nicht erreichbar", "Unreachable")))
+                    if (cont.isActive) cont.resumeWithException(MinerApiException(e.message ?: tr(R.string.unreachable)))
                 }
 
                 override fun onResponse(call: Call, response: Response) {
@@ -107,14 +107,14 @@ object MinerApiClient {
         val request = Request.Builder().url(url(host, "/api/system/info")).header("Accept", "application/json").build()
         val body = execute(client, request).use { resp ->
             val text = withContext(Dispatchers.IO) { resp.body?.string().orEmpty() }
-            if (!resp.isSuccessful) throw MinerApiException(L("HTTP-Fehler", "HTTP error") + " ${resp.code}${if (text.isEmpty()) "" else ": $text"}")
+            if (!resp.isSuccessful) throw MinerApiException(tr(R.string.http_error) + " ${resp.code}${if (text.isEmpty()) "" else ": $text"}")
             text
         }
         return try {
             val obj = JSONObject(body)
             Fetched(MinerSystemInfo.fromJson(obj), prettySorted(obj), MINER_KEYS.any(obj::has))
         } catch (e: Exception) {
-            throw MinerApiException(L("Ungültige Antwort vom Miner", "Invalid response from miner") + ": ${e.message}")
+            throw MinerApiException(tr(R.string.invalid_response_from_miner) + ": ${e.message}")
         }
     }
 
@@ -148,7 +148,7 @@ object MinerApiClient {
             val text = withContext(Dispatchers.IO) { resp.body?.string().orEmpty() }
             if (!resp.isSuccessful) throw MinerApiException.ofResponse(resp.code, text)
             runCatching { OtpSession.parseResponse(text, System.currentTimeMillis()) }.getOrElse {
-                throw MinerApiException(L("Ungültige Antwort vom Miner", "Invalid response from the miner"))
+                throw MinerApiException(tr(R.string.invalid_response_from_the_miner))
             }
         }
     }
@@ -194,7 +194,7 @@ object MinerApiClient {
         }
     }
 
-    fun readOnlyMessage() = L("„Nur lesen“ ist an: MinerGuru ändert nichts am Miner.", "Read-only mode is on: MinerGuru changes nothing on the miner.")
+    fun readOnlyMessage() = tr(R.string.read_only_mode_is_on)
 
     /** On IO: closing a response whose body is still in transit reads the socket, which the main thread may not. */
     private suspend fun sendChecked(request: Request, fields: String = "", body: String? = null) = withContext(Dispatchers.IO) {

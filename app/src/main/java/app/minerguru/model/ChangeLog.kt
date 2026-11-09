@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -15,9 +16,9 @@ enum class ChangeSource {
 
     val title: String
         get() = when (this) {
-            MANUAL -> L("Von Hand", "Manual")
-            SCHEDULE -> L("Zeitplan", "Schedule")
-            WATCHDOG -> L("Automatik", "Automatic")
+            MANUAL -> tr(R.string.by_hand)
+            SCHEDULE -> tr(R.string.schedule)
+            WATCHDOG -> tr(R.string.automatic)
         }
 }
 
@@ -164,11 +165,11 @@ class ChangeLog(private var folder: File? = null) {
         }
 
         fun actionTitle(action: String): String = when (action) {
-            "restart" -> L("Neustart", "Restart")
-            "pause" -> L("Pausieren", "Pause")
-            "resume" -> L("Fortsetzen", "Resume")
-            "clearSlot" -> L("Pool-Slot geleert", "Pool slot cleared")
-            else -> L("Einstellungen", "Settings")
+            "restart" -> tr(R.string.restart_event)
+            "pause" -> tr(R.string.pause)
+            "resume" -> tr(R.string.resume)
+            "clearSlot" -> tr(R.string.pool_slot_cleared)
+            else -> tr(R.string.settings)
         }
 
         fun flatten(rawJSON: String): Map<String, String>? =
@@ -230,34 +231,34 @@ class ChangeLog(private var folder: File? = null) {
             val prefix = if (isSlot) "Pool ${(parts[1].toIntOrNull() ?: 0) + 1}: " else ""
             return prefix + when (name) {
                 "hostname" -> "Hostname"
-                "frequency" -> L("Frequenz", "Frequency")
-                "coreVoltage" -> L("Kernspannung", "Core voltage")
-                "autofanspeed" -> L("Lüfterautomatik", "Automatic fan")
-                "fanspeed", "manualFanSpeed" -> L("Lüfter", "Fan")
-                "stratumURL" -> L("Pool-Adresse", "Pool address")
+                "frequency" -> tr(R.string.frequency)
+                "coreVoltage" -> tr(R.string.core_voltage)
+                "autofanspeed" -> tr(R.string.automatic_fan)
+                "fanspeed", "manualFanSpeed" -> tr(R.string.fan)
+                "stratumURL" -> tr(R.string.pool_address)
                 "stratumPort" -> "Pool-Port"
-                "stratumUser" -> L("Pool-Benutzer", "Pool user")
-                "stratumPassword" -> L("Pool-Passwort", "Pool password")
-                "fallbackStratumURL" -> L("Fallback-Adresse", "Fallback address")
+                "stratumUser" -> tr(R.string.pool_user)
+                "stratumPassword" -> tr(R.string.pool_password)
+                "fallbackStratumURL" -> tr(R.string.fallback_address)
                 "fallbackStratumPort" -> "Fallback-Port"
-                "fallbackStratumUser" -> L("Fallback-Benutzer", "Fallback user")
-                "fallbackStratumPassword" -> L("Fallback-Passwort", "Fallback password")
-                "overclockEnabled" -> L("Eigene Taktwerte", "Custom clock values")
-                "temptarget", "pidTargetTemp" -> L("Zieltemperatur", "Target temperature")
-                "poolMode" -> L("Pool-Modus", "Pool mode")
-                "poolBalance" -> L("Pool-Aufteilung", "Pool split")
-                "primaryPoolIndex" -> L("Primärer Pool-Platz", "Primary pool slot")
-                "secondaryPoolIndex" -> L("Fallback-Platz", "Fallback slot")
-                "id" -> L("Platz", "Slot")
-                "stratumProtocol" -> L("Protokoll", "Protocol")
+                "fallbackStratumUser" -> tr(R.string.fallback_user)
+                "fallbackStratumPassword" -> tr(R.string.fallback_password)
+                "overclockEnabled" -> tr(R.string.custom_clock_values)
+                "temptarget", "pidTargetTemp" -> tr(R.string.target_temperature)
+                "poolMode" -> tr(R.string.pool_mode)
+                "poolBalance" -> tr(R.string.pool_split)
+                "primaryPoolIndex" -> tr(R.string.primary_pool_slot)
+                "secondaryPoolIndex" -> tr(R.string.fallback_slot)
+                "id" -> tr(R.string.slot)
+                "stratumProtocol" -> tr(R.string.protocol)
                 "stratumTLS" -> "TLS"
-                "stratumSuggestedDifficulty" -> L("Vorgeschlagene Difficulty", "Suggested difficulty")
+                "stratumSuggestedDifficulty" -> tr(R.string.suggested_difficulty)
                 "stratumExtranonceSubscribe" -> "Extranonce-Subscribe"
-                "stratumDecodeCoinbase" -> L("Coinbase auswerten", "Decode coinbase")
-                "stratumShareWarning" -> L("Share-Warnung", "Share warning")
-                "stratumV2ChannelType" -> L("SV2-Kanaltyp", "SV2 channel type")
-                "stratumV2AuthorityPubkey" -> L("SV2-Authority-Key", "SV2 authority key")
-                "stratumV2RequireAuth" -> L("SV2-Authentifizierung", "SV2 authentication")
+                "stratumDecodeCoinbase" -> tr(R.string.decode_coinbase)
+                "stratumShareWarning" -> tr(R.string.share_warning)
+                "stratumV2ChannelType" -> tr(R.string.sv2_channel_type)
+                "stratumV2AuthorityPubkey" -> tr(R.string.sv2_authority_key)
+                "stratumV2RequireAuth" -> tr(R.string.sv2_authentication)
                 else -> name
             }
         }
@@ -265,8 +266,8 @@ class ChangeLog(private var folder: File? = null) {
         /** Values the firmware stores as numbers, in words. Everything else stays as it is. */
         fun shown(value: String, key: String): String = when (key.substringAfterLast('.')) {
             "overclockEnabled", "autofanspeed", "stratumExtranonceSubscribe", "stratumDecodeCoinbase", "stratumShareWarning", "stratumV2RequireAuth" -> when (value) {
-                "1", "true" -> L("an", "on")
-                "0", "false" -> L("aus", "off")
+                "1", "true" -> tr(R.string.on)
+                "0", "false" -> tr(R.string.off_in_text)
                 else -> value
             }
             "poolMode" -> when (value) {

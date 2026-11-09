@@ -8,7 +8,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import app.minerguru.R
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,8 +32,8 @@ class MonitorService : Service() {
         AlertCenter.ensureChannels(this)
         val notification = NotificationCompat.Builder(this, AlertCenter.CHANNEL_MONITOR)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(L("MinerGuru überwacht deine Miner", "MinerGuru is watching your miners"))
-            .setContentText(L("Abfrage jede Minute. Ausschalten in den Einstellungen.", "Polling every minute. Turn off in Settings."))
+            .setContentTitle(tr(R.string.minerguru_is_watching_your_miners))
+            .setContentText(tr(R.string.polling_every_minute_turn_off))
             .setContentIntent(AlertCenter.openAppIntent(this))
             .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_MIN)

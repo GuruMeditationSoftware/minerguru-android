@@ -41,6 +41,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
+import app.minerguru.R
 import app.minerguru.ui.components.isCompactHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -56,7 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.service.MinerStore
 import app.minerguru.ui.components.AppSnackbar
 import app.minerguru.ui.components.AppSnackbarVisuals
@@ -139,11 +140,11 @@ private fun NavigationSuiteType.isHorizontalBar() =
 
 private val Route.tabTitle: String
     get() = when (this) {
-        Route.Overview -> L("Übersicht", "Overview")
-        Route.Miners -> L("Miner", "Miners")
-        Route.Pools -> L("Pools", "Pools")
-        Route.Power -> L("Strom", "Power")
-        else -> L("Einstellungen", "Settings")
+        Route.Overview -> tr(R.string.overview)
+        Route.Miners -> tr(R.string.miners)
+        Route.Pools -> tr(R.string.pools)
+        Route.Power -> tr(R.string.power_page)
+        else -> tr(R.string.settings)
     }
 
 private val Route.tabIcon: ImageVector
@@ -174,7 +175,7 @@ fun MinerGuruMainScreen(store: MinerStore) {
         store.banners.collect { b ->
             scope.launch {
                 snackbar.currentSnackbarData?.dismiss()
-                val result = snackbar.showSnackbar(AppSnackbarVisuals(b.text, b.isError, b.retry?.let { L("Erneut", "Retry") }))
+                val result = snackbar.showSnackbar(AppSnackbarVisuals(b.text, b.isError, b.retry?.let { tr(R.string.retry) }))
                 if (result == SnackbarResult.ActionPerformed) b.retry?.invoke()
             }
         }

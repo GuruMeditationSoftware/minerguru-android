@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import org.json.JSONObject
 
 /** Kinds of alerts the user can switch on or off. Later watchdogs add entries here. */
@@ -14,13 +15,13 @@ enum class AlertKind {
 
     val title: String
         get() = when (this) {
-            OFFLINE -> L("Miner offline / wieder online", "Miner offline / back online")
-            MAINTENANCE -> L("Wartung fällig", "Maintenance due")
-            OVERHEAT -> L("Überhitzung", "Overheating")
-            FLATLINE -> L("Keine Shares mehr (Flatline)", "No more shares (flatline)")
-            FALLBACK -> L("Fallback-Pool aktiv", "Fallback pool active")
-            RESTART -> L("Unerwarteter Neustart", "Unexpected restart")
-            PAYOUT -> L("Auszahlungsadresse", "Payout address")
+            OFFLINE -> tr(R.string.miner_offline_back_online)
+            MAINTENANCE -> tr(R.string.maintenance_due)
+            OVERHEAT -> tr(R.string.overheating)
+            FLATLINE -> tr(R.string.no_more_shares_flatline)
+            FALLBACK -> tr(R.string.fallback_pool_active)
+            RESTART -> tr(R.string.unexpected_restart)
+            PAYOUT -> tr(R.string.payout_address)
         }
 }
 
@@ -35,9 +36,9 @@ enum class BackgroundMode {
 
     val title: String
         get() = when (this) {
-            OFF -> L("Nur bei geöffneter App", "Only while the app is open")
-            SAVER -> L("Sparsam (etwa alle 15 min)", "Battery saver (about every 15 min)")
-            INSTANT -> L("Sofort (jede Minute, dauerhafte Mitteilung)", "Instant (every minute, permanent notification)")
+            OFF -> tr(R.string.only_while_the_app_is)
+            SAVER -> tr(R.string.battery_saver_about_every_15)
+            INSTANT -> tr(R.string.instant_every_minute_permanent_notification)
         }
 }
 
@@ -68,17 +69,17 @@ data class AlertEvent(
         }
 
         private fun combinedTitle(kind: AlertKind, recovery: Boolean, count: Int): String = when (kind) {
-            AlertKind.MAINTENANCE -> L("$count Wartungen sind fällig", "$count maintenance tasks are due")
-            AlertKind.OVERHEAT -> if (recovery) L("$count Miner sind wieder kühl", "$count miners have cooled down")
-            else L("$count Miner sind überhitzt", "$count miners are overheating")
-            AlertKind.FLATLINE -> if (recovery) L("$count Miner liefern wieder Shares", "$count miners are delivering shares again")
-            else L("$count Miner liefern keine Shares mehr", "$count miners have stopped delivering shares")
-            AlertKind.FALLBACK -> if (recovery) L("$count Miner sind zurück auf dem Primär-Pool", "$count miners are back on the primary pool")
-            else L("$count Miner laufen auf dem Fallback-Pool", "$count miners are on the fallback pool")
-            AlertKind.RESTART -> L("$count Miner sind neu gestartet", "$count miners restarted")
-            AlertKind.PAYOUT -> L("$count Warnungen zur Auszahlungsadresse", "$count payout address warnings")
-            AlertKind.OFFLINE -> if (recovery) L("$count Miner sind wieder online", "$count miners are back online")
-            else L("$count Miner sind offline", "$count miners are offline")
+            AlertKind.MAINTENANCE -> tr(R.string.maintenance_tasks_are_due, count)
+            AlertKind.OVERHEAT -> if (recovery) tr(R.string.miners_have_cooled_down, count)
+            else tr(R.string.miners_are_overheating, count)
+            AlertKind.FLATLINE -> if (recovery) tr(R.string.miners_are_delivering_shares_again, count)
+            else tr(R.string.miners_have_stopped_delivering_shares, count)
+            AlertKind.FALLBACK -> if (recovery) tr(R.string.miners_are_back_on_the, count)
+            else tr(R.string.miners_are_on_the_fallback, count)
+            AlertKind.RESTART -> tr(R.string.miners_restarted, count)
+            AlertKind.PAYOUT -> tr(R.string.payout_address_warnings, count)
+            AlertKind.OFFLINE -> if (recovery) tr(R.string.miners_are_back_online, count)
+            else tr(R.string.miners_are_offline, count)
         }
     }
 }
@@ -138,9 +139,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                         val minutes = (now - firstFailure) / 60_000
                         events += AlertEvent(
                             AlertKind.OFFLINE, miner.id,
-                            L("${miner.displayName} ist offline", "${miner.displayName} is offline"),
-                            L("Keine Antwort seit $minutes min. Vielleicht ohne Strom, außer WLAN-Reichweite oder im Hotspot-Modus.",
-                                "No response for $minutes min. It may have lost power, be out of Wi-Fi range or be in hotspot mode."),
+                            tr(R.string.is_offline, miner.displayName),
+                            tr(R.string.no_response_for_min_it, minutes),
                             isRecovery = false
                         )
                     }
@@ -149,8 +149,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                     if (track.offlineAlerted) {
                         events += AlertEvent(
                             AlertKind.OFFLINE, miner.id,
-                            L("${miner.displayName} ist wieder online", "${miner.displayName} is back online"),
-                            L("Der Miner antwortet wieder.", "The miner is responding again."),
+                            tr(R.string.is_back_online, miner.displayName),
+                            tr(R.string.the_miner_is_responding_again),
                             isRecovery = true
                         )
                     }
@@ -188,8 +188,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
     private fun skippedRestartEvent(miner: MinerDevice, reason: MinerHealth.AutoRestartReason) = AlertEvent(
         kind = if (reason == MinerHealth.AutoRestartReason.FLATLINE) AlertKind.FLATLINE else AlertKind.FALLBACK,
         minerId = miner.id,
-        title = L("${miner.displayName} wurde nicht neu gestartet", "${miner.displayName} was not restarted"),
-        body = L("Ein automatischer Neustart war fällig, aber „Nur lesen“ ist an.", "An automatic restart was due, but read-only mode is on."),
+        title = tr(R.string.was_not_restarted, miner.displayName),
+        body = tr(R.string.an_automatic_restart_was_due),
         isRecovery = false,
         minerName = miner.displayName,
         standsAlone = true
@@ -215,8 +215,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                     val new = PayoutCheck.shortened(slot.address)
                     events += AlertEvent(
                         AlertKind.PAYOUT, miner.id,
-                        L("Adresse von $name wurde geändert", "Address of $name was changed"),
-                        L("${slot.title}: $old → $new. Das kam nicht von MinerGuru.", "${slot.title}: $old → $new. This did not come from MinerGuru."),
+                        tr(R.string.address_of_was_changed, name),
+                        tr(R.string.this_did_not_come_from, slot.title, old, new),
                         isRecovery = false
                     )
                 }
@@ -225,9 +225,9 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 val short = PayoutCheck.shortened(slot.address)
                 events += AlertEvent(
                     AlertKind.PAYOUT, miner.id,
-                    if (slot.verdict == PayoutVerdict.FACTORY_DEFAULT) L("$name nutzt eine Standard-Adresse", "$name uses a default address")
-                    else L("$name zahlt an eine fremde Adresse", "$name pays to a foreign address"),
-                    L("${slot.title}: $short. Ein Fund ginge nicht an dich.", "${slot.title}: $short. A block found would not go to you."),
+                    if (slot.verdict == PayoutVerdict.FACTORY_DEFAULT) tr(R.string.uses_a_default_address, name)
+                    else tr(R.string.pays_to_a_foreign_address, name),
+                    tr(R.string.a_block_found_would_not, slot.title, short),
                     isRecovery = false
                 )
             }
@@ -238,9 +238,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
             missAlerted = true
             events += AlertEvent(
                 AlertKind.PAYOUT, miner.id,
-                L("Block zahlt nicht an $name", "Block does not pay $name"),
-                L("Die Block-Vorlage des Pools enthält die Adresse des Miners nicht. Prüfe die Pool-Einstellungen.",
-                    "The pool's block template does not contain the miner's address. Check the pool settings."),
+                tr(R.string.block_does_not_pay, name),
+                tr(R.string.the_pool_s_block_template),
                 isRecovery = false
             )
         }
@@ -250,12 +249,11 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
     /** The result of a watchdog restart, as a message. Noted in the change log like any other write. */
     fun restartEvent(miner: MinerDevice, reason: MinerHealth.AutoRestartReason, error: String?): AlertEvent {
         val name = miner.displayName
-        val why = if (reason == MinerHealth.AutoRestartReason.FLATLINE) L("Keine Shares mehr.", "No more shares.")
-        else L("Der Primär-Pool ist wieder erreichbar, der Miner blieb aber auf dem Fallback-Pool.",
-            "The primary pool is reachable again, but the miner stayed on the fallback pool.")
+        val why = if (reason == MinerHealth.AutoRestartReason.FLATLINE) tr(R.string.no_more_shares)
+        else tr(R.string.the_primary_pool_is_reachable)
         val kind = if (reason == MinerHealth.AutoRestartReason.FLATLINE) AlertKind.FLATLINE else AlertKind.FALLBACK
-        return if (error == null) AlertEvent(kind, miner.id, L("$name wurde automatisch neu gestartet", "$name was restarted automatically"), why, false, name, true)
-        else AlertEvent(kind, miner.id, L("$name ließ sich nicht neu starten", "$name could not be restarted"), "$why $error", false, name, true)
+        return if (error == null) AlertEvent(kind, miner.id, tr(R.string.was_restarted_automatically, name), why, false, name, true)
+        else AlertEvent(kind, miner.id, tr(R.string.could_not_be_restarted, name), "$why $error", false, name, true)
     }
 
     /** A new expected address makes earlier warnings worth repeating. */
@@ -297,8 +295,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 health.overheatAlerted = false
                 events += AlertEvent(
                     AlertKind.OVERHEAT, miner.id,
-                    L("$name ist wieder kühl", "$name has cooled down"),
-                    L("Die Temperatur ist wieder im normalen Bereich.", "The temperature is back to normal."),
+                    tr(R.string.has_cooled_down, name),
+                    tr(R.string.the_temperature_is_back_to),
                     isRecovery = true
                 )
             } else if (due) {
@@ -309,11 +307,9 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 val limit = (info.overheatTemp ?: 0.0).toInt()
                 events += AlertEvent(
                     AlertKind.OVERHEAT, miner.id,
-                    L("$name ist überhitzt", "$name is overheating"),
-                    if (info.overheatMode) L("Der Miner hat sich gedrosselt und bleibt so bis zum Neustart. Prüfe vorher die Kühlung.",
-                        "The miner has throttled itself and stays that way until it restarts. Check the cooling first.")
-                    else L("ASIC $temp °C, Spannungsregler $vr °C, Grenze $limit °C. Prüfe die Kühlung.",
-                        "ASIC $temp °C, voltage regulator $vr °C, limit $limit °C. Check the cooling."),
+                    tr(R.string.is_overheating, name),
+                    if (info.overheatMode) tr(R.string.the_miner_has_throttled_itself)
+                    else tr(R.string.asic_c_voltage_regulator_c, temp, vr, limit),
                     isRecovery = false
                 )
             }
@@ -324,8 +320,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 health.flatlineAlerted = false
                 events += AlertEvent(
                     AlertKind.FLATLINE, miner.id,
-                    L("$name liefert wieder Shares", "$name is delivering shares again"),
-                    L("Es kommen wieder neue Shares an.", "New shares are arriving again."),
+                    tr(R.string.is_delivering_shares_again, name),
+                    tr(R.string.new_shares_are_arriving_again),
                     isRecovery = true
                 )
             } else if (due) {
@@ -334,9 +330,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 val minutes = health.minutesWithoutShares(now)
                 events += AlertEvent(
                     AlertKind.FLATLINE, miner.id,
-                    L("$name liefert keine Shares mehr", "$name has stopped delivering shares"),
-                    L("Seit $minutes min kein neuer Share, obwohl der Miner antwortet. Ein Neustart hilft meist.",
-                        "No new share for $minutes min although the miner responds. A restart usually helps."),
+                    tr(R.string.has_stopped_delivering_shares, name),
+                    tr(R.string.no_new_share_for_min, minutes),
                     isRecovery = false
                 )
             }
@@ -347,8 +342,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 health.fallbackAlerted = false
                 events += AlertEvent(
                     AlertKind.FALLBACK, miner.id,
-                    L("$name ist zurück auf dem Primär-Pool", "$name is back on the primary pool"),
-                    L("Der Miner nutzt wieder seinen Primär-Pool.", "The miner is using its primary pool again."),
+                    tr(R.string.is_back_on_the_primary, name),
+                    tr(R.string.the_miner_is_using_its),
                     isRecovery = true
                 )
             } else if (due) {
@@ -356,9 +351,8 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
                 health.lastFallbackAlertAt = now
                 events += AlertEvent(
                     AlertKind.FALLBACK, miner.id,
-                    L("$name läuft auf dem Fallback-Pool", "$name is on the fallback pool"),
-                    L("Seit mindestens 10 min auf ${info.activePoolHost}. Der Primär-Pool ist vielleicht gestört.",
-                        "On ${info.activePoolHost} for at least 10 min. The primary pool may be down."),
+                    tr(R.string.is_on_the_fallback_pool, name),
+                    tr(R.string.on_for_at_least_10, info.activePoolHost),
                     isRecovery = false
                 )
             }
@@ -367,21 +361,20 @@ class AlertEvaluator(private val tracks: MutableMap<String, Track> = mutableMapO
             health.stuckAlerted = true
             events += AlertEvent(
                 AlertKind.FALLBACK, miner.id,
-                L("$name wechselt nicht zurück", "$name does not switch back"),
-                L("Der Primär-Pool ist seit 15 min erreichbar, der Miner bleibt aber auf dem Fallback-Pool. Ein Neustart holt ihn zurück.",
-                    "The primary pool has been reachable for 15 min, but the miner stays on the fallback pool. A restart brings it back."),
+                tr(R.string.does_not_switch_back, name),
+                tr(R.string.the_primary_pool_has_been),
                 isRecovery = false
             )
         } else if (!health.isOnFallback) {
             health.stuckAlerted = false
         }
         if (health.restartedUnexpectedly) {
-            val reason = info.resetReason?.let { L("Grund laut Miner: $it.", "Reason given by the miner: $it.") }
-                ?: L("Der Miner nennt keinen Grund.", "The miner gives no reason.")
+            val reason = info.resetReason?.let { tr(R.string.reason_given_by_the_miner, it) }
+                ?: tr(R.string.the_miner_gives_no_reason)
             events += AlertEvent(
                 AlertKind.RESTART, miner.id,
-                L("$name ist neu gestartet", "$name restarted"),
-                L("MinerGuru hat das nicht ausgelöst. $reason", "MinerGuru did not trigger this. $reason"),
+                tr(R.string.restarted, name),
+                tr(R.string.minerguru_did_not_trigger_this, reason),
                 isRecovery = false
             )
         }

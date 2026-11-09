@@ -1,5 +1,6 @@
 package app.minerguru.ui.miner
 
+import app.minerguru.R
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
 import app.minerguru.service.WriteDeclined
@@ -101,7 +102,7 @@ fun OverviewTab(
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Meta("IP", Privacy.ip(miner.ipAddress), mono = true)
                     Meta("Uptime", MinerFormatting.formatUptime(info.uptimeSeconds))
-                    info.ssid?.takeIf { it.isNotEmpty() }?.let { Meta(L("WLAN", "Wi-Fi"), Privacy.ssid(it) + (info.wifiRSSI?.let { r -> " ($r dBm)" } ?: "")) }
+                    info.ssid?.takeIf { it.isNotEmpty() }?.let { Meta(tr(R.string.wi_fi), Privacy.ssid(it) + (info.wifiRSSI?.let { r -> " ($r dBm)" } ?: "")) }
                     if (info.firmwareVersion.isNotEmpty()) Meta("Firmware", info.firmwareVersion, mono = true)
                 }
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -117,16 +118,16 @@ fun OverviewTab(
         val latency = miner.activePoolLatencyMs
         val kpis: List<@Composable () -> Unit> = listOf(
             { MetricCard("Live Hashrate", hv, hu, info.hashrateAveragesText, Icons.Rounded.Bolt, if (miner.isNerdOS) MG.purple() else MG.orange()) },
-            { MetricCard(L("ASIC Temperatur", "ASIC temperature"), MinerFormatting.format1(info.temp), "°C", info.coolingText(tempWarningC), Icons.Rounded.Thermostat,
+            { MetricCard(tr(R.string.asic_temperature), MinerFormatting.format1(info.temp), "°C", info.coolingText(tempWarningC), Icons.Rounded.Thermostat,
                 if (hot) MG.red() else if (info.temp > 62) MG.orange() else MG.green(), warning = hot || info.overheatMode) },
-            { MetricCard(L("Verbrauch", "Power"), MinerFormatting.format1(info.power), "W", info.powerDetailText, Icons.Rounded.Bolt, MG.yellow()) },
-            { MetricCard(L("Effizienz", "Efficiency"), if (info.efficiencyJPerTH > 0) MinerFormatting.format1(info.efficiencyJPerTH) else "—", "J/TH", info.dailyEnergyText, Icons.Rounded.Eco, MG.green()) },
-            { MetricCard(L("Kühlung & Lüfter", "Cooling & fan"), info.fanPercentText, "%", info.fanRPMText, Icons.Rounded.Air, MG.blue()) },
-            { MetricCard(L("ASIC Takt & VCore", "ASIC clock & VCore"), "${info.frequencyMHz}", "MHz", info.coreVoltageText, Icons.Rounded.GraphicEq, MG.teal()) },
-            { MetricCard(if (info.isDualPoolMining) L("Pool-Latenz (Dual)", "Pool latency (dual)") else L("Pool-Latenz (RTT)", "Pool latency (RTT)"), latency?.let { MinerFormatting.format0(it) } ?: "—",
+            { MetricCard(tr(R.string.power_draw), MinerFormatting.format1(info.power), "W", info.powerDetailText, Icons.Rounded.Bolt, MG.yellow()) },
+            { MetricCard(tr(R.string.efficiency), if (info.efficiencyJPerTH > 0) MinerFormatting.format1(info.efficiencyJPerTH) else "—", "J/TH", info.dailyEnergyText, Icons.Rounded.Eco, MG.green()) },
+            { MetricCard(tr(R.string.cooling_fan), info.fanPercentText, "%", info.fanRPMText, Icons.Rounded.Air, MG.blue()) },
+            { MetricCard(tr(R.string.asic_clock_vcore), "${info.frequencyMHz}", "MHz", info.coreVoltageText, Icons.Rounded.GraphicEq, MG.teal()) },
+            { MetricCard(if (info.isDualPoolMining) tr(R.string.pool_latency_dual) else tr(R.string.pool_latency_rtt), latency?.let { MinerFormatting.format0(it) } ?: "—",
                 if (latency != null) "ms" else null, miner.poolLatencyDetailText,
                 if (info.isDualPoolMining) Icons.Rounded.AltRoute else Icons.Rounded.Public, MG.latency(LatencyQuality.evaluate(latency))) },
-            { MetricCard(L("Best Diff (Neustart)", "Best diff (restart)"), info.sessionBestDiffText, null, L("Allzeit-Best", "All-time best") + ": ${info.bestDiffFormatted}", Icons.Rounded.EmojiEvents, MG.indigo()) },
+            { MetricCard(tr(R.string.best_diff_restart), info.sessionBestDiffText, null, tr(R.string.all_time_best) + ": ${info.bestDiffFormatted}", Icons.Rounded.EmojiEvents, MG.indigo()) },
             { MetricCard("Shares", "${info.sharesAccepted}", null, info.sharesText, Icons.Rounded.Verified, MG.blue()) }
         )
         CardGrid(kpis, spacing = 10.dp) { it() }
@@ -163,7 +164,7 @@ private fun PayoutCheckCard(store: MinerStore, miner: MinerDevice) {
     var failure by remember { mutableStateOf<String?>(null) }
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            SectionTitle(L("Auszahlung", "Payout"), Icons.Rounded.VerifiedUser)
+            SectionTitle(tr(R.string.payout), Icons.Rounded.VerifiedUser)
             slots.forEach { slot ->
                 val color = when (slot.verdict) {
                     PayoutVerdict.EXPECTED -> MG.green()
@@ -195,12 +196,12 @@ private fun PayoutCheckCard(store: MinerStore, miner: MinerDevice) {
                                 failure = e.message
                             }
                         }
-                    }) { Text(L("Soll-Adresse eintragen", "Enter expected address")) }
+                    }) { Text(tr(R.string.enter_expected_address)) }
                 }
             }
             when (info.coinbasePayoutStatus) {
-                "verified" -> L("Der aktuelle Block zahlt an diesen Miner.", "The current block pays this miner.")
-                "not_found" -> L("Der aktuelle Block enthält die Adresse dieses Miners nicht.", "The current block does not contain this miner's address.")
+                "verified" -> tr(R.string.the_current_block_pays_this)
+                "not_found" -> tr(R.string.the_current_block_does_not)
                 else -> null
             }?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             failure?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
@@ -215,11 +216,11 @@ private fun PoolInformationCard(miner: MinerDevice, onConfigurePool: () -> Unit)
     val isDual = info.isDualPoolMining
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(L("Pool & Stratum-Verbindung", "Pool & stratum connection"), Icons.Rounded.Public)
+            SectionTitle(tr(R.string.pool_stratum_connection), Icons.Rounded.Public)
             if (isDual) DualSplitBanner(info)
 
             PoolSlot(
-                title = if (isDual) "Pool 1 (${info.dualPoolPrimaryPercent}% • ~${MinerFormatting.formatHashrate(info.hashRate * info.dualPoolPrimaryPercent / 100.0)})" else L("Primärer Stratum-Pool", "Primary stratum pool"),
+                title = if (isDual) "Pool 1 (${info.dualPoolPrimaryPercent}% • ~${MinerFormatting.formatHashrate(info.hashRate * info.dualPoolPrimaryPercent / 100.0)})" else tr(R.string.primary_stratum_pool),
                 coin = info.primaryPoolCoin,
                 isActive = if (isDual) info.primaryPoolStatus?.connected ?: true else !info.isUsingFallbackStratum,
                 host = info.stratumURL, port = info.stratumPort, user = info.stratumUser,
@@ -228,7 +229,7 @@ private fun PoolInformationCard(miner: MinerDevice, onConfigurePool: () -> Unit)
                 directMs = miner.poolLatency?.primaryPoolDirectMs, minerMs = info.primaryPoolMinerLatencyMs
             )
             PoolSlot(
-                title = if (isDual) "Pool 2 (${info.dualPoolSecondaryPercent}% • ~${MinerFormatting.formatHashrate(info.hashRate * info.dualPoolSecondaryPercent / 100.0)})" else L("Fallback Stratum-Pool", "Fallback stratum pool"),
+                title = if (isDual) "Pool 2 (${info.dualPoolSecondaryPercent}% • ~${MinerFormatting.formatHashrate(info.hashRate * info.dualPoolSecondaryPercent / 100.0)})" else tr(R.string.fallback_stratum_pool),
                 coin = info.secondaryPoolCoin,
                 isActive = if (isDual) info.secondaryPoolStatus?.connected ?: true else info.isUsingFallbackStratum,
                 host = info.fallbackStratumURL, port = info.fallbackStratumPort, user = info.fallbackStratumUser,
@@ -241,9 +242,9 @@ private fun PoolInformationCard(miner: MinerDevice, onConfigurePool: () -> Unit)
             info.activeWorkerName?.let { Meta("Worker", it, mono = true) }
             if (!isDual) info.activePoolDifficulty?.takeIf { it > 0 }?.let { Meta("Pool-Difficulty", MinerFormatting.formatDifficulty(it)) }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilledTonalButton(onClick = onConfigurePool) { Icon(Icons.Rounded.Tune, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(L("Pool konfigurieren", "Configure pool")) }
+                FilledTonalButton(onClick = onConfigurePool) { Icon(Icons.Rounded.Tune, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(tr(R.string.configure_pool)) }
                 FilledTonalButton(onClick = { copyToClipboard(context, "Pool-User", info.stratumUser) }) {
-                    Icon(Icons.Rounded.ContentCopy, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(L("User kopieren", "Copy user"))
+                    Icon(Icons.Rounded.ContentCopy, null, Modifier.size(18.dp)); Spacer(Modifier.width(6.dp)); Text(tr(R.string.copy_user))
                 }
             }
         }
@@ -260,7 +261,7 @@ private fun DualSplitBanner(info: MinerSystemInfo) {
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             CoinBadge(info.primaryPoolCoin, info.dualPoolPrimaryPercent)
-            Text(L("Dual-Pool Hashrate-Split", "Dual pool hashrate split"), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(tr(R.string.dual_pool_hashrate_split), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             CoinBadge(info.secondaryPoolCoin, info.dualPoolSecondaryPercent)
         }
         Row(Modifier.fillMaxWidth().height(8.dp), horizontalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -306,16 +307,16 @@ private fun PoolSlot(
                 )
             }
         } else if (netDiff != null) {
-            Row { Label(L("Netzwerk", "Network")); Text("Net-Diff: $netDiff (${coin.fullName})", style = MaterialTheme.typography.bodySmall) }
+            Row { Label(tr(R.string.network)); Text("Net-Diff: $netDiff (${coin.fullName})", style = MaterialTheme.typography.bodySmall) }
         }
-        Row { Label("Best Diff"); Text("${MinerFormatting.formatSessionBest(sessionBest)} " + L("seit Neustart", "since restart"), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold) }
+        Row { Label("Best Diff"); Text("${MinerFormatting.formatSessionBest(sessionBest)} " + tr(R.string.since_restart), style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold) }
         Row {
-            Label(L("Latenz", "Latency"))
+            Label(tr(R.string.latency))
             val parts = listOfNotNull(
                 minerMs?.takeIf { it > 0 }?.let { "Miner-RTT: ${MinerFormatting.formatLatency(it)}" },
                 directMs?.takeIf { it > 0 }?.let { "TCP-Ping: ${MinerFormatting.formatLatency(it)}" }
             )
-            Text(if (parts.isEmpty()) L("Wird gemessen…", "Measuring…") else parts.joinToString(" • "), style = MaterialTheme.typography.bodySmall,
+            Text(if (parts.isEmpty()) tr(R.string.measuring) else parts.joinToString(" • "), style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
@@ -333,22 +334,22 @@ private fun Label(text: String) =
 @Composable
 private fun HardwareSection(miner: MinerDevice, info: MinerSystemInfo) {
     val items = listOf(
-        L("Modell / Typ", "Model / type") to miner.hardwareTitle,
+        tr(R.string.model_type) to miner.hardwareTitle,
         "ASIC-Chip" to "${info.asicCount}x ${info.asicModel}",
         "Board-Version" to (info.boardVersion ?: "—"),
         "Small Cores" to (info.smallCoreCount?.toString() ?: "—"),
         "Hostname" to info.hostname,
-        L("MAC-Adresse", "MAC address") to (info.macAddress?.let { Privacy.mac(it) } ?: "—"),
-        L("WLAN SSID", "Wi-Fi SSID") to (info.ssid?.let { Privacy.ssid(it) } ?: "—"),
-        L("WLAN Signal", "Wi-Fi signal") to (info.wifiRSSI?.let { "$it dBm" } ?: info.wifiStatus ?: "—"),
+        tr(R.string.mac_address) to (info.macAddress?.let { Privacy.mac(it) } ?: "—"),
+        tr(R.string.wi_fi_ssid) to (info.ssid?.let { Privacy.ssid(it) } ?: "—"),
+        tr(R.string.wi_fi_signal) to (info.wifiRSSI?.let { "$it dBm" } ?: info.wifiStatus ?: "—"),
         "Firmware" to info.firmwareVersion.ifEmpty { "—" },
         "ESP-IDF" to (info.idfVersion ?: "—"),
-        L("Freier Heap RAM", "Free heap RAM") to (info.freeHeap?.let { "${it / 1024} KB" } ?: "—"),
-        L("Best Diff Session / Allzeit", "Best diff session / all-time") to "${info.sessionBestDiffText} / ${info.bestDiffFormatted}"
+        tr(R.string.free_heap_ram) to (info.freeHeap?.let { "${it / 1024} KB" } ?: "—"),
+        tr(R.string.best_diff_session_all_time) to "${info.sessionBestDiffText} / ${info.bestDiffFormatted}"
     )
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            SectionTitle(L("Hardware- & System-Telemetrie", "Hardware & system telemetry"), Icons.Rounded.Memory)
+            SectionTitle(tr(R.string.hardware_system_telemetry), Icons.Rounded.Memory)
             CardGrid(items, minCellWidth = 140.dp) { (l, v) -> LabeledValue(l, v, mono = true) }
         }
     }

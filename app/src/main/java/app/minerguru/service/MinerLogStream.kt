@@ -1,6 +1,7 @@
 package app.minerguru.service
 
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.model.LogCategoryFilter
 import app.minerguru.model.MinerLogEntry
 import kotlinx.coroutines.CoroutineScope
@@ -54,7 +55,7 @@ class MinerLogStream(private val scope: CoroutineScope) {
     fun start(host: String) {
         val normalized = MinerApiClient.normalizeHost(host)
         if (normalized.isEmpty()) {
-            _state.value = StreamState.Error(L("Ungültige IP-Adresse", "Invalid IP address"))
+            _state.value = StreamState.Error(tr(R.string.invalid_ip_address))
             return
         }
         if (currentHost != normalized) {
@@ -81,14 +82,14 @@ class MinerLogStream(private val scope: CoroutineScope) {
                 if (webSocket !== socket) return
                 val st = _state.value
                 if (st is StreamState.Paused || st is StreamState.Stopped) return
-                _state.value = StreamState.Error(L("Verbindung zu", "Connection to") + " ws://$normalized/api/ws " + L("getrennt", "lost") + " (${t.message ?: L("Fehler", "error")})")
+                _state.value = StreamState.Error(tr(R.string.connection_to) + " ws://$normalized/api/ws " + tr(R.string.lost) + " (${t.message ?: tr(R.string.error)})")
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 if (webSocket !== socket) return
                 val st = _state.value
                 if (st is StreamState.Streaming || st is StreamState.Connecting) {
-                    _state.value = StreamState.Error(L("Verbindung vom Miner geschlossen", "Connection closed by the miner"))
+                    _state.value = StreamState.Error(tr(R.string.connection_closed_by_the_miner))
                 }
             }
         })
@@ -138,9 +139,9 @@ class MinerLogStream(private val scope: CoroutineScope) {
             val lines = mutableListOf(
                 "# MinerGuru Live-Log Export",
                 "# Miner: $minerName ($ip) — $hardware",
-                "# " + L("Exportiert am", "Exported at") + ": ${fmt.format(Date())}",
-                "# Filter: ${category.label}" + (if (search.isEmpty()) "" else " | " + L("Suche", "Search") + ": '$search'"),
-                "# " + L("Zeilen", "Lines") + ": ${entries.size} (" + L("von", "of") + " $total " + L("im Puffer", "in buffer") + ")",
+                "# " + tr(R.string.exported_at) + ": ${fmt.format(Date())}",
+                "# Filter: ${category.label}" + (if (search.isEmpty()) "" else " | " + tr(R.string.search) + ": '$search'"),
+                "# " + tr(R.string.lines) + ": ${entries.size} (" + tr(R.string.of) + " $total " + tr(R.string.in_buffer) + ")",
                 "-".repeat(78)
             )
             entries.forEach { lines += it.exportLine(fmt) }

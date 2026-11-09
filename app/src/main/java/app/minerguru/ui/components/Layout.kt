@@ -56,7 +56,8 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.service.MinerStore
 import kotlinx.coroutines.launch
 
@@ -229,36 +230,28 @@ fun rememberNetworkAccessGate(store: MinerStore): NetworkAccessGate {
     if (gate.showRationale) AlertDialog(
         onDismissRequest = { gate.showRationale = false; gate.pending = null },
         icon = { Icon(Icons.Rounded.Lan, null) },
-        title = { Text(L("Zugriff auf das lokale Netzwerk", "Access to the local network")) },
+        title = { Text(tr(R.string.access_to_the_local_network)) },
         text = {
-            Text(L(
-                "MinerGuru spricht direkt mit deinen Minern im WLAN, um Werte abzufragen und Einstellungen zu ändern. " +
-                    "Android fragt dafür nach dem Zugriff auf Geräte im lokalen Netzwerk. MinerGuru hat keinen eigenen Server.",
-                "MinerGuru talks directly to your miners on your Wi-Fi to read their values and change settings. " +
-                    "Android asks for access to devices in the local network for this. MinerGuru has no server of its own."
-            ))
+            Text(tr(R.string.minerguru_talks_directly_to_your))
         },
         confirmButton = {
             TextButton(onClick = {
                 gate.showRationale = false
                 if (deniedForGood) gate.showSettingsHint = true else launcher.launch(MinerStore.LOCAL_NETWORK_PERMISSION)
-            }) { Text(L("Weiter", "Continue")) }
+            }) { Text(tr(R.string.continue_label)) }
         },
         dismissButton = {
             TextButton(onClick = { gate.showRationale = false; gate.pending = null; store.showBanner(deniedHint(), false) }) {
-                Text(L("Nicht jetzt", "Not now"))
+                Text(tr(R.string.not_now))
             }
         }
     )
     if (gate.showSettingsHint) AlertDialog(
         onDismissRequest = { gate.showSettingsHint = false },
         icon = { Icon(Icons.Rounded.Lan, null) },
-        title = { Text(L("Zugriff in den Einstellungen erlauben", "Allow access in Settings")) },
+        title = { Text(tr(R.string.allow_access_in_settings)) },
         text = {
-            Text(L(
-                "Der Zugriff auf das lokale Netzwerk wurde abgelehnt. Erlaube ihn in den App-Einstellungen unter „Berechtigungen“, damit MinerGuru deine Miner erreicht.",
-                "Access to the local network was denied. Allow it in the app settings under “Permissions” so MinerGuru can reach your miners."
-            ))
+            Text(tr(R.string.access_to_the_local_network_was))
         },
         confirmButton = {
             TextButton(onClick = {
@@ -267,17 +260,14 @@ fun rememberNetworkAccessGate(store: MinerStore): NetworkAccessGate {
                     Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
-            }) { Text(L("Einstellungen öffnen", "Open settings")) }
+            }) { Text(tr(R.string.open_settings)) }
         },
-        dismissButton = { TextButton(onClick = { gate.showSettingsHint = false }) { Text(L("Abbrechen", "Cancel")) } }
+        dismissButton = { TextButton(onClick = { gate.showSettingsHint = false }) { Text(tr(R.string.cancel)) } }
     )
     return gate
 }
 
-private fun deniedHint() = L(
-    "Ohne Zugriff auf das lokale Netzwerk kann MinerGuru deine Miner nicht erreichen.",
-    "Without access to the local network MinerGuru cannot reach your miners."
-)
+private fun deniedHint() = tr(R.string.without_access_to_the_local)
 
 /** Shown on the overview and miner list while the permission is missing. */
 @Composable
@@ -295,14 +285,13 @@ fun NetworkAccessCard(modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Rounded.Lan, null, Modifier.size(20.dp))
                 Spacer(Modifier.size(8.dp))
-                Text(L("Kein Zugriff auf das lokale Netzwerk", "No access to the local network"), style = MaterialTheme.typography.titleSmall)
+                Text(tr(R.string.no_access_to_the_local), style = MaterialTheme.typography.titleSmall)
             }
             Text(
-                L("Ohne diese Berechtigung kann MinerGuru deine Miner nicht erreichen.",
-                    "Without this permission MinerGuru cannot reach your miners."),
+                tr(R.string.without_this_permission_minerguru_cannot),
                 style = MaterialTheme.typography.bodyMedium
             )
-            Button(onClick = { gate.request() }) { Text(L("Zugriff erlauben", "Allow access")) }
+            Button(onClick = { gate.request() }) { Text(tr(R.string.allow_access)) }
         }
     }
 }

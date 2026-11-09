@@ -49,12 +49,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import app.minerguru.R
 import app.minerguru.model.ConnectionState
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import app.minerguru.model.L
-import app.minerguru.model.Lp
+import app.minerguru.model.tr
+import app.minerguru.model.trp
 import app.minerguru.model.MinerFormatting
 import app.minerguru.model.Privacy
 import app.minerguru.model.MinerSystemInfo
@@ -73,8 +74,8 @@ fun AddMinerScreen(store: MinerStore, startOnScan: Boolean, onClose: () -> Unit)
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(L("Miner hinzufügen", "Add miner")) },
-                navigationIcon = { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, L("Zurück", "Back")) } }
+                title = { Text(tr(R.string.add_miner)) },
+                navigationIcon = { IconButton(onClick = onClose) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr(R.string.back)) } }
             )
         }
     ) { padding ->
@@ -84,8 +85,8 @@ fun AddMinerScreen(store: MinerStore, startOnScan: Boolean, onClose: () -> Unit)
                 .wrapContentWidth(Alignment.CenterHorizontally).widthIn(max = 640.dp)
         ) {
             PrimaryTabRow(selectedTabIndex = tab) {
-                Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(L("Netzwerk-Scan", "Network scan")) })
-                Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(L("Per IP / Hostname", "By IP / hostname")) })
+                Tab(selected = tab == 0, onClick = { tab = 0 }, text = { Text(tr(R.string.network_scan)) })
+                Tab(selected = tab == 1, onClick = { tab = 1 }, text = { Text(tr(R.string.by_ip_hostname)) })
             }
             if (tab == 0) ScanTab(store) else IpTab(store, onClose)
         }
@@ -95,45 +96,45 @@ fun AddMinerScreen(store: MinerStore, startOnScan: Boolean, onClose: () -> Unit)
 @Composable
 private fun ScanTab(store: MinerStore) {
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(L("Erkennt alle Bitaxe- und NerdOS-Miner über /api/system/info.", "Detects all Bitaxe and NerdOS miners via /api/system/info."),
+        Text(tr(R.string.detects_all_bitaxe_and_nerdos),
             style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             AppTextField(
                 value = store.subnetPrefix, onValueChange = { store.updateSubnetPrefix(it.trim()) },
-                label = { Text(L("Subnetz-Präfix", "Subnet prefix")) }, suffix = { Text(".1 – .254") }, singleLine = true,
+                label = { Text(tr(R.string.subnet_prefix)) }, suffix = { Text(".1 – .254") }, singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), modifier = Modifier.weight(1f).sensitive(),
                 enabled = !store.isScanning
             )
             if (store.isScanning) {
-                FilledTonalButton(onClick = { store.stopScan() }) { Icon(Icons.Rounded.Stop, null); Spacer(Modifier.width(6.dp)); Text(L("Stopp", "Stop")) }
+                FilledTonalButton(onClick = { store.stopScan() }) { Icon(Icons.Rounded.Stop, null); Spacer(Modifier.width(6.dp)); Text(tr(R.string.stop)) }
             } else {
                 val gate = LocalNetworkGate.current
-                Button(onClick = { gate.run { store.startScan() } }) { Icon(Icons.Rounded.Radar, null); Spacer(Modifier.width(6.dp)); Text(L("Scannen", "Scan")) }
+                Button(onClick = { gate.run { store.startScan() } }) { Icon(Icons.Rounded.Radar, null); Spacer(Modifier.width(6.dp)); Text(tr(R.string.scan)) }
             }
         }
-        Text(L("Eigene IP", "Own IP") + ": ${Privacy.ip(store.detectedLocalIp)}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(tr(R.string.own_ip) + ": ${Privacy.ip(store.detectedLocalIp)}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         if (store.isScanning) {
             LinearProgressIndicator(progress = { store.scanCompleted / store.scanTotal.toFloat() }, modifier = Modifier.fillMaxWidth())
-            Text(L("Scanne", "Scanning") + " ${Privacy.ip(store.subnetPrefix)}.1–254… (${store.scanCompleted} / ${store.scanTotal} " + L("IPs geprüft", "IPs checked") + ")", style = MaterialTheme.typography.bodySmall)
+            Text(tr(R.string.scanning) + " ${Privacy.ip(store.subnetPrefix)}.1–254… (${store.scanCompleted} / ${store.scanTotal} " + tr(R.string.ips_checked) + ")", style = MaterialTheme.typography.bodySmall)
         } else if (store.scanFinished) {
-            Text(Lp(store.discoveredMiners.size, "Miner", "Miner", "miner", "miners") + L(" gefunden", " found"), style = MaterialTheme.typography.bodySmall,
+            Text(trp(R.plurals.miners_count, store.discoveredMiners.size) + tr(R.string.found), style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
                 color = if (store.discoveredMiners.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant else MG.text(MG.green()))
         }
 
         if (store.discoveredMiners.isNotEmpty()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(L("Gefundene Miner", "Found miners") + " (${store.discoveredMiners.size})", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
+                Text(tr(R.string.found_miners) + " (${store.discoveredMiners.size})", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                 if (store.discoveredMiners.any { !store.isIpAlreadyAdded(it.ipAddress) }) {
-                    TextButton(onClick = { store.addAllDiscovered() }) { Text(L("Alle neuen hinzufügen", "Add all new")) }
+                    TextButton(onClick = { store.addAllDiscovered() }) { Text(tr(R.string.add_all_new)) }
                 }
             }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(store.discoveredMiners, key = { it.ipAddress }) { item -> DiscoveredRow(store, item) }
             }
         } else if (!store.isScanning && store.scanFinished) {
-            EmptyHint(L("Keine Miner gefunden. Prüfe das Subnetz oder füge den Miner per IP hinzu.", "No miners found. Check the subnet or add the miner by IP."))
+            EmptyHint(tr(R.string.no_miners_found_check_the))
         }
     }
 }
@@ -153,9 +154,9 @@ private fun DiscoveredRow(store: MinerStore, item: DiscoveredMiner) {
                     style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             if (added) {
-                Chip(L("Vorhanden", "Added"), MG.green(), icon = Icons.Rounded.CheckCircle)
+                Chip(tr(R.string.added), MG.green(), icon = Icons.Rounded.CheckCircle)
             } else {
-                Button(onClick = { store.addDiscovered(item) }) { Text(L("Hinzufügen", "Add")) }
+                Button(onClick = { store.addDiscovered(item) }) { Text(tr(R.string.add)) }
             }
         }
     }
@@ -175,18 +176,18 @@ private fun IpTab(store: MinerStore, onClose: () -> Unit) {
     var notMiner by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(L("Verbindet per HTTP mit /api/system/info deines Bitaxe- oder NerdOS-Miners.", "Connects via HTTP to /api/system/info of your Bitaxe or NerdOS miner."),
+        Text(tr(R.string.connects_via_http_to_api),
             style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         AppTextField(
             value = host, onValueChange = { host = it; testInfo = null; testError = null; notMiner = false },
-            label = { Text(L("IP-Adresse oder Hostname", "IP address or hostname")) }, placeholder = { Text("192.168.1.150 / bitaxe.local") },
+            label = { Text(tr(R.string.ip_address_or_hostname)) }, placeholder = { Text("192.168.1.150 / bitaxe.local") },
             singleLine = true, modifier = Modifier.fillMaxWidth().sensitive(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri)
         )
         if (host.isNotBlank() && !hostValid) {
-            StatusMessage(L("Das ist keine gültige Adresse. Beispiel: 192.168.1.150 oder bitaxe.local:80", "This is not a valid address. Example: 192.168.1.150 or bitaxe.local:80"), true)
+            StatusMessage(tr(R.string.this_is_not_a_valid), true)
         }
         AppTextField(
-            value = name, onValueChange = { name = it }, label = { Text(L("Anzeigename (optional)", "Display name (optional)")) },
+            value = name, onValueChange = { name = it }, label = { Text(tr(R.string.display_name_optional)) },
             singleLine = true, modifier = Modifier.fillMaxWidth()
         )
         FilledTonalButton(
@@ -199,24 +200,24 @@ private fun IpTab(store: MinerStore, onClose: () -> Unit) {
                         if (r.isMiner) { testInfo = r.info; testRaw = r.rawPretty }
                         else notMiner = true
                     } catch (e: Exception) {
-                        testError = e.message ?: L("Nicht erreichbar", "Unreachable")
+                        testError = e.message ?: tr(R.string.unreachable)
                     }
                     testing = false
                 }
             },
             enabled = hostValid && !testing, modifier = Modifier.fillMaxWidth()
         ) {
-            if (testing) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp) else Text(L("Verbindung prüfen", "Test connection"))
+            if (testing) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp) else Text(tr(R.string.test_connection))
         }
 
         testInfo?.let { info ->
             StatusMessage(
-                "${info.detectedHardwareTitle} " + L("erkannt", "detected") + " • ${MinerFormatting.formatHashrate(info.hashRate)} • ${MinerFormatting.format1(info.temp)} °C • Pool: ${info.activePoolEndpoint}",
+                "${info.detectedHardwareTitle} " + tr(R.string.detected) + " • ${MinerFormatting.formatHashrate(info.hashRate)} • ${MinerFormatting.format1(info.temp)} °C • Pool: ${info.activePoolEndpoint}",
                 isError = false
             )
         }
-        if (notMiner) StatusMessage(L("Das Gerät antwortet, ist aber kein Miner.", "The device answers but is not a miner."), true)
-        testError?.let { StatusMessage(L("Miner aktuell nicht erreichbar", "Miner currently unreachable") + ": $it — " + L("Du kannst die IP trotzdem hinzufügen.", "You can still add the IP."), isError = true) }
+        if (notMiner) StatusMessage(tr(R.string.the_device_answers_but_is), true)
+        testError?.let { StatusMessage(tr(R.string.miner_currently_unreachable) + ": $it — " + tr(R.string.you_can_still_add_the), isError = true) }
 
         Button(
             onClick = {
@@ -224,6 +225,6 @@ private fun IpTab(store: MinerStore, onClose: () -> Unit) {
                 onClose()
             },
             enabled = hostValid, modifier = Modifier.fillMaxWidth()
-        ) { Text(L("Miner hinzufügen", "Add miner")) }
+        ) { Text(tr(R.string.add_miner)) }
     }
 }

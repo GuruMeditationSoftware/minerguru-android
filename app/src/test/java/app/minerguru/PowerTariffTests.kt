@@ -9,7 +9,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class PowerTariffTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     private val berlin = ZoneId.of("Europe/Berlin")
 

@@ -1,5 +1,7 @@
 package app.minerguru.model
 
+import androidx.annotation.StringRes
+import app.minerguru.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -8,15 +10,15 @@ enum class MinerLogLevel(val raw: String, val shortLabel: String) {
     INFO("INFO", "I"), WARNING("WARN", "W"), ERROR("ERROR", "E"), DEBUG("DEBUG", "D")
 }
 
-enum class LogCategoryFilter(private val de: String, private val en: String) {
-    ALL("Alle", "All"),
-    SHARES_AND_POOL("Shares & Pool", "Shares & pool"),
-    ASIC_AND_HARDWARE("ASIC & Hardware", "ASIC & hardware"),
-    POWER_AND_THERMAL("Power & Kühlung", "Power & cooling"),
-    WARNINGS_AND_ERRORS("Warnungen & Fehler", "Warnings & errors"),
-    SYSTEM_AND_NETWORK("System & Netzwerk", "System & network");
+enum class LogCategoryFilter(@StringRes private val labelRes: Int) {
+    ALL(R.string.all),
+    SHARES_AND_POOL(R.string.shares_pool),
+    ASIC_AND_HARDWARE(R.string.asic_hardware),
+    POWER_AND_THERMAL(R.string.power_cooling),
+    WARNINGS_AND_ERRORS(R.string.warnings_errors),
+    SYSTEM_AND_NETWORK(R.string.system_network);
 
-    val label: String get() = L(de, en)
+    val label: String get() = tr(labelRes)
 }
 
 /** A single structured log line from a Bitaxe or NerdQAxe++ miner. */

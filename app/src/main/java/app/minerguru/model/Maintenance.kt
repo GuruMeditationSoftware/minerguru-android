@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
@@ -13,29 +14,29 @@ enum class MaintenanceKind(val defaultIntervalDays: Int) {
 
     val title: String
         get() = when (this) {
-            FIRMWARE -> L("Firmware-Update prüfen", "Check for firmware update")
-            FAN_CLEANING -> L("Lüfter reinigen", "Clean the fan")
-            DUST -> L("Kühlkörper entstauben", "Dust the heatsink")
-            THERMAL_PASTE -> L("Wärmeleitpaste erneuern", "Renew thermal paste")
-            FAN_REPLACEMENT -> L("Lüfter tauschen", "Replace the fan")
-            POWER -> L("Netzteil und Stecker prüfen", "Check power supply and plugs")
-            CABLING -> L("Standort und WLAN prüfen", "Check location and Wi-Fi")
-            POOLS -> L("Pool und Auszahlungsadresse prüfen", "Check pool and payout address")
-            BACKUP -> L("Einstellungen sichern", "Back up settings")
-            CUSTOM -> L("Eigene Aufgabe", "Custom task")
+            FIRMWARE -> tr(R.string.check_for_firmware_update)
+            FAN_CLEANING -> tr(R.string.clean_the_fan)
+            DUST -> tr(R.string.dust_the_heatsink)
+            THERMAL_PASTE -> tr(R.string.renew_thermal_paste)
+            FAN_REPLACEMENT -> tr(R.string.replace_the_fan)
+            POWER -> tr(R.string.check_power_supply_and_plugs)
+            CABLING -> tr(R.string.check_location_and_wi_fi)
+            POOLS -> tr(R.string.check_pool_and_payout_address)
+            BACKUP -> tr(R.string.back_up_settings)
+            CUSTOM -> tr(R.string.custom_task)
         }
 
     val hint: String
         get() = when (this) {
-            FIRMWARE -> L("Neue Firmware bringt Fehlerbehebungen. Vor dem Update Einstellungen sichern.", "New firmware brings fixes. Back up your settings before updating.")
-            FAN_CLEANING -> L("Staub am Lüfter kostet Drehzahl und treibt die Temperatur hoch. Nur im Stillstand reinigen.", "Dust on the fan costs speed and drives up the temperature. Clean it only when it has stopped.")
-            DUST -> L("Mit Druckluft oder Pinsel, Miner vorher vom Strom trennen.", "Use compressed air or a brush, and unplug the miner first.")
-            THERMAL_PASTE -> L("Steigt die Temperatur bei gleichem Takt, ist die Paste oft trocken.", "If the temperature rises at the same frequency, the paste has often dried out.")
-            FAN_REPLACEMENT -> L("Lager nutzen sich ab. Laute oder langsame Lüfter rechtzeitig ersetzen.", "Bearings wear out. Replace loud or slow fans in good time.")
-            POWER -> L("Warme Stecker und knappe Netzteile sind die häufigste Brandursache.", "Warm plugs and undersized power supplies are the most common fire hazard.")
-            CABLING -> L("Luftzufuhr, Umgebungstemperatur und WLAN-Empfang kontrollieren.", "Check airflow, room temperature and Wi-Fi reception.")
-            POOLS -> L("Stimmen Pool und Adresse noch? Abgleich mit der Blockansicht.", "Are pool and address still right? Compare them with the block view.")
-            BACKUP -> L("Pools und Takt notieren oder exportieren, bevor etwas schiefgeht.", "Note down or export pools and frequency before something goes wrong.")
+            FIRMWARE -> tr(R.string.new_firmware_brings_fixes_back)
+            FAN_CLEANING -> tr(R.string.dust_on_the_fan_costs)
+            DUST -> tr(R.string.use_compressed_air_or_a)
+            THERMAL_PASTE -> tr(R.string.if_the_temperature_rises_at)
+            FAN_REPLACEMENT -> tr(R.string.bearings_wear_out_replace_loud)
+            POWER -> tr(R.string.warm_plugs_and_undersized_power)
+            CABLING -> tr(R.string.check_airflow_room_temperature_and)
+            POOLS -> tr(R.string.are_pool_and_address_still)
+            BACKUP -> tr(R.string.note_down_or_export_pools)
             CUSTOM -> ""
         }
 }

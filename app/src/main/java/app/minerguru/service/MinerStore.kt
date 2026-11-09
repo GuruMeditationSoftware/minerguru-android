@@ -1,5 +1,6 @@
 package app.minerguru.service
 
+import app.minerguru.R
 import app.minerguru.widget.MinerWidgets
 import app.minerguru.widget.WidgetBridge
 
@@ -433,8 +434,8 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
         val info = res.info
         val latency = res.latency
         if (info == null || latency == null) {
-            val reason = if (!localNetworkGranted) L("Kein Zugriff auf das lokale Netzwerk", "No access to the local network")
-            else res.error ?: L("Nicht erreichbar", "Unreachable")
+            val reason = if (!localNetworkGranted) tr(R.string.no_access_to_the_local)
+            else res.error ?: tr(R.string.unreachable)
             return device.copy(connectionState = ConnectionState.Offline(reason))
         }
         val history = (device.history + sampleOf(info, latency.effectiveLatencyMs(info.isUsingFallbackStratum)))
@@ -558,7 +559,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
         if (ChangeLog.shared.isReadOnly) throw MinerApiException(MinerApiClient.readOnlyMessage())
         val current = miner.rawJSON?.let { ChangeLog.flatten(it) }.orEmpty()
         val fields = ChangeLog.changes(payload.toJson().toString(), current) +
-            clearing.map { ChangeField("pools.$it.stratumURL", null, L("(geleert)", "(cleared)")) }
+            clearing.map { ChangeField("pools.$it.stratumURL", null, tr(R.string.cleared)) }
         val request = WriteRequest(miner.displayName, fields, restarts)
         // One dialog at a time: several miners can ask at once, and a second request must not replace the first.
         val accepted = confirming.withLock {
@@ -586,7 +587,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
         val m = miner(minerId) ?: return
         confirm(m, payload)
         writeSettings(m, payload)
-        showBanner(L("Einstellungen an ${m.displayName} übertragen.", "Settings sent to ${m.displayName}."), false)
+        showBanner(tr(R.string.settings_sent_to, m.displayName), false)
         delay(600)
         refreshMiner(minerId)
     }
@@ -599,12 +600,12 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                showBanner(L("Neustart von ${m.displayName} fehlgeschlagen", "Restart of ${m.displayName} failed") + ": ${e.message}", true) {
+                showBanner(tr(R.string.restart_of_failed, m.displayName) + ": ${e.message}", true) {
                     restartMiner(minerId)
                 }
                 return@launch
             }
-            showBanner(L("Neustart für ${m.displayName} ausgelöst.", "Restart of ${m.displayName} triggered."), false)
+            showBanner(tr(R.string.restart_of_triggered, m.displayName), false)
             miners = miners.map { if (it.id == minerId) it.copy(connectionState = ConnectionState.Checking) else it }
             delay(4000)
             refreshMiner(minerId)
@@ -642,7 +643,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
             } catch (_: WriteDeclined) {
                 // Nothing happened.
             } catch (e: Exception) {
-                status.error = e.message ?: L("Fehler beim Übertragen", "Transfer failed")
+                status.error = e.message ?: tr(R.string.transfer_failed)
             } finally {
                 status.isSaving = false
             }
@@ -684,7 +685,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
                 if (results.isNotEmpty() && miners.isEmpty()) {
                     results.filterNot { isIpAlreadyAdded(it.ipAddress) }
                         .forEach { addMiner(it.ipAddress, null, it.info, it.rawJSON) }
-                    showBanner(Lp(results.size, "Miner", "Miner", "miner", "miners") + L(" im lokalen Netzwerk gefunden und hinzugefügt.", " found in the local network and added."), false)
+                    showBanner(trp(R.plurals.miners_count, results.size) + tr(R.string.found_in_the_local_network), false)
                 }
             } finally {
                 isScanning = false
@@ -710,7 +711,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
                 added++
             }
         }
-        if (added > 0) showBanner(Lp(added, "Miner", "Miner", "miner", "miners") + L(" zum Dashboard hinzugefügt.", " added to the dashboard."), false)
+        if (added > 0) showBanner(trp(R.plurals.miners_count, added) + tr(R.string.added_to_the_dashboard), false)
     }
 
     // endregion
@@ -817,7 +818,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
 
     fun duplicatePool(id: String): PoolConfig? {
         val original = poolLibrary.firstOrNull { it.id == id } ?: return null
-        val copy = original.copy(id = java.util.UUID.randomUUID().toString(), name = original.name + L(" Kopie", " copy"))
+        val copy = original.copy(id = java.util.UUID.randomUUID().toString(), name = original.name + tr(R.string.copy_suffix))
         addPool(copy)
         return copy
     }
@@ -847,8 +848,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
         writeSettings(m, form.poolPayload(m.supportsDualPool))
         for (slot in form.slotsToClear) MinerApiClient.deletePoolSlot(m.ipAddress, slot)
         MinerApiClient.restartMiner(m.ipAddress)
-        showBanner(L("Pool-Konfiguration an ${m.displayName} übertragen – Miner startet neu.",
-            "Pool configuration sent to ${m.displayName} – miner restarts."), false)
+        showBanner(tr(R.string.pool_configuration_sent_to_miner, m.displayName), false)
         miners = miners.map { if (it.id == minerId) it.copy(connectionState = ConnectionState.Checking) else it }
         // Wait until the miner answers again, so the caller reloads the configuration it really uses.
         delay(5000)
@@ -910,7 +910,7 @@ class MinerStore(app: Application) : AndroidViewModel(app) {
                     poolApplying.remove(id)
                 } catch (e: Exception) {
                     poolApplying.remove(id)
-                    poolErrors[id] = e.message ?: L("Fehler beim Übertragen", "Transfer failed")
+                    poolErrors[id] = e.message ?: tr(R.string.transfer_failed)
                 }
             }
         }

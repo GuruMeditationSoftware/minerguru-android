@@ -6,7 +6,7 @@ import org.junit.Before
 import org.junit.Test
 
 class FallbackWatchTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     private val start = 1_800_000_000_000L
     private fun at(m: Int) = start + m * 60_000L
@@ -90,7 +90,7 @@ class FallbackWatchTests {
 }
 
 class PayoutCheckTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     private val mine = "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq"
     private val other = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
@@ -217,7 +217,7 @@ class PayoutCheckTests {
 }
 
 class ChangeLogTests {
-    @Before fun germanUi() = Lang.apply(AppLanguage.GERMAN)
+    @Before fun germanUi() = useGermanTexts()
 
     @Test fun showsOnlyChangedValues() {
         val current = ChangeLog.flatten("""{"frequency":500,"coreVoltage":1150}""")!!

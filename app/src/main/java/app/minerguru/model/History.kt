@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import org.json.JSONObject
 import java.time.Instant
 import java.util.Locale
@@ -67,11 +68,11 @@ enum class HistoryRange(val seconds: Long) {
 
     val title: String
         get() = when (this) {
-            DAY -> L("24 Std.", "24 hrs")
-            WEEK -> L("7 Tage", "7 days")
-            MONTH -> L("30 Tage", "30 days")
-            QUARTER -> L("90 Tage", "90 days")
-            YEAR -> L("1 Jahr", "1 year")
+            DAY -> tr(R.string.hours_24)
+            WEEK -> tr(R.string.days_7)
+            MONTH -> tr(R.string.days_30)
+            QUARTER -> tr(R.string.days_90)
+            YEAR -> tr(R.string.one_year)
         }
 }
 
@@ -80,11 +81,11 @@ enum class HistoryMetric {
 
     val title: String
         get() = when (this) {
-            HASHRATE -> L("Hashrate", "Hashrate")
-            TEMPERATURE -> L("Temperatur", "Temperature")
-            EFFICIENCY -> L("Effizienz", "Efficiency")
-            POWER -> L("Leistung", "Power")
-            ERRORS -> L("Fehlerquote", "Error rate")
+            HASHRATE -> tr(R.string.hashrate)
+            TEMPERATURE -> tr(R.string.temperature)
+            EFFICIENCY -> tr(R.string.efficiency)
+            POWER -> tr(R.string.power)
+            ERRORS -> tr(R.string.error_rate)
         }
 
     fun value(p: HistoryPoint): Double? = when (this) {

@@ -1,5 +1,7 @@
 package app.minerguru.model
 
+import app.minerguru.R
+
 /** How the payout address of a pool slot looks. */
 enum class PayoutVerdict {
     /** The address the user set for this coin. */
@@ -18,12 +20,12 @@ enum class PayoutVerdict {
 
     val description: String
         get() = when (this) {
-            EXPECTED -> L("Entspricht deiner Soll-Adresse", "Matches your expected address")
-            VALID -> L("Gültige Adresse, keine Soll-Adresse festgelegt", "Valid address, no expected address set")
-            FOREIGN -> L("Weicht von deiner Soll-Adresse ab", "Differs from your expected address")
-            FACTORY_DEFAULT -> L("Standard-Adresse der Firmware: Ein Fund ginge nicht an dich", "Firmware default: a block found would not go to you")
-            ACCOUNT -> L("Konto bei einem Pool oder Tippfehler", "Pool account or typing error")
-            EMPTY -> L("Nichts eingetragen", "Nothing entered")
+            EXPECTED -> tr(R.string.matches_your_expected_address)
+            VALID -> tr(R.string.valid_address_no_expected_address)
+            FOREIGN -> tr(R.string.differs_from_your_expected_address)
+            FACTORY_DEFAULT -> tr(R.string.firmware_default_a_block_found)
+            ACCOUNT -> tr(R.string.pool_account_or_typing_error)
+            EMPTY -> tr(R.string.nothing_entered)
         }
 }
 
@@ -69,7 +71,7 @@ object PayoutCheck {
         val pools = info.axePools
         if (!pools.isNullOrEmpty()) return pools.mapNotNull { slot("pool${it.id}", "Pool ${it.id + 1}", it.stratumURL, it.stratumUser) }
         return listOfNotNull(
-            slot("primary", L("Primär", "Primary"), info.stratumURL, info.stratumUser),
+            slot("primary", tr(R.string.primary), info.stratumURL, info.stratumUser),
             slot("fallback", "Fallback", info.fallbackStratumURL, info.fallbackStratumUser)
         )
     }

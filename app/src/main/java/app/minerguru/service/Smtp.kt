@@ -1,7 +1,8 @@
 package app.minerguru.service
 
 import android.util.Base64
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -81,7 +82,7 @@ class SmtpDialogue(
         Step.EHLO -> {
             expect(code, 250, text)
             if (useStartTls) {
-                if ("STARTTLS" !in text.uppercase()) throw SmtpException(L("Der Mailserver bietet kein STARTTLS an.", "The mail server does not offer STARTTLS."))
+                if ("STARTTLS" !in text.uppercase()) throw SmtpException(tr(R.string.the_mail_server_does_not))
                 step = Step.START_TLS
                 Action.Send("STARTTLS")
             } else authenticate()
@@ -146,7 +147,7 @@ class SmtpDialogue(
     }
 
     private fun expect(code: Int, wanted: Int, text: String) {
-        if (code != wanted) throw SmtpException(L("Mailserver: $text", "Mail server: $text"))
+        if (code != wanted) throw SmtpException(tr(R.string.mail_server, text))
     }
 
     companion object {
@@ -208,9 +209,9 @@ object SmtpClient {
     private fun readReply(reader: BufferedReader): Pair<Int, String> {
         val text = StringBuilder()
         while (true) {
-            val line = reader.readLine() ?: throw SmtpException(L("Der Mailserver hat die Verbindung getrennt.", "The mail server closed the connection."))
+            val line = reader.readLine() ?: throw SmtpException(tr(R.string.the_mail_server_closed_the))
             text.appendLine(line)
-            val code = line.take(3).toIntOrNull() ?: throw SmtpException(L("Unerwartete Antwort vom Mailserver.", "Unexpected reply from the mail server."))
+            val code = line.take(3).toIntOrNull() ?: throw SmtpException(tr(R.string.unexpected_reply_from_the_mail))
             if (line.length == 3 || line[3] != '-') return code to text.toString().trim()
         }
     }

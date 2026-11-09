@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -9,11 +10,11 @@ enum class ReportPeriod {
 
     val title: String
         get() = when (this) {
-            YESTERDAY -> L("Gestern", "Yesterday")
-            LAST_7_DAYS -> L("Letzte 7 Tage", "Last 7 days")
-            LAST_30_DAYS -> L("Letzte 30 Tage", "Last 30 days")
-            THIS_MONTH -> L("Dieser Monat", "This month")
-            LAST_MONTH -> L("Letzter Monat", "Last month")
+            YESTERDAY -> tr(R.string.yesterday)
+            LAST_7_DAYS -> tr(R.string.last_7_days)
+            LAST_30_DAYS -> tr(R.string.last_30_days)
+            THIS_MONTH -> tr(R.string.this_month)
+            LAST_MONTH -> tr(R.string.last_month)
         }
 
     /** Start and end in milliseconds. */

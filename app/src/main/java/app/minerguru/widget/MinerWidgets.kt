@@ -20,7 +20,7 @@ import androidx.annotation.IdRes
 import app.minerguru.BuildConfig
 import app.minerguru.MainActivity
 import app.minerguru.R
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinerFormatting
 import app.minerguru.service.MinerMonitor
 import java.util.Date
@@ -118,7 +118,7 @@ object MinerWidgets {
     }
 
     private fun fleetWide(context: Context, s: WidgetSnapshot, skin: WidgetSkin) = RemoteViews(context.packageName, R.layout.widget_fleet_l).apply {
-        setTextViewText(R.id.wg_title, L("Flotte", "Fleet"))
+        setTextViewText(R.id.wg_title, tr(R.string.fleet))
         hashrate(this, s.totalHashRateGHs, stale(s))
         setImageViewResource(R.id.wg_status, statusIcon(fleetLook(s)))
         setTextViewText(R.id.wg_status_text, if (stale(s)) asOf(context, s) else problemOr(s, onlineText(s)))
@@ -130,7 +130,7 @@ object MinerWidgets {
     }
 
     private fun fleetList(context: Context, s: WidgetSnapshot, skin: WidgetSkin, widgetId: Int) = RemoteViews(context.packageName, R.layout.widget_fleet_xl).apply {
-        setTextViewText(R.id.wg_title, L("Flotte", "Fleet"))
+        setTextViewText(R.id.wg_title, tr(R.string.fleet))
         val watts = if (s.totalPowerW > 0) " · " + MinerFormatting.format0(s.totalPowerW) + " W" else ""
         setTextViewText(R.id.wg_value, if (stale(s)) asOf(context, s) else MinerFormatting.formatHashrate(s.totalHashRateGHs) + watts)
         setImageViewResource(R.id.wg_status, statusIcon(fleetLook(s)))
@@ -156,9 +156,9 @@ object MinerWidgets {
     }
 
     private fun chips(views: RemoteViews, s: WidgetSnapshot) = views.apply {
-        setTextViewText(R.id.wg_c1l, L("Leistung", "Power"))
+        setTextViewText(R.id.wg_c1l, tr(R.string.power))
         setTextViewText(R.id.wg_c1v, if (s.totalPowerW > 0) MinerFormatting.format0(s.totalPowerW) + " W" else "–")
-        setTextViewText(R.id.wg_c2l, L("Effizienz", "Efficiency"))
+        setTextViewText(R.id.wg_c2l, tr(R.string.efficiency))
         setTextViewText(R.id.wg_c2v, s.efficiencyJPerTH?.let { MinerFormatting.format1(it) + " J/TH" } ?: "–")
         setTextViewText(R.id.wg_c3l, "Best Diff")
         setTextViewText(R.id.wg_c3v, s.bestDiff ?: "–")
@@ -204,7 +204,7 @@ object MinerWidgets {
     }
 
     private fun solo(context: Context, s: WidgetSnapshot?, skin: WidgetSkin): RemoteViews {
-        if (s == null || s.solo.isEmpty()) return empty(context, skin, L("Keine Solo-Chance", "No solo chance"), L("Kein Miner online", "No miner online"))
+        if (s == null || s.solo.isEmpty()) return empty(context, skin, tr(R.string.no_solo_chance), tr(R.string.no_miner_online))
         val open = openIntent(context, "overview", 0)
         if (s.solo.size == 1) return soloOne(context, s, s.solo[0], skin).also { it.setOnClickPendingIntent(android.R.id.background, open) }
         // Two coins fit at 2×1; taller widgets show more, Bitcoin and the largest first.
@@ -216,7 +216,7 @@ object MinerWidgets {
 
     private fun soloOne(context: Context, s: WidgetSnapshot, solo: WidgetSnapshot.Solo, skin: WidgetSkin) =
         RemoteViews(context.packageName, R.layout.widget_solo).apply {
-            setTextViewText(R.id.wg_label, L("Solo-Chance", "Solo chance") + " · " + solo.coin)
+            setTextViewText(R.id.wg_label, tr(R.string.solo_chance) + " · " + solo.coin)
             setTextViewText(R.id.wg_value, solo.odds)
             setTextViewText(R.id.wg_status_text, if (stale(s)) asOf(context, s) else solo.period)
             setColorStateList(R.id.wg_coin, Tint.IMAGE.method, coinColor(solo.key))
@@ -226,7 +226,7 @@ object MinerWidgets {
     private fun soloRows(context: Context, s: WidgetSnapshot, skin: WidgetSkin, max: Int) =
         RemoteViews(context.packageName, R.layout.widget_solo_multi).apply {
             val period = if (stale(s)) asOf(context, s) else s.solo.first().period
-            setTextViewText(R.id.wg_label, L("Solo-Chance", "Solo chance") + " · " + period)
+            setTextViewText(R.id.wg_label, tr(R.string.solo_chance) + " · " + period)
             paint(this, skin, listOf(R.id.wg_label to Role.SUB))
             removeAllViews(R.id.wg_rows)
             for (solo in s.solo.take(max)) {
@@ -254,8 +254,8 @@ object MinerWidgets {
 
     private fun empty(
         context: Context, skin: WidgetSkin,
-        title: String = L("Keine Miner", "No miners"),
-        hint: String = L("In MinerGuru hinzufügen", "Add them in MinerGuru")
+        title: String = tr(R.string.no_miners),
+        hint: String = tr(R.string.add_them_in_minerguru)
     ) = RemoteViews(context.packageName, R.layout.widget_empty).apply {
         setTextViewText(R.id.wg_title, title)
         setTextViewText(R.id.wg_status_text, hint)
@@ -293,7 +293,7 @@ object MinerWidgets {
 
     private fun stale(s: WidgetSnapshot) = System.currentTimeMillis() - s.time > SHOW_AGE_AFTER_MS
 
-    private fun asOf(context: Context, s: WidgetSnapshot) = L("Stand", "As of") + " " + DateFormat.getTimeFormat(context).format(Date(s.time))
+    private fun asOf(context: Context, s: WidgetSnapshot) = tr(R.string.as_of) + " " + DateFormat.getTimeFormat(context).format(Date(s.time))
 
     private fun onlineText(s: WidgetSnapshot) = "${s.online.size}/${s.miners.size} online"
 

@@ -9,7 +9,7 @@ import org.junit.Test
 class MinerGuruCoreTests {
     @Before fun germanUi() {
         DisplayFormat.locale = java.util.Locale.GERMANY
-        Lang.apply(AppLanguage.GERMAN)
+        useGermanTexts()
     }
 
     private fun bitaxe(overrides: Map<String, Any?> = emptyMap(), hashRate: Double = 1000.0, power: Double = 18.0): MinerSystemInfo {

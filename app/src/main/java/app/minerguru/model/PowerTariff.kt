@@ -1,5 +1,6 @@
 package app.minerguru.model
 
+import app.minerguru.R
 import org.json.JSONArray
 import org.json.JSONObject
 import java.time.DayOfWeek
@@ -26,7 +27,7 @@ object Weekdays {
 
     /** „täglich“, „Mo–Fr“ or „Sa, So“. */
     fun summary(days: Set<Int>): String = when (days) {
-        all -> L("täglich", "daily")
+        all -> tr(R.string.daily_in_text)
         workdays -> "${shortName(1)}–${shortName(5)}"
         else -> (1..7).filter { it in days }.joinToString(", ") { shortName(it) }
     }
@@ -53,7 +54,7 @@ data class WeeklyWindow(val weekdays: Set<Int>, val startMinute: Int, val endMin
         return contains(t.dayOfWeek.value, t.hour * 60 + t.minute)
     }
 
-    val timeRangeText: String get() = if (isWholeDay) L("ganztags", "all day") else "${clock(startMinute)}–${clock(endMinute)}"
+    val timeRangeText: String get() = if (isWholeDay) tr(R.string.all_day) else "${clock(startMinute)}–${clock(endMinute)}"
 
     fun toJson(): JSONObject = JSONObject()
         .put("weekdays", JSONArray(weekdays.sorted()))
@@ -159,9 +160,9 @@ enum class PowerAction {
 
     val title: String
         get() = when (this) {
-            NORMAL -> L("Normal", "Normal")
-            NIGHT_MODE -> L("Nachtmodus", "Night mode")
-            PAUSE -> L("Pause", "Pause")
+            NORMAL -> tr(R.string.normal)
+            NIGHT_MODE -> tr(R.string.night_mode)
+            PAUSE -> tr(R.string.pause_noun)
         }
 }
 

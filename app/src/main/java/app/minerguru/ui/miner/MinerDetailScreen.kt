@@ -1,6 +1,7 @@
 package app.minerguru.ui.miner
 
-import app.minerguru.model.L
+import app.minerguru.R
+import app.minerguru.model.tr
 import app.minerguru.model.Privacy
 import app.minerguru.ui.components.sensitive
 import app.minerguru.ui.components.PrivacyToggle
@@ -75,7 +76,7 @@ import app.minerguru.ui.components.SectionCard
 import app.minerguru.ui.fleet.openUrl
 import app.minerguru.ui.theme.MG
 
-private val TABS get() = listOf(L("Übersicht", "Overview"), L("Verlauf", "History"), "Live-Log", L("Steuerung", "Control"))
+private val TABS get() = listOf(tr(R.string.overview), tr(R.string.history), "Live-Log", tr(R.string.control))
 
 /** Detail page of one miner, split into Overview, History, Live log and Control. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -124,26 +125,26 @@ fun MinerDetailScreen(store: MinerStore, minerId: String, showBack: Boolean, onB
                         }
                     },
                     navigationIcon = {
-                        if (showBack) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, L("Zurück", "Back")) }
+                        if (showBack) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, tr(R.string.back)) }
                     },
                     scrollBehavior = scrollBehavior,
                     actions = {
                         PrivacyToggle(store)
                         Box {
-                            IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, L("Mehr", "More")) }
+                            IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, tr(R.string.more)) }
                             DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                                DropdownMenuItem(text = { Text(L("Aktualisieren", "Refresh")) }, leadingIcon = { Icon(Icons.Rounded.Refresh, null) },
+                                DropdownMenuItem(text = { Text(tr(R.string.refresh)) }, leadingIcon = { Icon(Icons.Rounded.Refresh, null) },
                                     onClick = { menu = false; store.refreshMinerAsync(minerId) })
-                                DropdownMenuItem(text = { Text(L("Weboberfläche öffnen", "Open web interface")) }, leadingIcon = { Icon(Icons.Rounded.OpenInBrowser, null) },
+                                DropdownMenuItem(text = { Text(tr(R.string.open_web_interface)) }, leadingIcon = { Icon(Icons.Rounded.OpenInBrowser, null) },
                                     onClick = { menu = false; openUrl(context, miner.webInterfaceUrl) })
-                                DropdownMenuItem(text = { Text(L("JSON-Rohdaten", "Raw JSON")) }, leadingIcon = { Icon(Icons.Rounded.Code, null) },
+                                DropdownMenuItem(text = { Text(tr(R.string.raw_json)) }, leadingIcon = { Icon(Icons.Rounded.Code, null) },
                                     onClick = { menu = false; showJson = true })
-                                DropdownMenuItem(text = { Text(L("Miner neu starten", "Restart miner")) }, leadingIcon = { Icon(Icons.Rounded.RestartAlt, null) },
+                                DropdownMenuItem(text = { Text(tr(R.string.restart_miner)) }, leadingIcon = { Icon(Icons.Rounded.RestartAlt, null) },
                                     onClick = { menu = false; confirmRestart = true })
                                 if (store.alertsEnabled) {
                                     val muted = minerId in store.mutedMiners
                                     DropdownMenuItem(
-                                        text = { Text(if (muted) L("Benachrichtigungen an", "Unmute notifications") else L("Stummschalten", "Mute notifications")) },
+                                        text = { Text(if (muted) tr(R.string.unmute_notifications) else tr(R.string.mute_notifications)) },
                                         leadingIcon = { Icon(if (muted) Icons.Rounded.Notifications else Icons.Rounded.NotificationsOff, null) },
                                         onClick = { menu = false; store.setMinerMuted(minerId, !muted) }
                                     )
@@ -193,29 +194,29 @@ fun MinerDetailScreen(store: MinerStore, minerId: String, showBack: Boolean, onB
 
     if (showJson) AlertDialog(
         onDismissRequest = { showJson = false },
-        title = { Text(L("API-Rohdaten", "Raw API data")) },
+        title = { Text(tr(R.string.raw_api_data)) },
         text = {
             Column {
                 Text("http://${Privacy.ip(miner.ipAddress)}/api/system/info", style = MaterialTheme.typography.labelSmall, fontFamily = FontFamily.Monospace)
                 Spacer(Modifier.size(8.dp))
                 Box(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState())) {
                     androidx.compose.foundation.text.selection.SelectionContainer {
-                        Text(miner.rawJSON ?: L("Keine Daten", "No data"), style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace, modifier = Modifier.sensitive())
+                        Text(miner.rawJSON ?: tr(R.string.no_data), style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace, modifier = Modifier.sensitive())
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = { showJson = false }) { Text(L("Schließen", "Close")) } },
+        confirmButton = { TextButton(onClick = { showJson = false }) { Text(tr(R.string.close)) } },
         dismissButton = {
-            TextButton(onClick = { copyToClipboard(context, "JSON", miner.rawJSON.orEmpty()) }) { Text(L("Kopieren", "Copy")) }
+            TextButton(onClick = { copyToClipboard(context, "JSON", miner.rawJSON.orEmpty()) }) { Text(tr(R.string.copy)) }
         }
     )
     if (confirmRestart) AlertDialog(
         onDismissRequest = { confirmRestart = false },
-        title = { Text(L("Miner neu starten?", "Restart miner?")) },
-        text = { Text(L("Soll ${miner.displayName} jetzt neu gestartet werden? Das Mining wird kurz unterbrochen.", "Restart ${miner.displayName} now? Mining is interrupted briefly.")) },
-        confirmButton = { TextButton(onClick = { confirmRestart = false; store.restartMiner(minerId) }) { Text(L("Neu starten", "Restart")) } },
-        dismissButton = { TextButton(onClick = { confirmRestart = false }) { Text(L("Abbrechen", "Cancel")) } }
+        title = { Text(tr(R.string.restart_miner_question)) },
+        text = { Text(tr(R.string.restart_now_mining_is_interrupted, miner.displayName)) },
+        confirmButton = { TextButton(onClick = { confirmRestart = false; store.restartMiner(minerId) }) { Text(tr(R.string.restart)) } },
+        dismissButton = { TextButton(onClick = { confirmRestart = false }) { Text(tr(R.string.cancel)) } }
     )
 }
 
@@ -237,11 +238,11 @@ private fun OfflinePlaceholder(name: String, ip: String, state: ConnectionState,
         SectionCard {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Icon(Icons.Rounded.WifiOff, null, tint = MG.red(), modifier = Modifier.size(40.dp))
-                Text(L("$name (${Privacy.ip(ip)}) antwortet derzeit nicht", "$name (${Privacy.ip(ip)}) is not responding"), style = MaterialTheme.typography.titleSmall)
+                Text(tr(R.string.is_not_responding, name, Privacy.ip(ip)), style = MaterialTheme.typography.titleSmall)
                 (state as? ConnectionState.Offline)?.let {
                     Text(it.reason, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Button(onClick = onRetry) { Icon(Icons.Rounded.Refresh, null); Spacer(Modifier.width(8.dp)); Text(L("Erneut verbinden", "Reconnect")) }
+                Button(onClick = onRetry) { Icon(Icons.Rounded.Refresh, null); Spacer(Modifier.width(8.dp)); Text(tr(R.string.reconnect)) }
             }
         }
     }

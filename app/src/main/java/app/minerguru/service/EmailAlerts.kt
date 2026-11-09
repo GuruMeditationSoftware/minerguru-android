@@ -2,8 +2,9 @@ package app.minerguru.service
 
 import android.content.Context
 import android.util.Log
+import app.minerguru.R
 import app.minerguru.model.AlertEvent
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -69,8 +70,8 @@ object EmailAlerts {
     }
 
     /** Throws what went wrong, for the test button. */
-    suspend fun sendTest(context: Context, settings: EmailSettings) = send(context, settings, L("MinerGuru: Test-Mail", "MinerGuru: test mail"),
-        L("Diese Test-Mail zeigt: Warnungen von MinerGuru kommen bei dir an.", "This test mail shows that alerts from MinerGuru reach you."))
+    suspend fun sendTest(context: Context, settings: EmailSettings) = send(context, settings, tr(R.string.minerguru_test_mail),
+        tr(R.string.this_test_mail_shows_that))
 
     /** A failed mail is logged, the alert itself stays delivered. */
     suspend fun deliver(context: Context, events: List<AlertEvent>) {

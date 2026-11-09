@@ -41,11 +41,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.minerguru.R
 import app.minerguru.model.BlockTemplateSummary
 import app.minerguru.model.BlockTemplateSummary.PayoutState
 import app.minerguru.model.CoinbaseOutput
 import app.minerguru.model.DisplayFormat
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.Privacy
 import app.minerguru.service.BlockProbeStore
 import app.minerguru.service.BlockProbeTarget
@@ -75,13 +76,7 @@ fun BlockTemplateCard(
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 BlockCardTitle(poolLabel) { PayoutStateBadge(block.payoutState) }
                 Text(
-                    if (block.probedAtMillis == null) L(
-                        "Die Vorlage des Pools, an der dein Miner gerade rechnet. Findet er den Block, zahlt die Coinbase so aus wie hier gezeigt. Die übrigen Transaktionen kennt nur der Pool.",
-                        "The pool's template your miner is hashing on right now. If it finds the block, the coinbase pays out as shown here. Only the pool knows the other transactions."
-                    ) else L(
-                        "Die Vorlage, die der Pool gerade für deine Adresse baut. Der Miner meldet sie nicht, deshalb hat MinerGuru sie selbst beim Pool abgefragt, ohne mitzurechnen. Findet dein Miner den Block, zahlt die Coinbase so aus wie hier gezeigt.",
-                        "The template the pool is building for your address right now. The miner does not report it, so MinerGuru asked the pool itself, without mining. If your miner finds the block, the coinbase pays out as shown here."
-                    ),
+                    if (block.probedAtMillis == null) tr(R.string.the_pool_s_template_your) else tr(R.string.the_template_the_pool_is),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -89,11 +84,11 @@ fun BlockTemplateCard(
 
             val coins = { sats: Double -> BlockTemplateSummary.formatCoins(sats, block.coin) }
             val pairs = listOf(
-                L("Blockhöhe", "Block height") to DisplayFormat.integer(block.height),
-                L("Pool-Kennung", "Pool tag") to (block.poolTag ?: "—"),
-                L("Belohnung", "Reward") to (block.totalSats?.let(coins) ?: "—"),
-                L("davon Gebühren", "of which fees") to (block.feesSats?.let(coins) ?: "—"),
-                L("An deine Adresse", "To your address") to userShareText(block)
+                tr(R.string.block_height) to DisplayFormat.integer(block.height),
+                tr(R.string.pool_tag) to (block.poolTag ?: "—"),
+                tr(R.string.reward) to (block.totalSats?.let(coins) ?: "—"),
+                tr(R.string.of_which_fees) to (block.feesSats?.let(coins) ?: "—"),
+                tr(R.string.to_your_address) to userShareText(block)
             )
             SelectionContainer {
                 CardGrid(pairs, minCellWidth = 140.dp, spacing = 12.dp, minColumns = 2, maxColumns = 5) { (label, value) -> BlockFigure(label, value) }
@@ -101,10 +96,7 @@ fun BlockTemplateCard(
 
             block.transactionRange?.let { range ->
                 Text(
-                    L("Transaktionen im Block: ", "Transactions in the block: ") + rangeText(range) + L(
-                        " (aus der Tiefe des Merkle-Baums; der Pool nennt nur die Größenordnung)",
-                        " (from the depth of the merkle tree; the pool only gives the order of magnitude)"
-                    ),
+                    tr(R.string.transactions_in_the_block) + rangeText(range) + tr(R.string.from_the_depth_of_the),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -137,7 +129,7 @@ private fun BlockCardTitle(poolLabel: String?, trailing: @Composable () -> Unit 
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(end = 12.dp)) {
             Icon(Icons.Rounded.ViewInAr, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
-            Text(L("Aktueller Block", "Current block"), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
+            Text(tr(R.string.current_block), style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
             if (poolLabel != null) {
                 Text(" · $poolLabel", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
             }
@@ -155,11 +147,11 @@ private fun PayoutStateBadge(state: PayoutState) {
         else -> MG.idle()
     }
     val title = when (state) {
-        PayoutState.VERIFIED -> L("Deine Adresse ist im Block", "Your address is in the block")
-        PayoutState.NOT_FOUND -> L("Deine Adresse fehlt", "Your address is missing")
-        PayoutState.NOT_APPLICABLE -> L("Konto-Pool", "Account pool")
-        PayoutState.DECODING_OFF -> L("Nicht geprüft", "Not checked")
-        PayoutState.UNKNOWN -> L("Noch keine Daten", "No data yet")
+        PayoutState.VERIFIED -> tr(R.string.your_address_is_in_the)
+        PayoutState.NOT_FOUND -> tr(R.string.your_address_is_missing)
+        PayoutState.NOT_APPLICABLE -> tr(R.string.account_pool)
+        PayoutState.DECODING_OFF -> tr(R.string.not_checked)
+        PayoutState.UNKNOWN -> tr(R.string.no_data_yet)
     }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(6.dp).clip(CircleShape).background(color))
@@ -177,7 +169,7 @@ private fun PayoutStateBadge(state: PayoutState) {
 private fun SignalsRow(signals: List<String>) {
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp),
         itemVerticalAlignment = Alignment.CenterVertically) {
-        Text(L("Signalisiert:", "Signals:"), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(tr(R.string.signals), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         signals.forEach { signal ->
             Text(
                 signal, style = MGType.mono(11.sp),
@@ -191,11 +183,11 @@ private fun SignalsRow(signals: List<String>) {
 @Composable
 private fun Outputs(block: BlockTemplateSummary, onOpenWebInterface: (() -> Unit)?) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(L("Empfänger der Belohnung", "Recipients of the reward"), style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(tr(R.string.recipients_of_the_reward), style = MGType.mono(11.sp), color = MaterialTheme.colorScheme.onSurfaceVariant)
         when {
             block.payoutState == PayoutState.DECODING_OFF -> DecodingOffHint(onOpenWebInterface)
             block.outputs.isEmpty() -> Text(
-                L("Der Miner hat noch keine Empfänger gemeldet.", "The miner has not reported any recipients yet."),
+                tr(R.string.the_miner_has_not_reported),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             else -> SelectionContainer {
@@ -204,7 +196,7 @@ private fun Outputs(block: BlockTemplateSummary, onOpenWebInterface: (() -> Unit
                     if (block.othersCount > 0) {
                         InsetRow(Icons.Rounded.MoreHoriz, MaterialTheme.colorScheme.onSurfaceVariant, block.othersValueSats.takeIf { it > 0 }, block) {
                             Text(
-                                L("${block.othersCount} weitere Empfänger", "${block.othersCount} more recipients"),
+                                tr(R.string.more_recipients, block.othersCount),
                                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -227,9 +219,9 @@ private fun OutputRow(output: CoinbaseOutput, block: BlockTemplateSummary) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(displayText(output), style = MGType.mono(11.sp), maxLines = 1, overflow = TextOverflow.MiddleEllipsis)
             val note = when {
-                output.isUserOutput -> L("Deine Adresse", "Your address")
-                output.isWitnessCommitment -> L("SegWit-Prüfsumme, keine Auszahlung", "SegWit commitment, no payout")
-                output.isDataOutput -> L("Daten, keine Auszahlung", "Data, no payout")
+                output.isUserOutput -> tr(R.string.your_address)
+                output.isWitnessCommitment -> tr(R.string.segwit_commitment_no_payout)
+                output.isDataOutput -> tr(R.string.data_no_payout)
                 else -> null
             }
             if (note != null) {
@@ -277,17 +269,14 @@ private fun DecodingOffHint(onOpenWebInterface: (() -> Unit)?) {
         Icon(Icons.Rounded.Info, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(10.dp))
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(L("Coinbase-Dekodierung ist für den aktiven Pool aus.", "Coinbase decoding is off for the active pool."),
+            Text(tr(R.string.coinbase_decoding_is_off_for),
                 style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
             Text(
-                L(
-                    "Ohne sie meldet der Miner nicht, wer die Belohnung bekommt, und prüft deine Adresse nicht. Du kannst sie in der Weboberfläche des Miners bei den Pool-Einstellungen einschalten.",
-                    "Without it the miner does not report who gets the reward and does not check your address. You can switch it on in the miner's web interface under the pool settings."
-                ),
+                tr(R.string.without_it_the_miner_does),
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             if (onOpenWebInterface != null) {
-                FilledTonalButton(onClick = onOpenWebInterface) { Text(L("Weboberfläche öffnen", "Open web interface")) }
+                FilledTonalButton(onClick = onOpenWebInterface) { Text(tr(R.string.open_web_interface)) }
             }
         }
     }
@@ -300,13 +289,13 @@ private fun ProbeFooter(probedAtMillis: Long, onRefresh: (() -> Unit)?, isRefres
         Spacer(Modifier.width(8.dp))
         val time = DateFormat.getTimeInstance(DateFormat.SHORT).format(Date(probedAtMillis))
         Text(
-            L("Von diesem Gerät beim Pool abgefragt, $time Uhr", "Fetched from the pool by this device at $time"),
+            tr(R.string.fetched_from_the_pool_by, time),
             style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f)
         )
         if (isRefreshing) {
             CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
         } else if (onRefresh != null) {
-            TextButton(onClick = onRefresh) { Text(L("Neu abfragen", "Fetch again")) }
+            TextButton(onClick = onRefresh) { Text(tr(R.string.fetch_again)) }
         }
     }
 }
@@ -360,7 +349,7 @@ fun ProbedBlockSection(probes: BlockProbeStore, targets: List<BlockProbeTarget>,
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
                         Spacer(Modifier.width(10.dp))
-                        Text(L("MinerGuru fragt den Pool nach seiner Vorlage …", "MinerGuru is asking the pool for its template …"),
+                        Text(tr(R.string.minerguru_is_asking_the_pool),
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -371,7 +360,7 @@ fun ProbedBlockSection(probes: BlockProbeStore, targets: List<BlockProbeTarget>,
                         Text(state.message, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.weight(1f))
                         if (running) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
-                        else TextButton(onClick = { probes.refresh(target, force = true) }) { Text(L("Erneut versuchen", "Try again")) }
+                        else TextButton(onClick = { probes.refresh(target, force = true) }) { Text(tr(R.string.try_again)) }
                     }
                 }
             }
@@ -407,16 +396,13 @@ private fun ProbeOffHint(onOpenSettings: () -> Unit) {
             Icon(Icons.Rounded.ViewInAr, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(12.dp))
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(L("Blockansicht", "Block view"), style = MaterialTheme.typography.titleSmall)
+                Text(tr(R.string.block_view), style = MaterialTheme.typography.titleSmall)
                 Text(
-                    L(
-                        "Dieser Miner meldet nicht, an welchem Block er rechnet. MinerGuru kann die Vorlage selbst beim Pool abfragen und prüfen, ob deine Adresse darin steht.",
-                        "This miner does not report which block it is working on. MinerGuru can ask the pool for the template itself and check whether your address is in it."
-                    ),
+                    tr(R.string.this_miner_does_not_report),
                     style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 TextButton(onClick = onOpenSettings, contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)) {
-                    Text(L("In den Einstellungen einschalten", "Switch on in settings"))
+                    Text(tr(R.string.switch_on_in_settings))
                 }
             }
         }

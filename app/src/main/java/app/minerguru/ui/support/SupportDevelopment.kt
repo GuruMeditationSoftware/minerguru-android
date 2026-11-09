@@ -41,8 +41,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.minerguru.R
 import app.minerguru.model.DonationCoin
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.ui.theme.MGType
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -56,7 +57,7 @@ fun SupportDevelopmentButton(modifier: Modifier = Modifier) {
     TextButton(onClick = { open = true }, modifier = modifier) {
         Icon(Icons.Rounded.FavoriteBorder, null, Modifier.size(16.dp))
         Spacer(Modifier.width(6.dp))
-        Text(L("Diese Entwicklung unterstützen", "Support this project"), style = MaterialTheme.typography.labelMedium)
+        Text(tr(R.string.support_this_project), style = MaterialTheme.typography.labelMedium)
     }
     if (open) SupportDevelopmentDialog { open = false }
 }
@@ -65,15 +66,14 @@ fun SupportDevelopmentButton(modifier: Modifier = Modifier) {
 private fun SupportDevelopmentDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(L("Diese Entwicklung unterstützen", "Support this project")) },
+        title = { Text(tr(R.string.support_this_project)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(L("MinerGuru ist kostenlos und zeigt keine Werbung. Wenn dir die App hilft, freue ich mich über eine kleine Spende für die Weiterentwicklung.",
-                    "MinerGuru is free and has no ads. If the app helps you, a small donation towards further development is very welcome."))
+                Text(tr(R.string.minerguru_is_free_and_has))
                 DonationCoin.entries.forEach { CoinBlock(it) }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text(L("Schließen", "Close")) } }
+        confirmButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.close)) } }
     )
 }
 
@@ -84,7 +84,7 @@ private fun CoinBlock(coin: DonationCoin) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(coin.coinName, style = MaterialTheme.typography.titleSmall)
         if (!coin.isConfigured) {
-            Text(L("Adresse noch nicht hinterlegt.", "Address not set yet."), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(tr(R.string.address_not_set_yet), color = MaterialTheme.colorScheme.onSurfaceVariant)
             return@Column
         }
         QrCode(coin.paymentUri)
@@ -96,7 +96,7 @@ private fun CoinBlock(coin: DonationCoin) {
         }) {
             Icon(Icons.Rounded.ContentCopy, null, Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
-            Text(if (copied) L("Kopiert", "Copied") else L("Adresse kopieren", "Copy address"))
+            Text(if (copied) tr(R.string.copied) else tr(R.string.copy_address))
         }
     }
 }

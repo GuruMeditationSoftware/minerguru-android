@@ -2,8 +2,9 @@ package app.minerguru.service
 
 import android.content.Context
 import android.util.Log
+import app.minerguru.R
 import app.minerguru.model.BackgroundMode
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.minerScopeWithout
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.MinerFirmware
@@ -181,7 +182,7 @@ object PowerCenter {
             throw e
         } catch (e: Exception) {
             Log.w(TAG, "Schedule for $host failed: ${e.message}")
-            lastError = "${miner.displayName}: ${e.message ?: L("Nicht erreichbar", "Unreachable")}"
+            lastError = "${miner.displayName}: ${e.message ?: tr(R.string.unreachable)}"
             null
         }
     }

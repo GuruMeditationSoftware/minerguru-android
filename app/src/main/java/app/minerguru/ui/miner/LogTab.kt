@@ -1,5 +1,6 @@
 package app.minerguru.ui.miner
 
+import app.minerguru.R
 import app.minerguru.ui.components.AppTextField
 import app.minerguru.ui.components.AppFilterChip
 import androidx.compose.foundation.layout.FlowRow
@@ -8,7 +9,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.foundation.layout.PaddingValues
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.Privacy
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -87,19 +88,19 @@ fun LogTab(miner: MinerDevice, log: MinerLogStream, contentPadding: PaddingValue
             horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             if (log.isRunning) {
-                FilledTonalButton(onClick = { log.pause() }) { Icon(Icons.Rounded.Pause, null); Spacer(Modifier.width(6.dp)); Text(L("Stoppen", "Stop")) }
+                FilledTonalButton(onClick = { log.pause() }) { Icon(Icons.Rounded.Pause, null); Spacer(Modifier.width(6.dp)); Text(tr(R.string.stop_action)) }
             } else {
                 FilledTonalButton(onClick = { log.start(miner.ipAddress) }) {
                     Icon(Icons.Rounded.PlayArrow, null); Spacer(Modifier.width(6.dp))
-                    Text(if (state is StreamState.Paused) L("Weiter", "Resume") else L("Live-Log starten", "Start live log"))
+                    Text(if (state is StreamState.Paused) tr(R.string.resume_short) else tr(R.string.start_live_log))
                 }
             }
             val (label, color) = when (state) {
                 StreamState.Streaming -> "Live" to MG.green()
-                StreamState.Connecting -> L("Verbinde…", "Connecting…") to MG.yellow()
-                StreamState.Paused -> L("Angehalten", "Paused") to MG.orange()
-                StreamState.Stopped -> L("Gestoppt", "Stopped") to MaterialTheme.colorScheme.onSurfaceVariant
-                is StreamState.Error -> L("Getrennt", "Disconnected") to MG.red()
+                StreamState.Connecting -> tr(R.string.connecting) to MG.yellow()
+                StreamState.Paused -> tr(R.string.paused) to MG.orange()
+                StreamState.Stopped -> tr(R.string.stopped) to MaterialTheme.colorScheme.onSurfaceVariant
+                is StreamState.Error -> tr(R.string.disconnected) to MG.red()
             }
             Chip(label, color, dot = true)
             Spacer(Modifier.weight(1f))
@@ -109,10 +110,10 @@ fun LogTab(miner: MinerDevice, log: MinerLogStream, contentPadding: PaddingValue
             // Less frequent actions sit in a menu, so the row still fits at 360 dp and large font sizes.
             Box {
                 var menu by remember { mutableStateOf(false) }
-                IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, L("Mehr", "More")) }
+                IconButton(onClick = { menu = true }) { Icon(Icons.Rounded.MoreVert, tr(R.string.more)) }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     DropdownMenuItem(
-                        text = { Text(L("Exportieren", "Export")) }, leadingIcon = { Icon(Icons.Rounded.Share, null) },
+                        text = { Text(tr(R.string.export)) }, leadingIcon = { Icon(Icons.Rounded.Share, null) },
                         enabled = filtered.isNotEmpty(),
                         onClick = {
                             menu = false
@@ -121,16 +122,16 @@ fun LogTab(miner: MinerDevice, log: MinerLogStream, contentPadding: PaddingValue
                                 putExtra(android.content.Intent.EXTRA_SUBJECT, MinerLogEntry.exportFileName(miner.displayName, miner.ipAddress))
                                 putExtra(android.content.Intent.EXTRA_TEXT, exportText())
                             }
-                            context.startActivity(android.content.Intent.createChooser(send, L("Log exportieren", "Export log")))
+                            context.startActivity(android.content.Intent.createChooser(send, tr(R.string.export_log)))
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text(L("Kopieren", "Copy")) }, leadingIcon = { Icon(Icons.Rounded.ContentCopy, null) },
+                        text = { Text(tr(R.string.copy)) }, leadingIcon = { Icon(Icons.Rounded.ContentCopy, null) },
                         enabled = filtered.isNotEmpty(),
                         onClick = { menu = false; copyToClipboard(context, "Log", exportText()) }
                     )
                     DropdownMenuItem(
-                        text = { Text(L("Leeren", "Clear")) }, leadingIcon = { Icon(Icons.Rounded.Delete, null) },
+                        text = { Text(tr(R.string.clear)) }, leadingIcon = { Icon(Icons.Rounded.Delete, null) },
                         enabled = entries.isNotEmpty(),
                         onClick = { menu = false; log.clear() }
                     )
@@ -145,7 +146,7 @@ fun LogTab(miner: MinerDevice, log: MinerLogStream, contentPadding: PaddingValue
         }
         AppTextField(
             value = search, onValueChange = { search = it }, singleLine = true, modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(L("Im Log suchen…", "Search log…")) }
+            placeholder = { Text(tr(R.string.search_log)) }
         )
 
         Column(
@@ -154,17 +155,17 @@ fun LogTab(miner: MinerDevice, log: MinerLogStream, contentPadding: PaddingValue
             if (filtered.isEmpty()) {
                 val hint = when {
                     state is StreamState.Error -> (state as StreamState.Error).message
-                    state is StreamState.Connecting -> L("Verbinde mit", "Connecting to") + " ws://${Privacy.ip(miner.ipAddress)}/api/ws…"
-                    entries.isNotEmpty() -> L("Keine Einträge für den aktuellen Filter.", "No entries for the current filter.")
-                    state is StreamState.Streaming -> L("Verbunden – warte auf Log-Ausgabe vom Miner…", "Connected – waiting for log output from the miner…")
-                    else -> L("Die Live-Konsole ist standardmäßig aus, um den Miner nicht unnötig zu belasten.", "The live console is off by default so the miner is not loaded unnecessarily.")
+                    state is StreamState.Connecting -> tr(R.string.connecting_to) + " ws://${Privacy.ip(miner.ipAddress)}/api/ws…"
+                    entries.isNotEmpty() -> tr(R.string.no_entries_for_the_current)
+                    state is StreamState.Streaming -> tr(R.string.connected_waiting_for_log_output)
+                    else -> tr(R.string.the_live_console_is_off)
                 }
                 Text(hint, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             } else {
                 LazyColumn(state = listState) { items(filtered) { LogRow(it) } }
             }
         }
-        Text("${filtered.size} " + L("von", "of") + " ${entries.size} " + L("Zeilen", "lines") + " • $total " + L("empfangen", "received"), style = MaterialTheme.typography.labelSmall,
+        Text("${filtered.size} " + tr(R.string.of) + " ${entries.size} " + tr(R.string.lines_in_text) + " • $total " + tr(R.string.received), style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

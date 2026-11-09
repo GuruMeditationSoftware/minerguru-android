@@ -23,11 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import app.minerguru.R
 import app.minerguru.model.HistoryCsv
 import app.minerguru.model.HistoryMetric
 import app.minerguru.model.HistoryPoint
 import app.minerguru.model.HistoryRange
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinerDevice
 import app.minerguru.model.MinerFormatting
 import app.minerguru.service.HistoryRecorder
@@ -58,7 +59,7 @@ fun LongTermHistoryCard(miner: MinerDevice) {
     }
     val values = points.mapNotNull(metric::value)
 
-    SectionTitle(L("Langzeit-Verlauf", "Long-term history"), Icons.Rounded.History)
+    SectionTitle(tr(R.string.long_term_history), Icons.Rounded.History)
     SectionCard {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -70,8 +71,7 @@ fun LongTermHistoryCard(miner: MinerDevice) {
                 }
             }
             if (values.isEmpty()) {
-                EmptyHint(L("Noch keine Daten in diesem Zeitraum. MinerGuru zeichnet auf, solange die App oder die Überwachung läuft.",
-                    "No data for this period yet. MinerGuru records while the app or background monitoring is running."))
+                EmptyHint(tr(R.string.no_data_for_this_period))
             } else {
                 LineChart(listOf(ChartSeries(metric.valuesWithGaps(points, HistoryQuery.step(range.seconds)), MG.accent(), fill = true)), axisFormat = { MinerFormatting.format1(it) })
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -82,10 +82,10 @@ fun LongTermHistoryCard(miner: MinerDevice) {
                 val recorded = points.sumOf { it.recordedMinutes }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (recorded > 0) {
-                        Text(L("Betriebszeit ", "Uptime ") + MinerFormatting.format1(points.sumOf { it.onlineMinutes } * 100.0 / recorded) + " %",
+                        Text(tr(R.string.uptime) + MinerFormatting.format1(points.sumOf { it.onlineMinutes } * 100.0 / recorded) + " %",
                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
                     }
-                    TextButton(onClick = { csv.launch("${miner.displayName}-${range.name.lowercase()}.csv") }) { Text(L("Als CSV sichern", "Save as CSV")) }
+                    TextButton(onClick = { csv.launch("${miner.displayName}-${range.name.lowercase()}.csv") }) { Text(tr(R.string.save_as_csv)) }
                 }
             }
         }

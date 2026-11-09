@@ -1,5 +1,6 @@
 package app.minerguru.ui.pools
 
+import app.minerguru.R
 import app.minerguru.ui.components.StatusMessage
 import app.minerguru.ui.components.AppTextField
 import androidx.compose.material3.FilledTonalButton
@@ -43,7 +44,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import app.minerguru.model.L
+import app.minerguru.model.tr
 import app.minerguru.model.MinedCoin
 import app.minerguru.model.MinerSettingsForm
 import app.minerguru.model.PoolConfig
@@ -72,21 +73,21 @@ fun LibraryPoolPicker(
     var open by remember { mutableStateOf(false) }
     val match = if (endpoint.hasContent) library.firstOrNull { it.matches(endpoint) } else null
     val label = when {
-        !endpoint.hasContent -> L("— leer —", "— empty —")
+        !endpoint.hasContent -> tr(R.string.empty_placeholder)
         match != null -> match.name
-        else -> StratumHost.clean(endpoint.host).ifEmpty { Privacy.user(endpoint.user) } + L(" (nicht gespeichert)", " (not saved)")
+        else -> StratumHost.clean(endpoint.host).ifEmpty { Privacy.user(endpoint.user) } + tr(R.string.not_saved)
     }
     ExposedDropdownMenuBox(expanded = open, onExpandedChange = { open = it }, modifier = modifier) {
         AppTextField(
             value = label, onValueChange = {}, readOnly = true, singleLine = true,
-            label = { Text(L("Pool aus Bibliothek", "Pool from library")) },
+            label = { Text(tr(R.string.pool_from_library)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = open) },
             modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
         )
         ExposedDropdownMenu(expanded = open, onDismissRequest = { open = false }) {
             if (library.isEmpty()) {
                 DropdownMenuItem(
-                    text = { Text(L("Bibliothek ist leer", "Library is empty")) }, onClick = { open = false }, enabled = false
+                    text = { Text(tr(R.string.library_is_empty)) }, onClick = { open = false }, enabled = false
                 )
             }
             library.forEach { pool ->
@@ -104,7 +105,7 @@ fun LibraryPoolPicker(
             }
             if (allowEmpty && endpoint.hasContent) {
                 HorizontalDivider()
-                DropdownMenuItem(text = { Text(L("Slot leeren", "Clear slot")) }, onClick = { open = false; onSelect(null) })
+                DropdownMenuItem(text = { Text(tr(R.string.clear_slot)) }, onClick = { open = false; onSelect(null) })
             }
         }
     }
@@ -128,11 +129,11 @@ fun PoolConfigEditorDialog(initial: PoolConfig, isNew: Boolean, onDismiss: () ->
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (isNew) L("Neue Pool-Konfiguration", "New pool configuration") else L("Pool bearbeiten", "Edit pool")) },
+        title = { Text(if (isNew) tr(R.string.new_pool_configuration) else tr(R.string.edit_pool)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box {
-                    FilledTonalButton(onClick = { templates = true }) { Text(L("Vorlage…", "Template…")) }
+                    FilledTonalButton(onClick = { templates = true }) { Text(tr(R.string.template_menu)) }
                     DropdownMenu(expanded = templates, onDismissRequest = { templates = false }) {
                         PoolPreset.commonPools.forEach { p ->
                             DropdownMenuItem(text = { Text("${p.name} (${p.host}:${p.port})") }, onClick = {
@@ -143,7 +144,7 @@ fun PoolConfigEditorDialog(initial: PoolConfig, isNew: Boolean, onDismiss: () ->
                         }
                     }
                 }
-                AppTextField(name, { name = it }, label = { Text("Name") }, placeholder = { Text(L("z. B. CKPool EU · rig1", "e.g. CKPool EU · rig1")) },
+                AppTextField(name, { name = it }, label = { Text("Name") }, placeholder = { Text(tr(R.string.e_g_ckpool_eu_rig1)) },
                     singleLine = true, modifier = Modifier.fillMaxWidth())
                 AppTextField(host, { host = it }, label = { Text("Stratum Host / URL") }, placeholder = { Text("public-pool.io") },
                     singleLine = true, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri))
@@ -152,7 +153,7 @@ fun PoolConfigEditorDialog(initial: PoolConfig, isNew: Boolean, onDismiss: () ->
                         modifier = Modifier.weight(1f), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
                     PasswordField(password, { password = it }, Modifier.weight(1f))
                 }
-                AppTextField(user, { user = it }, label = { Text(L("Wallet-Adresse.Worker", "Wallet address.worker")) },
+                AppTextField(user, { user = it }, label = { Text(tr(R.string.wallet_address_worker)) },
                     placeholder = { Text("bc1q…wallet.bitaxe") }, singleLine = true, modifier = Modifier.fillMaxWidth().sensitive())
                 MinedCoin.mismatchWarning(host, user)?.let { StatusMessage(it, true) }
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -167,7 +168,7 @@ fun PoolConfigEditorDialog(initial: PoolConfig, isNew: Boolean, onDismiss: () ->
                         enabled = valid && !testing
                     ) {
                         if (testing) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
-                        else Text(L("Latenz testen", "Test latency"))
+                        else Text(tr(R.string.test_latency))
                     }
                 }
             }
@@ -179,9 +180,9 @@ fun PoolConfigEditorDialog(initial: PoolConfig, isNew: Boolean, onDismiss: () ->
                 val finalName = name.trim().ifEmpty { PoolConfig.suggestedName(cleanHost, portValue, cleanUser) }
                 onSave(initial.copy(name = finalName, host = cleanHost, port = portValue, user = cleanUser, password = password.ifEmpty { "x" }))
                 onDismiss()
-            }, enabled = valid) { Text(L("Speichern", "Save")) }
+            }, enabled = valid) { Text(tr(R.string.save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(L("Abbrechen", "Cancel")) } }
+        dismissButton = { TextButton(onClick = onDismiss) { Text(tr(R.string.cancel)) } }
     )
 }
 
@@ -204,7 +205,7 @@ fun SlotRolePicker(
     val choices = (form.slots.indices.filter { form.slots[it].hasContent } + selected).distinct().sorted()
     fun title(i: Int): String {
         val slot = form.slots[i]
-        if (!slot.hasContent) return form.slotTitle(i) + L(" (leer)", " (empty)")
+        if (!slot.hasContent) return form.slotTitle(i) + tr(R.string.empty_suffix)
         val name = library.firstOrNull { it.matches(slot) }?.name ?: StratumHost.clean(slot.host)
         return "${form.slotTitle(i)}: $name"
     }

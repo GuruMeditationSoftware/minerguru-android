@@ -1,5 +1,7 @@
 package app.minerguru.model
 
+import androidx.annotation.StringRes
+import app.minerguru.R
 import java.util.UUID
 
 sealed interface ConnectionState {
@@ -95,7 +97,7 @@ data class MinerDevice(
         }
 
     val hardwareTitle: String
-        get() = latestInfo?.detectedHardwareTitle ?: cachedHardwareModel ?: L("Unbekannter Miner", "Unknown miner")
+        get() = latestInfo?.detectedHardwareTitle ?: cachedHardwareModel ?: tr(R.string.unknown_miner)
 
     val requiresOtp: Boolean get() = latestInfo?.otp == true
     val isNerdOS: Boolean get() = latestInfo?.firmware == MinerFirmware.NERD_OS
@@ -212,11 +214,11 @@ data class PoolPreset(
     }
 }
 
-enum class LatencyQuality(private val de: String, private val en: String) {
-    EXCELLENT("Exzellent", "Excellent"), GOOD("Gut", "Good"), FAIR("Mittel", "Fair"), POOR("Hoch", "High"),
-    UNAVAILABLE("Keine Daten", "No data");
+enum class LatencyQuality(@StringRes private val labelRes: Int) {
+    EXCELLENT(R.string.excellent), GOOD(R.string.good), FAIR(R.string.fair), POOR(R.string.high),
+    UNAVAILABLE(R.string.no_data);
 
-    val label: String get() = L(de, en)
+    val label: String get() = tr(labelRes)
 
     companion object {
         fun evaluate(ms: Double?): LatencyQuality = when {
@@ -356,17 +358,16 @@ data class MinerSettingsForm(
 
     val poolValidationMessage: String?
         get() {
-            if (StratumHost.clean(primary.host).isEmpty()) return L("Der primäre Pool braucht einen Host.", "The primary pool needs a host.")
+            if (StratumHost.clean(primary.host).isEmpty()) return tr(R.string.the_primary_pool_needs_a)
             slots.forEachIndexed { index, slot ->
                 if (!slot.hasContent) return@forEachIndexed
-                if (slot.port !in 1..65535) return "${slotTitle(index)}: " + L("Ungültiger Port", "Invalid port") + " ${slot.port}."
+                if (slot.port !in 1..65535) return "${slotTitle(index)}: " + tr(R.string.invalid_port) + " ${slot.port}."
                 if (poolApi == PoolApi.SLOTS && !slot.isComplete) {
-                    return "${slotTitle(index)}: " + L("Host und Wallet/Stratum-User sind erforderlich.", "Host and wallet/stratum user are required.")
+                    return "${slotTitle(index)}: " + tr(R.string.host_and_wallet_stratum_user)
                 }
             }
             if (poolApi == PoolApi.SLOTS && !slots[secondarySlot].hasContent && secondarySlot != primarySlot && secondarySlot in storedSlots) {
-                return L("Der Fallback-Slot ist leer. Wähle einen anderen Fallback-Slot oder belege ihn.",
-                    "The fallback slot is empty. Choose another fallback slot or fill it.")
+                return tr(R.string.the_fallback_slot_is_empty)
             }
             return null
         }

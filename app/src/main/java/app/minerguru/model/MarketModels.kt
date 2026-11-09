@@ -1,17 +1,19 @@
 package app.minerguru.model
 
+import androidx.annotation.StringRes
+import app.minerguru.R
 import kotlin.math.exp
 import kotlin.math.roundToLong
 
-enum class SoloChanceTimeframe(private val de: String, private val en: String) {
-    PER_BLOCK("Pro Block", "Per block"),
-    PER_HOUR("Pro Stunde", "Per hour"),
-    PER_DAY("Pro Tag", "Per day"),
-    PER_WEEK("Pro Woche", "Per week"),
-    PER_MONTH("Pro Monat", "Per month"),
-    PER_YEAR("Pro Jahr", "Per year");
+enum class SoloChanceTimeframe(@StringRes private val labelRes: Int) {
+    PER_BLOCK(R.string.per_block),
+    PER_HOUR(R.string.per_hour),
+    PER_DAY(R.string.per_day),
+    PER_WEEK(R.string.per_week),
+    PER_MONTH(R.string.per_month),
+    PER_YEAR(R.string.per_year);
 
-    val label: String get() = L(de, en)
+    val label: String get() = tr(labelRes)
 
     fun durationSeconds(coin: MinedCoin): Double = when (this) {
         PER_BLOCK -> coin.targetBlockTimeSeconds
@@ -62,8 +64,8 @@ data class FleetCoinMiningSummary(
         if (p <= 0) return "—"
         val oneIn = maxOf(1.0, (1.0 / p).roundToLong().toDouble())
         return when {
-            oneIn >= 1e9 -> "1 : ${DisplayFormat.decimal(oneIn / 1e9, 2)} " + L("Mrd.", "bn")
-            oneIn >= 1e7 -> "1 : ${DisplayFormat.decimal(oneIn / 1e6, 1)} " + L("Mio.", "M")
+            oneIn >= 1e9 -> "1 : ${DisplayFormat.decimal(oneIn / 1e9, 2)} " + tr(R.string.billion_short)
+            oneIn >= 1e7 -> "1 : ${DisplayFormat.decimal(oneIn / 1e6, 1)} " + tr(R.string.million_short)
             else -> "1 : ${DisplayFormat.decimal(oneIn, 0)}"
         }
     }
@@ -73,11 +75,11 @@ data class FleetCoinMiningSummary(
             val lambdaPerDay = expectedBlocksLambda(SoloChanceTimeframe.PER_DAY)
             if (lambdaPerDay <= 0) return "—"
             val days = 1.0 / lambdaPerDay
-            if (days < 1.0) return "~${DisplayFormat.decimal(days * 24.0, 1)} " + L("Std.", "h")
-            if (days < 60.0) return "~${DisplayFormat.decimal(days, 1)} " + L("Tage", "days")
+            if (days < 1.0) return "~${DisplayFormat.decimal(days * 24.0, 1)} " + tr(R.string.hours_short)
+            if (days < 60.0) return "~${DisplayFormat.decimal(days, 1)} " + tr(R.string.days_in_text)
             val years = days / 365.25
-            if (years >= 1_000) return "~${DisplayFormat.decimal(years.roundToLong().toDouble(), 0)} " + L("J.", "yrs")
-            return "~${DisplayFormat.decimal(years, 1)} " + L("Jahre", "years")
+            if (years >= 1_000) return "~${DisplayFormat.decimal(years.roundToLong().toDouble(), 0)} " + tr(R.string.years_short)
+            return "~${DisplayFormat.decimal(years, 1)} " + tr(R.string.years)
         }
 
     /** Block subsidy in coins, e.g. `"3,125 BTC"`. */
