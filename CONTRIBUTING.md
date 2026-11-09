@@ -20,4 +20,4 @@ Welcome, above all for miner models and firmware versions MinerGuru does not kno
 
 ## Developer documentation
 
-In German: [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md), [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md) and, for what all three apps share, [GRUNDLAGEN.md](https://github.com/GuruMeditationSoftware/minerguru/blob/main/docs/GRUNDLAGEN.md) in the Mac repository.
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and, for what all three apps share, [FUNDAMENTALS.md](https://github.com/GuruMeditationSoftware/minerguru/blob/main/docs/FUNDAMENTALS.md) in the Mac repository.
