@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fleet, 4×3 and larger: every miner with hashrate and temperature. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.DeviceDefault.DayNight"
+    android:background="@drawable/wg_bg"
+    android:backgroundTint="@color/wg_surface"
+    android:clipToOutline="true"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <FrameLayout
+            android:id="@+id/wg_mark_bg"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/wg_circle"
+            android:backgroundTint="@color/wg_accent_container">
+            <ImageView android:id="@+id/wg_mark_frame" android:layout_width="18dp" android:layout_height="18dp" android:layout_gravity="center"
+                android:src="@drawable/wg_mark_frame" android:tint="@color/wg_on_accent_container" android:importantForAccessibility="no" />
+            <ImageView android:id="@+id/wg_mark_chip" android:layout_width="18dp" android:layout_height="18dp" android:layout_gravity="center"
+                android:src="@drawable/wg_mark_chip" android:tint="@color/wg_accent" android:importantForAccessibility="no" />
+        </FrameLayout>
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="10dp" android:orientation="vertical">
+            <TextView android:id="@+id/wg_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+                android:textSize="15sp" android:textFontWeight="500" android:textColor="@color/wg_text" android:text="@string/wg_sample_fleet" />
+            <TextView android:id="@+id/wg_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end" android:fontFeatureSettings="tnum"
+                android:layout_marginTop="2dp" android:textSize="12sp" android:textColor="@color/wg_sub" android:text="16.75 TH/s · 225 W" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/wg_pill" android:layout_width="wrap_content" android:layout_height="26dp" android:orientation="horizontal" android:gravity="center_vertical"
+            android:paddingHorizontal="10dp" android:background="@drawable/wg_pill_bg" android:backgroundTint="@color/wg_inner">
+            <ImageView android:id="@+id/wg_status" android:layout_width="8dp" android:layout_height="8dp" android:src="@drawable/wg_status_online" android:importantForAccessibility="no" />
+            <TextView android:id="@+id/wg_status_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end" android:fontFeatureSettings="tnum"
+                android:layout_marginStart="6dp" android:textSize="12sp" android:textFontWeight="500" android:textColor="@color/wg_sub" android:text="5/5" />
+        </LinearLayout>
+    </LinearLayout>
+    <FrameLayout android:id="@+id/wg_list_bg" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="12dp"
+        android:paddingHorizontal="12dp" android:paddingVertical="4dp" android:background="@drawable/wg_inner_bg" android:backgroundTint="@color/wg_inner">
+        <ListView android:id="@+id/wg_list" android:layout_width="match_parent" android:layout_height="match_parent"
+            android:divider="@null" android:dividerHeight="0dp" android:scrollbars="none" android:listSelector="@android:color/transparent" />
+    </FrameLayout>
+</LinearLayout>

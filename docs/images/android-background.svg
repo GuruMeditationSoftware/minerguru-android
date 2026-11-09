@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 476" width="1040" height="476" role="img" aria-labelledby="t d">
+<title id="t">MinerGuru Android: Wann die App abfragt</title>
+<desc id="d">Zeitachse über 35 Minuten. Bei sichtbarer App fragt MinerStore alle 5 Sekunden. Im Hintergrund fragt im Modus Sofort ein Vordergrunddienst jede Minute, im Modus Sparsam WorkManager etwa alle 15 Minuten mit bis zu zwei Wiederholungen im Abstand von 45 Sekunden, im Modus Aus gar nicht.</desc>
+<style>
+text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif;fill:#1d1d1f}
+.h{font-size:19px;font-weight:650}.b{font-size:14px;font-weight:600}.m{font-size:12.5px;fill:#6e6e73}
+.c{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11.5px;fill:#3a3a3c}
+.bg{fill:#fafafa;stroke:#e4e4e7}.lane{fill:#f1f1f3}.band{fill:#d9780a;fill-opacity:.10}
+.tick{stroke:#d9780a;stroke-width:3;stroke-linecap:round}.retry{stroke:#d9780a;stroke-width:3;stroke-linecap:round;stroke-opacity:.4}
+.dense{fill:#d9780a}.axis{stroke:#8e8e93;stroke-width:1.2}.grid{stroke:#d4d4d9;stroke-dasharray:3 4}.none{stroke:#b0b0b5;stroke-dasharray:4 5;stroke-width:1.5}
+.ln{fill:none;stroke:#8e8e93;stroke-width:1.2}
+@media (prefers-color-scheme:dark){
+text{fill:#f2f2f3}.m{fill:#a1a1a6}.c{fill:#d1d1d6}
+.bg{fill:#141415;stroke:#2c2c2f}.lane{fill:#1f1f21}.band{fill:#f0a03c;fill-opacity:.14}
+.tick,.retry{stroke:#f0a03c}.dense{fill:#f0a03c}.axis{stroke:#7c7c82}.grid{stroke:#36363a}.none{stroke:#55555a}.ln{stroke:#7c7c82}}
+</style>
+<defs><pattern id="dense" width="3.6" height="22" patternUnits="userSpaceOnUse"><rect class="dense" width="1.6" height="22"/></pattern></defs>
+<rect class="bg" x="0.5" y="0.5" width="1039" height="475" rx="16"/>
+<text class="h" x="32" y="46">Wann die Android-App abfragt</text>
+<text class="m" x="32" y="70">Sichtbar fragt immer MinerStore. Im Hintergrund entscheidet die Einstellung, ob und wie oft MinerMonitor fragt.</text>
+
+<path class="grid" d="M240.0 110V372"/>
+<path class="grid" d="M348.57 110V372"/>
+<path class="grid" d="M457.14 110V372"/>
+<path class="grid" d="M565.71 110V372"/>
+<path class="grid" d="M674.29 110V372"/>
+<path class="grid" d="M782.86 110V372"/>
+<path class="grid" d="M891.43 110V372"/>
+<path class="grid" d="M1000.0 110V372"/>
+<rect class="lane" x="232" y="118" width="776" height="44" rx="8"/>
+<text class="b" x="32" y="137">App sichtbar</text><text class="m" x="32" y="156">MinerStore, alle 5 s</text>
+<rect class="lane" x="232" y="182" width="776" height="44" rx="8"/>
+<text class="b" x="32" y="201">Sofort</text><text class="m" x="32" y="220">Vordergrunddienst, 60 s</text>
+<rect class="lane" x="232" y="246" width="776" height="44" rx="8"/>
+<text class="b" x="32" y="265">Sparsam</text><text class="m" x="32" y="284">WorkManager, nur WLAN</text>
+<rect class="lane" x="232" y="310" width="776" height="44" rx="8"/>
+<text class="b" x="32" y="329">Aus</text><text class="m" x="32" y="348">nur bei offener App</text>
+<rect x="240" y="129" width="760" height="22" fill="url(#dense)"/>
+<path class="tick" d="M240.0 193v22M261.71 193v22M283.43 193v22M305.14 193v22M326.86 193v22M348.57 193v22M370.29 193v22M392.0 193v22M413.71 193v22M435.43 193v22M457.14 193v22M478.86 193v22M500.57 193v22M522.29 193v22M544.0 193v22M565.71 193v22M587.43 193v22M609.14 193v22M630.86 193v22M652.57 193v22M674.29 193v22M696.0 193v22M717.71 193v22M739.43 193v22M761.14 193v22M782.86 193v22M804.57 193v22M826.29 193v22M848.0 193v22M869.71 193v22M891.43 193v22M913.14 193v22M934.86 193v22M956.57 193v22M978.29 193v22M1000.0 193v22"/>
+<path class="tick" d="M240.0 257v22"/>
+<path class="retry" d="M256.29 257v22M272.57 257v22"/>
+<rect class="band" x="522.29" y="248" width="86.86" height="40" rx="6"/>
+<path class="tick" d="M565.71 257v22"/>
+<path class="retry" d="M582.0 257v22M598.29 257v22"/>
+<rect class="band" x="848.0" y="248" width="86.86" height="40" rx="6"/>
+<path class="tick" d="M891.43 257v22"/>
+<path class="retry" d="M907.71 257v22M924.0 257v22"/>
+<path class="ln" d="M278.57 266C305.14 266 305.14 266 309.49 266"/>
+<text class="m" x="313.83" y="270">nur bei fehlendem Miner</text>
+<text class="m" x="622.17" y="270">Zeitpunkt nur ungefähr</text>
+<path class="none" d="M240 332H1000"/>
+<text class="m" x="522.29" y="326">nichts, bis die App wieder offen ist</text>
+<path class="axis" d="M240 372H1000"/>
+<path class="axis" d="M240.0 372v6"/>
+<text class="m" x="240.0" y="394" text-anchor="middle">0</text>
+<path class="axis" d="M348.57 372v6"/>
+<text class="m" x="348.57" y="394" text-anchor="middle">5 min</text>
+<path class="axis" d="M457.14 372v6"/>
+<text class="m" x="457.14" y="394" text-anchor="middle">10 min</text>
+<path class="axis" d="M565.71 372v6"/>
+<text class="m" x="565.71" y="394" text-anchor="middle">15 min</text>
+<path class="axis" d="M674.29 372v6"/>
+<text class="m" x="674.29" y="394" text-anchor="middle">20 min</text>
+<path class="axis" d="M782.86 372v6"/>
+<text class="m" x="782.86" y="394" text-anchor="middle">25 min</text>
+<path class="axis" d="M891.43 372v6"/>
+<text class="m" x="891.43" y="394" text-anchor="middle">30 min</text>
+<path class="axis" d="M1000.0 372v6"/>
+<text class="m" x="1000.0" y="394" text-anchor="middle">35 min</text>
+<text class="m" x="32" y="428">Offline gilt erst nach drei Fehlversuchen über 90 s. Ein Lauf im Modus Sparsam fragt darum bis zu dreimal.</text>
+<text class="m" x="32" y="448">Nach Neustart oder App-Update startet <tspan class="c">RestartReceiver</tspan> die Überwachung neu, ohne dass jemand die App öffnet.</text>
+</svg>

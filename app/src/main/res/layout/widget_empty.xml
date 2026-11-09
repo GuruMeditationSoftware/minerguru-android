@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- No miners yet: a calm hint instead of zeros. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.DeviceDefault.DayNight"
+    android:background="@drawable/wg_bg"
+    android:backgroundTint="@color/wg_surface"
+    android:clipToOutline="true"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="14dp">
+        <FrameLayout
+            android:id="@+id/wg_mark_bg"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/wg_circle"
+            android:backgroundTint="@color/wg_accent_container">
+            <ImageView android:id="@+id/wg_mark_frame" android:layout_width="14dp" android:layout_height="14dp" android:layout_gravity="center"
+                android:src="@drawable/wg_mark_frame" android:tint="@color/wg_on_accent_container" android:importantForAccessibility="no" />
+            <ImageView android:id="@+id/wg_mark_chip" android:layout_width="14dp" android:layout_height="14dp" android:layout_gravity="center"
+                android:src="@drawable/wg_mark_chip" android:tint="@color/wg_accent" android:importantForAccessibility="no" />
+        </FrameLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:layout_marginStart="10dp" android:orientation="vertical">
+        <TextView android:id="@+id/wg_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+            android:textSize="14sp" android:textFontWeight="500" android:textColor="@color/wg_text" android:text="@string/wg_sample_no_miners" />
+        <TextView android:id="@+id/wg_status_text" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+            android:layout_marginTop="2dp" android:textSize="12sp" android:textColor="@color/wg_sub" android:text="@string/wg_sample_add" />
+    </LinearLayout>
+</LinearLayout>

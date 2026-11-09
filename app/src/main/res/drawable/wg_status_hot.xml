@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Status block of the app: the shape carries the state, the color repeats it. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="10dp" android:height="10dp"
+    android:viewportWidth="10" android:viewportHeight="10">
+    <path android:fillColor="@color/wg_warning" android:pathData="M5,0.5L9.5,5L5,9.5L0.5,5z" />
+</vector>

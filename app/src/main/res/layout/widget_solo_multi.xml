@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Solo chance of a fleet that mines several coins: a row per coin, as many as fit. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.DeviceDefault.DayNight"
+    android:background="@drawable/wg_bg"
+    android:backgroundTint="@color/wg_surface"
+    android:clipToOutline="true"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:paddingHorizontal="14dp"
+    android:paddingVertical="10dp">
+    <TextView android:id="@+id/wg_label" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+        android:textSize="12sp" android:textColor="@color/wg_sub" android:text="@string/wg_sample_solo_multi" />
+    <LinearLayout android:id="@+id/wg_rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="2dp" />
+</LinearLayout>

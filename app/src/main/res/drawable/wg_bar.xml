@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Temperature bar: track and fill, both tinted. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape><corners android:radius="3dp" /><solid android:color="@android:color/white" /></shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip><shape><corners android:radius="3dp" /><solid android:color="@android:color/white" /></shape></clip>
+    </item>
+</layer-list>

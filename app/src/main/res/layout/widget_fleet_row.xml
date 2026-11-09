@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/wg_row"
+    android:layout_width="match_parent"
+    android:layout_height="34dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+    <ImageView android:id="@+id/wg_status" android:layout_width="8dp" android:layout_height="8dp" android:src="@drawable/wg_status_online" android:importantForAccessibility="no" />
+    <TextView android:id="@+id/wg_name" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+        android:layout_marginStart="10dp" android:textSize="14sp" android:textColor="@color/wg_text" android:text="Bitaxe Hex" />
+    <TextView android:id="@+id/wg_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end" android:fontFeatureSettings="tnum"
+        android:layout_marginStart="10dp" android:textSize="14sp" android:textFontWeight="500" android:textColor="@color/wg_text" android:text="8.37 TH/s" />
+    <TextView android:id="@+id/wg_temp" android:layout_width="44dp" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end" android:fontFeatureSettings="tnum"
+        android:gravity="end" android:textSize="12sp" android:textColor="@color/wg_sub" android:text="56 °C" />
+</LinearLayout>

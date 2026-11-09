@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 740" width="1040" height="740" role="img" aria-labelledby="t d">
+<title id="t">MinerGuru Android: Aufbau</title>
+<desc id="d">Fünf Schichten: Einstieg mit MainActivity, Compose-Oberfläche, Zustand im MinerStore-ViewModel, Dienste als object-Singletons und App-interner Speicher. Rechts die Hintergrund-Überwachung, die über MinerMonitor dieselben Dienste nutzt, und die Homescreen-Widgets, die einen Schnappschuss lesen.</desc>
+<style>
+text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Helvetica,Arial,sans-serif;fill:#1d1d1f}
+.h{font-size:19px;font-weight:650}.b{font-size:14px;font-weight:600}.t{font-size:13px;font-weight:600}.m{font-size:12.5px;fill:#6e6e73}
+.c,.c text{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11.5px;fill:#3a3a3c}
+.z{font-size:12.5px;font-weight:600;fill:#8a8a8e}
+.bg{fill:#fafafa;stroke:#e4e4e7}.card{fill:#fff;stroke:#d4d4d9}.raised{fill:#f1f1f3;stroke:#d9d9de}
+.hot{fill:#fdf3e6;stroke:#e0923a}
+.ln{fill:none;stroke:#8e8e93;stroke-width:1.5}.la{fill:none;stroke:#d9780a;stroke-width:1.8}
+.ah{fill:#8e8e93}.aa{fill:#d9780a}
+@media (prefers-color-scheme:dark){
+text{fill:#f2f2f3}.m{fill:#a1a1a6}.c,.c text{fill:#d1d1d6}.z{fill:#8e8e93}
+.bg{fill:#141415;stroke:#2c2c2f}.card{fill:#1c1c1e;stroke:#3a3a3e}.raised{fill:#242426;stroke:#38383c}
+.hot{fill:#2d2114;stroke:#b8762c}
+.ln{stroke:#7c7c82}.ah{fill:#7c7c82}.la{stroke:#f0a03c}.aa{fill:#f0a03c}}
+</style>
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="ah" d="M0,1 L10,5 L0,9 z"/></marker>
+<marker id="aa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path class="aa" d="M0,1 L10,5 L0,9 z"/></marker>
+</defs>
+<rect class="bg" x="0.5" y="0.5" width="1039" height="739" rx="16"/>
+<text class="h" x="32" y="46">Android-App: Aufbau</text>
+<text class="m" x="32" y="70">Zwei Wege in dieselben Dienste: MinerStore, solange die App sichtbar ist, und MinerMonitor im Hintergrund.</text>
+
+<!-- Row 1 -->
+<rect class="card" x="24" y="100" width="776" height="88" rx="12"/>
+<text class="z" x="40" y="121">Einstieg · MainActivity.kt</text>
+<rect class="raised" x="40" y="132" width="177" height="44" rx="8"/><text class="t" x="52" y="151">Eine Aktivität</text><text class="c" x="52" y="168">MainActivity</text>
+<rect class="raised" x="229" y="132" width="177" height="44" rx="8"/><text class="t" x="241" y="151">Sichtbar: abfragen</text><text class="c" x="241" y="168">setForeground()</text>
+<rect class="raised" x="418" y="132" width="177" height="44" rx="8"/><text class="t" x="430" y="151">Graphit-Design</text><text class="c" x="430" y="168">MinerGuruTheme</text>
+<rect class="raised" x="607" y="132" width="177" height="44" rx="8"/><text class="t" x="619" y="151">Tipp aufs Widget</text><text class="c" x="619" y="168">pendingRoute</text>
+<path class="ln" d="M412 188V204" marker-end="url(#ah)"/>
+
+<!-- Row 2 -->
+<rect class="card" x="24" y="206" width="776" height="88" rx="12"/>
+<text class="z" x="40" y="227">Oberfläche · ui/ mit Navigation 3, NavigationSuiteScaffold, Liste und Detail</text>
+<rect class="raised" x="40" y="238" width="114" height="44" rx="8"/><text class="t" x="97" y="257" text-anchor="middle">Übersicht</text><text class="c" x="97" y="274" text-anchor="middle">fleet</text>
+<rect class="raised" x="166" y="238" width="114" height="44" rx="8"/><text class="t" x="223" y="257" text-anchor="middle">Miner</text><text class="c" x="223" y="274" text-anchor="middle">miner</text>
+<rect class="raised" x="292" y="238" width="114" height="44" rx="8"/><text class="t" x="349" y="257" text-anchor="middle">Pools</text><text class="c" x="349" y="274" text-anchor="middle">pools</text>
+<rect class="raised" x="418" y="238" width="114" height="44" rx="8"/><text class="t" x="475" y="257" text-anchor="middle">Strom</text><text class="c" x="475" y="274" text-anchor="middle">power</text>
+<rect class="raised" x="544" y="238" width="114" height="44" rx="8"/><text class="t" x="601" y="257" text-anchor="middle">Wartung</text><text class="c" x="601" y="274" text-anchor="middle">maintenance</text>
+<rect class="raised" x="670" y="238" width="114" height="44" rx="8"/><text class="t" x="727" y="257" text-anchor="middle">Einstellungen</text><text class="c" x="727" y="274" text-anchor="middle">settings</text>
+<path class="ln" d="M412 294V310" marker-end="url(#ah)"/>
+
+<!-- Row 3 -->
+<rect class="card" x="24" y="312" width="776" height="132" rx="12"/>
+<text class="z" x="40" y="333">Zustand · Compose-State im ViewModel</text>
+<rect class="hot" x="40" y="344" width="260" height="84" rx="10"/>
+<text class="b" x="56" y="368">MinerStore</text>
+<text class="m" x="56" y="390">AndroidViewModel, Felder mit</text>
+<text class="m" x="56" y="410">mutableStateOf, Abfrage alle 5 s</text>
+<g class="c" text-anchor="middle">
+<rect class="raised" x="316" y="344" width="150" height="26" rx="6"/><text x="391" y="361.5">BlockProbeStore</text>
+<rect class="raised" x="475" y="344" width="150" height="26" rx="6"/><text x="550" y="361.5">UpdateChecker</text>
+<rect class="raised" x="634" y="344" width="150" height="26" rx="6"/><text x="709" y="361.5">OtpSessions</text>
+<rect class="raised" x="316" y="376" width="150" height="26" rx="6"/><text x="391" y="393.5">MinerLogStream</text>
+<rect class="raised" x="475" y="376" width="309" height="26" rx="6"/><text x="629" y="393.5">ShareDifficultyTracker</text>
+</g>
+<text class="m" x="316" y="424">Live-Log und Share-Tracker leben je Detailseite.</text>
+<path class="ln" d="M412 444V460" marker-end="url(#ah)"/>
+
+<!-- Row 4 -->
+<rect class="card" x="24" y="462" width="776" height="130" rx="12"/>
+<text class="z" x="40" y="483">Dienste · object-Singletons mit Context, ohne Oberfläche nutzbar</text>
+<g class="c" text-anchor="middle">
+<rect class="hot" x="40" y="494" width="140" height="26" rx="6"/><text x="110" y="511.5">MinerApiClient</text>
+<rect class="raised" x="191" y="494" width="140" height="26" rx="6"/><text x="261" y="511.5">PoolLatencyService</text>
+<rect class="raised" x="342" y="494" width="140" height="26" rx="6"/><text x="412" y="511.5">NetworkScanner</text>
+<rect class="raised" x="493" y="494" width="140" height="26" rx="6"/><text x="563" y="511.5">StratumProbe</text>
+<rect class="raised" x="644" y="494" width="140" height="26" rx="6"/><text x="714" y="511.5">SmtpClient</text>
+<rect class="raised" x="40" y="526" width="140" height="26" rx="6"/><text x="110" y="543.5">AlertCenter</text>
+<rect class="raised" x="191" y="526" width="140" height="26" rx="6"/><text x="261" y="543.5">HistoryRecorder</text>
+<rect class="raised" x="342" y="526" width="140" height="26" rx="6"/><text x="412" y="543.5">PowerCenter</text>
+<rect class="raised" x="493" y="526" width="140" height="26" rx="6"/><text x="563" y="543.5">PoolScheduleCenter</text>
+<rect class="raised" x="644" y="526" width="140" height="26" rx="6"/><text x="714" y="543.5">MaintenanceCenter</text>
+<rect class="raised" x="40" y="558" width="140" height="26" rx="6"/><text x="110" y="575.5">EmailAlerts</text>
+<rect class="raised" x="191" y="558" width="140" height="26" rx="6"/><text x="261" y="575.5">OtpCenter</text>
+<rect class="raised" x="342" y="558" width="140" height="26" rx="6"/><text x="412" y="575.5">ChangeLog</text>
+<rect class="raised" x="493" y="558" width="140" height="26" rx="6"/><text x="563" y="575.5">DiagnosticLog</text>
+<rect class="raised" x="644" y="558" width="140" height="26" rx="6"/><text x="714" y="575.5">WidgetBridge</text>
+</g>
+<path class="ln" d="M412 592V608" marker-end="url(#ah)"/>
+
+<!-- Row 5 -->
+<rect class="card" x="24" y="610" width="776" height="96" rx="12"/>
+<text class="z" x="40" y="631">Speicher · filesDir und SharedPreferences (minerguru, alerts, power, …), kein Cloud-Backup</text>
+<rect class="raised" x="40" y="642" width="140" height="48" rx="8"/><text class="c" x="52" y="662">SharedPreferences</text><text class="m" x="52" y="680">Listen, Einstellungen</text>
+<rect class="raised" x="191" y="642" width="140" height="48" rx="8"/><text class="c" x="203" y="662">history.sqlite</text><text class="m" x="203" y="680">Langzeit, WAL</text>
+<rect class="raised" x="342" y="642" width="140" height="48" rx="8"/><text class="t" x="354" y="662">SecretBox</text><text class="m" x="354" y="680">Keystore: SMTP, OTP</text>
+<rect class="raised" x="493" y="642" width="140" height="48" rx="8"/><text class="c" x="505" y="662">changes.json</text><text class="m" x="505" y="680">und minerguru.log</text>
+<rect class="hot" x="644" y="642" width="140" height="48" rx="8"/><text class="c" x="656" y="662">snapshot.json</text><text class="m" x="656" y="680">widgets/</text>
+
+<!-- Background -->
+<rect class="card" x="824" y="100" width="192" height="362" rx="12"/>
+<text class="b" x="840" y="126">Hintergrund</text>
+<text class="c" x="840" y="146">BackgroundMonitor.sync()</text>
+<rect class="raised" x="840" y="160" width="160" height="46" rx="8"/>
+<text class="t" x="852" y="179">Aus</text><text class="m" x="852" y="197">nur bei offener App</text>
+<rect class="raised" x="840" y="214" width="160" height="62" rx="8"/>
+<text class="t" x="852" y="233">Sparsam</text><text class="c" x="852" y="251">MonitorWorker</text><text class="m" x="852" y="268">WorkManager, ~15 min</text>
+<rect class="raised" x="840" y="284" width="160" height="62" rx="8"/>
+<text class="t" x="852" y="303">Sofort</text><text class="c" x="852" y="321">MonitorService</text><text class="m" x="852" y="338">Vordergrund, 60 s</text>
+<path class="ln" d="M1000 245H1008V385H1002" marker-end="url(#ah)"/>
+<path class="ln" d="M1000 315H1008"/>
+<rect class="hot" x="840" y="362" width="160" height="46" rx="8"/>
+<text class="c" x="852" y="381">MinerMonitor</text><text class="c" x="852" y="398">pollOnce()</text>
+<text class="c" x="840" y="432">RestartReceiver</text>
+<text class="m" x="840" y="450">startet nach Boot und Update</text>
+<path class="la" d="M840 385H812V527H802" marker-end="url(#aa)"/>
+
+<!-- Widgets -->
+<rect class="hot" x="824" y="482" width="192" height="232" rx="12"/>
+<text class="b" x="840" y="508">Homescreen-Widgets</text>
+<text class="c" x="840" y="528">widget/</text>
+<rect class="card" x="840" y="542" width="160" height="28" rx="7"/><text class="t" x="852" y="561">Flotte</text>
+<rect class="card" x="840" y="576" width="160" height="28" rx="7"/><text class="t" x="852" y="595">Miner (wählbar)</text>
+<rect class="card" x="840" y="610" width="160" height="28" rx="7"/><text class="t" x="852" y="629">Solo-Chance</text>
+<text class="m" x="840" y="660">RemoteViews. Sind die Daten</text>
+<text class="m" x="840" y="678">älter als 10 min, fragt der</text>
+<text class="c" x="840" y="698">WidgetRefreshWorker</text>
+<path class="la" d="M784 666H822" marker-end="url(#aa)"/>
+</svg>

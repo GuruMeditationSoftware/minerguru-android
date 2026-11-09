@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_fleet_label">Flotte</string>
+    <string name="widget_fleet_description">Hashrate aller Miner. Größer kommen die letzten 24 Stunden, Leistung und eine Liste aller Miner dazu.</string>
+    <string name="widget_miner_label">Miner</string>
+    <string name="widget_miner_description">Ein Miner mit Hashrate und Temperatur. Welcher, wählst du beim Platzieren.</string>
+    <string name="widget_solo_label">Solo-Chance</string>
+    <string name="widget_solo_description">Die Chance, allein einen Block zu finden, für jede Münze, die du minst.</string>
+
+    <!-- Sample texts of the widget layouts, shown as preview where Android cannot draw a live one. -->
+    <string name="wg_sample_fleet" translatable="true">Flotte</string>
+    <string name="wg_sample_power" translatable="true">Leistung</string>
+    <string name="wg_sample_efficiency" translatable="true">Effizienz</string>
+    <string name="wg_sample_solo" translatable="true">Solo-Chance · BTC</string>
+    <string name="wg_sample_per_day" translatable="true">Pro Tag</string>
+    <string name="wg_sample_odds" translatable="true">1 : 829.876</string>
+    <string name="wg_sample_no_miners" translatable="true">Keine Miner</string>
+    <string name="wg_sample_add" translatable="true">In MinerGuru hinzufügen</string>
+    <string name="wg_sample_solo_multi">Solo-Chance · Pro Tag</string>
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One miner, 2×2: name, hashrate, chip temperature against the warning threshold. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.DeviceDefault.DayNight"
+    android:background="@drawable/wg_bg"
+    android:backgroundTint="@color/wg_surface"
+    android:clipToOutline="true"
+    android:orientation="vertical"
+    android:padding="14dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+        <FrameLayout android:id="@+id/wg_icon_bg" android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/wg_inner_bg" android:backgroundTint="@color/wg_inner">
+            <ImageView android:layout_width="22dp" android:layout_height="13dp" android:layout_gravity="center" android:src="@drawable/wg_board" android:importantForAccessibility="no" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+        <ImageView android:id="@+id/wg_status" android:layout_width="10dp" android:layout_height="10dp" android:src="@drawable/wg_status_online" android:importantForAccessibility="no" />
+    </LinearLayout>
+    <FrameLayout android:layout_width="1dp" android:layout_height="0dp" android:layout_weight="1" />
+    <TextView android:id="@+id/wg_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+        android:textSize="14sp" android:textFontWeight="500" android:textColor="@color/wg_text" android:text="Bitaxe Hex" />
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="horizontal" android:baselineAligned="true">
+        <TextView android:id="@+id/wg_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end" android:fontFeatureSettings="tnum"
+            android:textSize="26sp" android:textFontWeight="500" android:letterSpacing="-0.01" android:textColor="@color/wg_text" android:text="8.37" />
+        <TextView android:id="@+id/wg_unit" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end"
+            android:layout_marginStart="3dp" android:textSize="12sp" android:textColor="@color/wg_sub" android:text="TH/s" />
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="horizontal" android:gravity="center_vertical">
+        <TextView android:id="@+id/wg_temp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textAppearance="@android:style/TextAppearance.DeviceDefault" android:includeFontPadding="false" android:maxLines="1" android:ellipsize="end" android:fontFeatureSettings="tnum"
+            android:textSize="12sp" android:textColor="@color/wg_sub" android:text="56 °C" />
+        <ProgressBar android:id="@+id/wg_bar" style="@android:style/Widget.DeviceDefault.ProgressBar.Horizontal"
+            android:layout_width="0dp" android:layout_height="6dp" android:layout_weight="1" android:layout_marginStart="8dp"
+            android:max="100" android:progress="75" android:progressDrawable="@drawable/wg_bar"
+            android:progressTint="@color/wg_good" android:progressBackgroundTint="@color/wg_track" android:progressBackgroundTintMode="src_in" />
+    </LinearLayout>
+</LinearLayout>

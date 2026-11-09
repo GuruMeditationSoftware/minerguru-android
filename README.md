@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  <sub>Android 12 or later · Free · No account</sub>
+  <sub>Android 12 or later · Free · Open source · No account</sub>
 </p>
 
 <table>
@@ -90,6 +90,26 @@ Every release lists its SHA-256 checksum in `SHA256SUMS.txt`. What changed: [Rel
 | [**Mac**](https://github.com/GuruMeditationSoftware/minerguru) | macOS 14 or later, Apple Silicon | [MinerGuru.dmg](https://github.com/GuruMeditationSoftware/minerguru/releases/latest/download/MinerGuru.dmg) |
 | [**Windows**](https://github.com/GuruMeditationSoftware/minerguru-windows) | Windows 11, x64 or Arm | [x64](https://github.com/GuruMeditationSoftware/minerguru-windows/releases/latest/download/MinerGuru-x64.exe) · [Arm64](https://github.com/GuruMeditationSoftware/minerguru-windows/releases/latest/download/MinerGuru-arm64.exe) |
 
+## Build from source
+
+You need JDK 21 and the Android SDK. Android Studio brings both.
+
+```bash
+git clone https://github.com/GuruMeditationSoftware/minerguru-android.git
+```
+
+```bash
+cd minerguru-android
+./gradlew assembleDebug testDebugUnitTest   # debug app and unit tests
+./gradlew installDebug                      # onto a connected phone or emulator
+```
+
+The debug app has its own package name (`app.minerguru.dev`) and installs next to the official one. Releases are signed with the maintainer's key, so an APK you build yourself cannot update the official app.
+
+To test without hardware, start the simulated miners from the [Mac repository](https://github.com/GuruMeditationSoftware/minerguru) (`python3 MockMiners/mock_miner.py --host 0.0.0.0`) and add them by your computer's address, from port 48001. The emulator reaches your computer at `10.0.2.2`.
+
+Developer documentation, in German: [docs/ENTWICKLUNG.md](docs/ENTWICKLUNG.md) and [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md). What all three apps share is in [GRUNDLAGEN.md](https://github.com/GuruMeditationSoftware/minerguru/blob/main/docs/GRUNDLAGEN.md) of the Mac repository.
+
 ## Support the project
 
 MinerGuru is free and shows no ads. If it keeps your miners happy, a few sats keep the updates coming.
@@ -113,10 +133,10 @@ bc1qc6xpuwkys8jsjt439tfw2eu3fctkx7ad0hkehe
 bitcoincash:qruvqq2x9vyd9gykre058r4lda4gulpres33nr9aml
 ```
 
-## Feedback
+## Feedback and contributing
 
-Found a bug or have an idea? Open an [issue](https://github.com/GuruMeditationSoftware/minerguru/issues) in the Mac repository. It collects feedback for all three apps.
+Found a bug or have an idea? Open an [issue](https://github.com/GuruMeditationSoftware/minerguru/issues) in the Mac repository. It collects feedback for all three apps. Pull requests are welcome, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-Freeware, see [LICENSE.txt](LICENSE.txt). This repository holds the downloads only.
+MinerGuru is open source under the [MIT License](LICENSE.txt). The libraries inside the app keep their own licenses, see [THIRD-PARTY-NOTICES.txt](app/src/main/assets/THIRD-PARTY-NOTICES.txt).

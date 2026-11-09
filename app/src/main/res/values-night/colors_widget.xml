@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="wg_surface">@android:color/system_neutral2_900</color>
+    <color name="wg_inner">@android:color/system_neutral2_800</color>
+    <color name="wg_text">@android:color/system_neutral1_50</color>
+    <color name="wg_sub">@android:color/system_neutral2_200</color>
+    <color name="wg_accent">@android:color/system_accent1_200</color>
+    <color name="wg_accent_container">@android:color/system_accent1_700</color>
+    <color name="wg_on_accent_container">@android:color/system_accent1_100</color>
+    <color name="wg_track">@android:color/system_neutral2_700</color>
+
+    <color name="wg_oneui_surface">#E61F2023</color>
+    <color name="wg_oneui_inner">#14FFFFFF</color>
+    <color name="wg_oneui_text">#FFF3F3F3</color>
+    <color name="wg_oneui_sub">#FFB9BABF</color>
+    <color name="wg_oneui_accent">@android:color/system_accent1_200</color>
+    <color name="wg_oneui_accent_container">#24FFFFFF</color>
+    <color name="wg_oneui_on_accent_container">#FFF3F3F3</color>
+    <color name="wg_oneui_track">#24FFFFFF</color>
+
+    <color name="wg_good">#FF3ECF8E</color>
+    <color name="wg_warning">#FFF5B041</color>
+    <color name="wg_bad">#FFE66767</color>
+    <color name="wg_idle">#FF6E6E73</color>
+    <color name="wg_btc">#FFF0A03C</color>
+    <!-- Coin dots, as in the app. -->
+    <color name="wg_coin_btc">#FFF0A03C</color>
+    <color name="wg_coin_bch">#FF3ECF8E</color>
+    <color name="wg_coin_dgb">#FF5AA2F5</color>
+    <color name="wg_coin_xec">#FF3CC9C9</color>
+    <color name="wg_coin_bsv">#FFF5C04A</color>
+    <color name="wg_coin_ppc">#FF7CCF5A</color>
+    <color name="wg_coin_nmc">#FF8D98F0</color>
+    <color name="wg_coin_fb">#FFA48AF5</color>
+    <color name="wg_coin_unknown">#FF6E6E73</color>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sample 24-hour line for the widget picker. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="128dp" android:height="20dp"
+    android:viewportWidth="100" android:viewportHeight="30">
+    <path android:strokeColor="#FFFFFFFF" android:strokeWidth="2" android:strokeLineCap="round" android:fillColor="#00000000"
+        android:pathData="M0,18 C4,16 8,12 13,13 C18,14 22,22 26,19 C30,16 35,9 39,8 C44,7 48,14 52,15 C56,16 61,6 65,7 C70,8 74,16 78,14 C83,12 87,9 91,11 C95,13 98,12 100,12" />
+</vector>
