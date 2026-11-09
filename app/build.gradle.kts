@@ -23,8 +23,8 @@ android {
         minSdk = 31
         targetSdk = 37
         buildConfigField("String", "UPDATE_URL", "\"https://api.github.com/repos/GuruMeditationSoftware/minerguru-android/releases/latest\"")
-        versionCode = 18
-        versionName = "1.7.2"
+        versionCode = 19
+        versionName = "1.7.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
