@@ -15,7 +15,7 @@ EXPECTED_CERT="faa915c9d5dd64818faf2d9ea83979104d45fc4c9996661e1498accb424b9536"
 # repository: one extended regex per line in MINERGURU_TRACES (default ~/.config/minerguru/traces).
 TRACES_FILE="${MINERGURU_TRACES:-$HOME/.config/minerguru/traces}"
 TRACES=$(grep -v -e '^#' -e '^[[:space:]]*$' "${TRACES_FILE}" 2>/dev/null | paste -sd '|' - || true)
-[ -n "${TRACES}" ] || { echo "❌ Keine Spurenmuster in ${TRACES_FILE}, kein Release."; exit 1; }
+[ -n "${TRACES}" ] || { echo "❌ No trace patterns in ${TRACES_FILE}, no release."; exit 1; }
 
 VERSION=$(sed -n -E 's/^ *versionName = "(.*)"/\1/p' app/build.gradle.kts)
 APK="app/build/outputs/apk/release/app-release.apk"
@@ -24,22 +24,22 @@ UPLOAD_DIR="dist/upload"
 SDK="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
 APKSIGNER=$(ls -d "${SDK}"/build-tools/* | sort -V | tail -1)/apksigner
 
-echo "🔨 Release-Build ${VERSION} + Unit-Tests…"
+echo "🔨 Release build ${VERSION} + unit tests…"
 ./gradlew --quiet testDebugUnitTest assembleRelease
-[ -f "${APK}" ] || { echo "❌ Build fehlgeschlagen"; exit 1; }
+[ -f "${APK}" ] || { echo "❌ Build failed"; exit 1; }
 
-echo "🔏 Prüfe Signatur…"
+echo "🔏 Checking the signature…"
 CERTS=$("${APKSIGNER}" verify --print-certs "${APK}")
-echo "${CERTS}" | grep -q "certificate DN: CN=MinerGuru$" || { echo "❌ Unerwarteter Zertifikatsname:"; echo "${CERTS}" | grep DN; exit 1; }
-echo "${CERTS}" | grep -q "SHA-256 digest: ${EXPECTED_CERT}" || { echo "❌ Anderer Signaturschlüssel, Updates würden scheitern"; exit 1; }
+echo "${CERTS}" | grep -q "certificate DN: CN=MinerGuru$" || { echo "❌ Unexpected certificate name:"; echo "${CERTS}" | grep DN; exit 1; }
+echo "${CERTS}" | grep -q "SHA-256 digest: ${EXPECTED_CERT}" || { echo "❌ Different signing key, updates would fail"; exit 1; }
 
-echo "🕵️  Prüfe auf persönliche Spuren…"
+echo "🕵️  Checking for personal traces…"
 SCRATCH=$(mktemp -d)
 trap 'rm -rf "${SCRATCH}"' EXIT
 unzip -q "${APK}" -d "${SCRATCH}"
 LEAKS=$(LC_ALL=C grep -rla -i -E "${TRACES}" "${SCRATCH}" | sed "s|${SCRATCH}/||" || true)
 if [ -n "${LEAKS}" ]; then
-  echo "❌ Persönliche Daten im Build gefunden:"; echo "${LEAKS}" | head
+  echo "❌ Personal data found in the build:"; echo "${LEAKS}" | head
   exit 1
 fi
 
@@ -51,6 +51,6 @@ cp "${APK}" "${UPLOAD_DIR}/MinerGuru.apk"
 (cd "${UPLOAD_DIR}" && shasum -a 256 MinerGuru.apk > SHA256SUMS.txt)
 
 echo "✅ ${OUT_APK}"
-echo "   Upload-Dateien für Release v${VERSION}:"
+echo "   Upload files for release v${VERSION}:"
 ls -lh "${UPLOAD_DIR}"
 cat "${UPLOAD_DIR}/SHA256SUMS.txt"

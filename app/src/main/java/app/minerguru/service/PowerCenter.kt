@@ -174,13 +174,13 @@ object PowerCenter {
                     MinerApiClient.pauseMiner(host)
                 }
             }
-            Log.i(TAG, "Zeitplan: $host → $action")
+            Log.i(TAG, "Schedule: $host → $action")
             lastError = null
             MinerPowerState(action, now, saved)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Log.w(TAG, "Zeitplan für $host fehlgeschlagen: ${e.message}")
+            Log.w(TAG, "Schedule for $host failed: ${e.message}")
             lastError = "${miner.displayName}: ${e.message ?: L("Nicht erreichbar", "Unreachable")}"
             null
         }

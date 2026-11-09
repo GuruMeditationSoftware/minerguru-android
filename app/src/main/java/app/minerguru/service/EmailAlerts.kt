@@ -83,7 +83,7 @@ object EmailAlerts {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.w(TAG, "Warn-Mail nicht versendet: ${e.message}")
+                Log.w(TAG, "Alert mail not sent: ${e.message}")
             }
         }
     }

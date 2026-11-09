@@ -81,7 +81,7 @@ object PoolScheduleCenter {
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Log.w(TAG, "Wechsel für ${miner.ipAddress} fehlgeschlagen: ${e.message}")
+            Log.w(TAG, "Switch for ${miner.ipAddress} failed: ${e.message}")
             lastError = "${miner.displayName}: ${e.message ?: L("Nicht erreichbar", "Unreachable")}"
         }
     }
